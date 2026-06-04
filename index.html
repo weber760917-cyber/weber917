@@ -144,6 +144,29 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .about-item-title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
 .about-item-sub { font-size: 12px; color: var(--sub); line-height: 1.6; }
 
+/* ── CARD TEMPLATES ── */
+.tpl-btn { cursor:pointer; opacity:0.6; transition:opacity 0.15s; flex-shrink:0; }
+.tpl-btn.active { opacity:1; }
+.tpl-btn.active div:first-child { box-shadow: 0 0 0 3px var(--blue); border-radius:9px; }
+
+/* ── NEWS ── */
+.news-item { display: flex; gap: 10px; padding: 11px 0; border-bottom: 1px solid #f0f3f7; cursor: pointer; text-decoration: none; color: inherit; }
+.news-item:last-child { border-bottom: none; }
+.news-thumb { width: 64px; height: 48px; object-fit: cover; border-radius: 7px; flex-shrink: 0; background: #f0f3f7; }
+.news-body { flex: 1; min-width: 0; }
+.news-title { font-size: 13px; font-weight: 600; line-height: 1.5; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 3px; }
+.news-meta { font-size: 11px; color: var(--sub); }
+
+/* ── CALENDAR ── */
+.cal-item { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid #f0f3f7; }
+.cal-item:last-child { border-bottom: none; }
+.cal-date { background: var(--blue); color: white; border-radius: 8px; padding: 4px 8px; font-size: 11px; font-weight: 700; white-space: nowrap; text-align: center; min-width: 42px; }
+.cal-type { font-size: 11px; padding: 2px 7px; border-radius: 10px; font-weight: 600; white-space: nowrap; }
+.cal-agm  { background: #fff0e0; color: #d4720a; }
+.cal-ir   { background: #ebf4ff; color: #0f3460; }
+.cal-econ { background: #f0eaff; color: #6d28d9; }
+.cal-name { font-size: 13px; font-weight: 500; }
+
 /* ── UTILS ── */
 .section-label { font-size: 11px; font-weight: 700; color: var(--sub); letter-spacing: 1px; padding: 4px 2px 10px; text-transform: uppercase; }
 .error-note { font-size: 12px; color: var(--sub); text-align: center; padding: 12px; }
@@ -180,15 +203,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 <!-- TABS -->
 <div class="tabs-wrap">
   <div class="tabs">
-    <div class="tab active"  onclick="switchTab('market')">📈 今日行情</div>
-    <div class="tab" onclick="switchTab('copy')">✍️ 社群文案</div>
-    <div class="tab" onclick="switchTab('stories')">📖 案例故事</div>
+    <div class="tab active"  onclick="switchTab('stories')">📖 案例故事</div>
     <div class="tab" onclick="switchTab('about')">👤 關於我</div>
+    <div class="tab" onclick="switchTab('market')">📈 今日行情</div>
+    <div class="tab" onclick="switchTab('crypto')">₿ 加密貨幣</div>
+    <div class="tab" onclick="switchTab('fx')">💱 匯率</div>
+    <div class="tab" onclick="switchTab('copy')">✍️ 社群文案</div>
   </div>
 </div>
 
 <!-- ===== TAB: 今日行情 ===== -->
-<div id="panel-market" class="panel active">
+<div id="panel-market" class="panel">
 
   <!-- 台灣 -->
   <div class="card">
@@ -196,10 +221,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <div class="card-body" id="tw-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
   </div>
 
+  <!-- 財經行事曆 -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">📅 財經行事曆</div></div>
+    <div class="card-body" id="cal-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+  </div>
+
   <!-- 美國 -->
   <div class="card">
     <div class="card-head"><div class="card-title">🇺🇸 美國市場</div></div>
     <div class="card-body" id="us-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+  </div>
+
+  <!-- 美股重要新聞 -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">📰 美股財經新聞</div></div>
+    <div class="card-body" id="us-news"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
   </div>
 
   <!-- 其他 -->
@@ -222,10 +259,115 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   </div>
 </div>
 
+<!-- ===== TAB: 加密貨幣 ===== -->
+<div id="panel-crypto" class="panel">
+  <div class="card">
+    <div class="card-head"><div class="card-title">₿ 加密貨幣（USD）</div></div>
+    <div class="card-body" id="crypto-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">📉 BTC 近5日走勢</div></div>
+    <div class="card-body">
+      <div class="chart-wrap"><canvas id="chartBTC"></canvas></div>
+    </div>
+  </div>
+  <!-- 加密新聞 -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">📰 加密貨幣新聞</div></div>
+    <div class="card-body" id="crypto-news"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+  </div>
+
+  <div class="refresh-area">
+    <button class="refresh-mini" onclick="loadCrypto()">↺ 重新整理</button>
+  </div>
+</div>
+
+<!-- ===== TAB: 匯率 ===== -->
+<div id="panel-fx" class="panel">
+  <div class="card">
+    <div class="card-head"><div class="card-title">💱 對台幣匯率（TWD）</div></div>
+    <div class="card-body" id="fx-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">📉 美元／台幣 近5日</div></div>
+    <div class="card-body">
+      <div class="chart-wrap"><canvas id="chartFX"></canvas></div>
+    </div>
+  </div>
+  <div style="background:white;border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:12px;color:var(--sub);box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+    💡 匯率上漲代表台幣貶值（需要更多台幣換外幣）
+  </div>
+  <div class="refresh-area">
+    <button class="refresh-mini" onclick="loadFX()">↺ 重新整理</button>
+  </div>
+</div>
+
 <!-- ===== TAB: 社群文案 ===== -->
 <div id="panel-copy" class="panel">
 
   <div class="section-label">根據今日行情自動生成，可直接複製發佈</div>
+
+  <!-- 貼文卡片生成器 -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">🎨 貼文卡片生成器</div></div>
+    <div class="card-body">
+
+      <!-- 樣板選擇 -->
+      <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:8px;letter-spacing:0.5px">選擇樣板</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px">
+        <div class="tpl-btn active" data-tpl="dark" onclick="selectTpl(this,'dark')">
+          <div style="width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg,#1a1a2e,#0f3460);border:2px solid var(--blue)"></div>
+          <div style="font-size:10px;margin-top:4px;text-align:center;color:var(--blue);font-weight:700">深藍</div>
+        </div>
+        <div class="tpl-btn" data-tpl="gold" onclick="selectTpl(this,'gold')">
+          <div style="width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg,#1c1008,#8B6914)"></div>
+          <div style="font-size:10px;margin-top:4px;text-align:center;color:var(--sub)">金融</div>
+        </div>
+        <div class="tpl-btn" data-tpl="clean" onclick="selectTpl(this,'clean')">
+          <div style="width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg,#f8f9ff,#e8f0fe);border:1px solid #dde5f7"></div>
+          <div style="font-size:10px;margin-top:4px;text-align:center;color:var(--sub)">清爽</div>
+        </div>
+        <div class="tpl-btn" data-tpl="red" onclick="selectTpl(this,'red')">
+          <div style="width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg,#2d0a0a,#8B1a1a)"></div>
+          <div style="font-size:10px;margin-top:4px;text-align:center;color:var(--sub)">警示</div>
+        </div>
+        <div class="tpl-btn" data-tpl="green" onclick="selectTpl(this,'green')">
+          <div style="width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg,#0a2d1a,#1a6b3a)"></div>
+          <div style="font-size:10px;margin-top:4px;text-align:center;color:var(--sub)">穩健</div>
+        </div>
+      </div>
+
+      <!-- 文字輸入 -->
+      <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px;letter-spacing:0.5px">卡片主標題</div>
+      <input id="card-headline" type="text" placeholder="例：退休1000萬，73歲就見底了" maxlength="24"
+        style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;margin-bottom:10px;outline:none">
+
+      <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px;letter-spacing:0.5px">副文案（可留空，從左側文案複製貼上）</div>
+      <textarea id="card-body-text" rows="3" placeholder="例：長照費用每月5～8萬，很多人根本沒算到…"
+        style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;resize:none;outline:none;margin-bottom:12px"></textarea>
+
+      <!-- 上傳照片（可選） -->
+      <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px;letter-spacing:0.5px">背景照片（可不上傳，自動用設計背景）</div>
+      <div id="img-drop-area" onclick="document.getElementById('imgInput').click()"
+        style="border:2px dashed var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fafbfd;margin-bottom:10px">
+        <div id="img-placeholder" style="color:var(--sub);font-size:13px">
+          <div style="font-size:22px;margin-bottom:4px">📷</div>
+          點此上傳照片，或拖曳進來
+        </div>
+        <img id="img-preview" style="display:none;max-width:100%;max-height:160px;border-radius:8px;object-fit:cover" />
+      </div>
+      <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="previewImg(this)">
+
+      <!-- 預覽 -->
+      <canvas id="cardCanvas" style="width:100%;border-radius:10px;margin-bottom:10px;display:block"></canvas>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button onclick="clearImg()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;color:var(--sub);cursor:pointer">重置</button>
+        <button onclick="renderCard(true)" style="background:#e8f0fe;border:none;border-radius:8px;padding:8px 14px;font-size:12px;color:var(--blue);font-weight:700;cursor:pointer">👁 預覽</button>
+        <button onclick="downloadCard()" style="background:var(--blue);border:none;border-radius:8px;padding:8px 16px;font-size:12px;color:white;font-weight:700;cursor:pointer">⬇ 下載 1080px</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 市場文案 -->
   <div class="card">
@@ -246,7 +388,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 </div>
 
 <!-- ===== TAB: 案例故事 ===== -->
-<div id="panel-stories" class="panel">
+<div id="panel-stories" class="panel active">
 
   <div class="section-label">點標籤篩選案例</div>
 
@@ -730,7 +872,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   <div class="about-hero">
     <h2>Weber</h2>
     <p>保險業務 × 理財顧問 × 你身邊懂金融的朋友<br>做這行超過十年，最常聽到客戶說「早知道就好了。」<br>所以我寫這些，希望你在遇到之前就先知道。</p>
-    <a class="line-btn" href="https://line.me/ti/p/~weber760917" target="_blank">💬 LINE 私訊 Weber</a>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a class="line-btn" href="https://line.me/ti/p/~weber917" target="_blank" style="background:#06c755">💬 LINE：weber917</a>
+      <a class="line-btn" href="https://instagram.com/weber917" target="_blank" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)">📸 IG：weber917</a>
+    </div>
   </div>
   <div class="about-list">
     <div class="about-list-item">
@@ -763,10 +908,12 @@ document.getElementById('datePill').textContent =
 
 // ── TABS ──
 function switchTab(name) {
-  const names = ['market','copy','stories','about'];
+  const names = ['stories','about','market','crypto','fx','copy'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
+  if (name === 'crypto' && !document.getElementById('crypto-rows').querySelector('.mkt-row')) loadCrypto();
+  if (name === 'fx'     && !document.getElementById('fx-rows').querySelector('.mkt-row'))     loadFX();
 }
 
 // ── COPY UTILS ──
@@ -818,6 +965,18 @@ const SYMBOLS = {
     { sym: 'GC%3DF',   name: '黃金',     flag: '✨', code: 'USD/oz' },
     { sym: 'CL%3DF',   name: '布蘭特油', flag: '🛢️', code: 'USD/桶' },
     { sym: 'DX-Y.NYB', name: '美元指數', flag: '💵', code: 'DXY'   },
+  ],
+  crypto: [
+    { sym: 'BTC-USD', name: 'Bitcoin',  flag: '₿',  code: 'BTC' },
+    { sym: 'ETH-USD', name: 'Ethereum', flag: '⟠',  code: 'ETH' },
+    { sym: 'SOL-USD', name: 'Solana',   flag: '◎',  code: 'SOL' },
+    { sym: 'DOGE-USD',name: 'Dogecoin', flag: '🐶', code: 'DOGE'},
+  ],
+  fx: [
+    { sym: 'TWD%3DX',    name: '美元／台幣', flag: '🇺🇸', code: 'USD/TWD' },
+    { sym: 'JPYTWD%3DX', name: '日圓／台幣', flag: '🇯🇵', code: 'JPY/TWD' },
+    { sym: 'EURTWD%3DX', name: '歐元／台幣', flag: '🇪🇺', code: 'EUR/TWD' },
+    { sym: 'CNYTWD%3DX', name: '人民幣／台幣',flag: '🇨🇳', code: 'CNY/TWD' },
   ]
 };
 
@@ -833,8 +992,7 @@ async function fetchPrice(sym) {
     const data = await fetchQuote(sym);
     const meta = data.chart.result[0].meta;
     const price = meta.regularMarketPrice;
-    const prev  = meta.previousClose || meta.chartPreviousClose;
-    const chg   = prev ? ((price - prev) / prev * 100) : 0;
+    const chg   = meta.regularMarketChangePercent ?? 0;  // 直接用 Yahoo 官方漲跌幅
     const closes = data.chart.result[0].indicators.quote[0].close || [];
     return { price, chg, closes };
   } catch { return null; }
@@ -920,6 +1078,84 @@ async function loadMarket() {
 
   // Generate copy after market loads
   generateCopy();
+}
+
+// ── CRYPTO ──
+let chartBTC = null;
+async function loadCrypto() {
+  document.getElementById('crypto-rows').innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
+  const results = await Promise.all(SYMBOLS.crypto.map(item => fetchPrice(item.sym)));
+  document.getElementById('crypto-rows').innerHTML =
+    SYMBOLS.crypto.map((item, i) => mktRowHTML(item, results[i])).join('');
+  // BTC chart
+  try {
+    const d = await fetchQuote('BTC-USD');
+    const result = d.chart.result[0];
+    const closes = result.indicators.quote[0].close.filter(Boolean);
+    const labels = result.timestamp.slice(-closes.length)
+      .map(ts => new Date(ts*1000).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'}));
+    if (chartBTC) chartBTC.destroy();
+    const ctx = document.getElementById('chartBTC').getContext('2d');
+    const isUp = closes[closes.length-1] >= closes[0];
+    chartBTC = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets: [{
+        data: closes,
+        borderColor: isUp ? '#e63946' : '#2a9d8f',
+        backgroundColor: isUp ? 'rgba(230,57,70,0.08)' : 'rgba(42,157,143,0.08)',
+        tension: 0.3, fill: true, pointRadius: 3,
+        pointBackgroundColor: isUp ? '#e63946' : '#2a9d8f',
+      }]},
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+          y: { grid: { color: '#f0f3f7' }, ticks: { font: { size: 11 },
+            callback: v => '$' + v.toLocaleString('en',{maximumFractionDigits:0}) } }
+        }
+      }
+    });
+  } catch(e) { console.log('BTC chart error', e); }
+}
+
+// ── FX ──
+let chartFX = null;
+async function loadFX() {
+  document.getElementById('fx-rows').innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
+  const results = await Promise.all(SYMBOLS.fx.map(item => fetchPrice(item.sym)));
+  document.getElementById('fx-rows').innerHTML =
+    SYMBOLS.fx.map((item, i) => mktRowHTML(item, results[i])).join('');
+  // USD/TWD chart
+  try {
+    const d = await fetchQuote('TWD%3DX');
+    const result = d.chart.result[0];
+    const closes = result.indicators.quote[0].close.filter(Boolean);
+    const labels = result.timestamp.slice(-closes.length)
+      .map(ts => new Date(ts*1000).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'}));
+    if (chartFX) chartFX.destroy();
+    const ctx = document.getElementById('chartFX').getContext('2d');
+    const isUp = closes[closes.length-1] >= closes[0];
+    chartFX = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets: [{
+        data: closes,
+        borderColor: isUp ? '#e63946' : '#2a9d8f',
+        backgroundColor: isUp ? 'rgba(230,57,70,0.08)' : 'rgba(42,157,143,0.08)',
+        tension: 0.3, fill: true, pointRadius: 3,
+        pointBackgroundColor: isUp ? '#e63946' : '#2a9d8f',
+      }]},
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+          y: { grid: { color: '#f0f3f7' }, ticks: { font: { size: 11 },
+            callback: v => v.toFixed(2) } }
+        }
+      }
+    });
+  } catch(e) { console.log('FX chart error', e); }
 }
 
 // ── COPY GENERATION ──
@@ -1040,8 +1276,284 @@ function switchP(btn, paneId) {
   document.getElementById(paneId).classList.add('active');
 }
 
+// ── NEWS ──
+async function fetchNews(q, count = 5) {
+  try {
+    const r = await fetch(`/api/news?q=${encodeURIComponent(q)}&count=${count}`);
+    if (!r.ok) throw new Error('news failed');
+    return await r.json();
+  } catch { return []; }
+}
+
+function newsHTML(items) {
+  if (!items.length) return '<div class="error-note">目前無新聞資料</div>';
+  return items.map(n => {
+    const ts = n.providerPublishTime ? new Date(n.providerPublishTime*1000).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
+    const thumb = (n.thumbnail && n.thumbnail.resolutions && n.thumbnail.resolutions[0]) ? n.thumbnail.resolutions[0].url : '';
+    return `<a class="news-item" href="${n.link||'#'}" target="_blank" rel="noopener">
+      ${thumb ? `<img class="news-thumb" src="${thumb}" alt="" onerror="this.style.display='none'">` : ''}
+      <div class="news-body">
+        <div class="news-title">${n.title||''}</div>
+        <div class="news-meta">${n.publisher||''} · ${ts}</div>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+async function loadUSNews() {
+  document.getElementById('us-news').innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
+  const items = await fetchNews('US stock market S&P500 earnings tech');
+  document.getElementById('us-news').innerHTML = newsHTML(items);
+}
+
+async function loadCryptoNews() {
+  document.getElementById('crypto-news').innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
+  const items = await fetchNews('bitcoin ethereum crypto cryptocurrency');
+  document.getElementById('crypto-news').innerHTML = newsHTML(items);
+}
+
+// ── CALENDAR ──
+async function loadCalendar() {
+  // Fetch Taiwan market earnings/calendar events from Yahoo Finance
+  const items = await fetchNews('台股 法說會 股東會 財報 earnings call Taiwan', 6);
+  const el = document.getElementById('cal-rows');
+  if (!items.length) {
+    // Fallback: show static upcoming common events
+    const today = new Date();
+    const upcoming = [
+      { daysAhead: 1, type: 'econ', label: '🌐 總經', name: '美國非農就業數據' },
+      { daysAhead: 3, type: 'ir',   label: '📊 法說', name: '台積電法人說明會' },
+      { daysAhead: 5, type: 'agm',  label: '📋 股東', name: '台股股東會旺季' },
+      { daysAhead: 7, type: 'econ', label: '🌐 總經', name: 'Fed 利率決策會議' },
+    ];
+    el.innerHTML = upcoming.map(ev => {
+      const d = new Date(today); d.setDate(d.getDate() + ev.daysAhead);
+      const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+      return `<div class="cal-item">
+        <div class="cal-date">${dateStr}</div>
+        <div class="cal-type cal-${ev.type}">${ev.label}</div>
+        <div class="cal-name">${ev.name}</div>
+      </div>`;
+    }).join('');
+    return;
+  }
+  // Use news items as calendar entries
+  el.innerHTML = items.slice(0,5).map(n => {
+    const ts = n.providerPublishTime ? new Date(n.providerPublishTime*1000) : new Date();
+    const dateStr = `${ts.getMonth()+1}/${ts.getDate()}`;
+    const isAgm = n.title && (n.title.includes('股東') || n.title.includes('AGM'));
+    const isEcon = n.title && (n.title.includes('Fed') || n.title.includes('利率') || n.title.includes('通膨'));
+    const typeClass = isAgm ? 'agm' : isEcon ? 'econ' : 'ir';
+    const typeLabel = isAgm ? '📋 股東' : isEcon ? '🌐 總經' : '📊 法說';
+    return `<div class="cal-item">
+      <div class="cal-date">${dateStr}</div>
+      <div class="cal-type cal-${typeClass}">${typeLabel}</div>
+      <div class="cal-name" style="font-size:12px;line-height:1.4">${(n.title||'').substring(0,40)}…</div>
+    </div>`;
+  }).join('');
+}
+
+// ── CARD GENERATOR ──
+let userImg = null;
+let currentTpl = 'dark';
+
+const TEMPLATES = {
+  dark:  { bg1:'#1a1a2e', bg2:'#0f3460', accent:'#4a9eff', text:'#ffffff', sub:'rgba(255,255,255,0.6)',  bar:'rgba(255,255,255,0.07)' },
+  gold:  { bg1:'#1c1008', bg2:'#5a3e0a', accent:'#f5c842', text:'#ffffff', sub:'rgba(255,255,255,0.65)', bar:'rgba(245,200,66,0.12)' },
+  clean: { bg1:'#f0f4ff', bg2:'#dce8ff', accent:'#0f3460', text:'#1a1a2e', sub:'rgba(26,26,46,0.55)',   bar:'rgba(15,52,96,0.07)' },
+  red:   { bg1:'#2d0a0a', bg2:'#6b1212', accent:'#ff6b6b', text:'#ffffff', sub:'rgba(255,255,255,0.6)',  bar:'rgba(255,107,107,0.1)' },
+  green: { bg1:'#0a2d1a', bg2:'#0f5c2a', accent:'#4ecb71', text:'#ffffff', sub:'rgba(255,255,255,0.6)',  bar:'rgba(78,203,113,0.1)' },
+};
+
+function selectTpl(el, tpl) {
+  document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  currentTpl = tpl;
+  renderCard(false);
+}
+
+function previewImg(input) {
+  const file = (input.files || input)[0] || input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    userImg = e.target.result;
+    document.getElementById('img-preview').src = userImg;
+    document.getElementById('img-preview').style.display = 'block';
+    document.getElementById('img-placeholder').style.display = 'none';
+    renderCard(false);
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImg() {
+  userImg = null;
+  document.getElementById('img-preview').style.display = 'none';
+  document.getElementById('img-placeholder').style.display = 'block';
+  document.getElementById('imgInput').value = '';
+  renderCard(false);
+}
+
+// Wrap text helper
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const chars = text.split('');
+  let line = '', lines = [];
+  for (const ch of chars) {
+    const test = line + ch;
+    if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = ch; }
+    else line = test;
+  }
+  if (line) lines.push(line);
+  lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
+  return lines.length;
+}
+
+function renderCard(download = false) {
+  const canvas = document.getElementById('cardCanvas');
+  const SIZE = 1080;
+  canvas.width = SIZE; canvas.height = SIZE;
+  const ctx = canvas.getContext('2d');
+  const tpl = TEMPLATES[currentTpl] || TEMPLATES.dark;
+
+  const headline = (document.getElementById('card-headline').value || 'Weber 理財筆記').trim();
+  const bodyText = (document.getElementById('card-body-text').value || '').trim();
+  const dateStr = NOW.toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'});
+
+  const draw = () => {
+    // --- Background ---
+    if (userImg) {
+      // Photo mode: image fills top 55%
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.max(SIZE / img.width, SIZE * 0.6 / img.height);
+        const sw = img.width * scale, sh = img.height * scale;
+        ctx.drawImage(img, (SIZE - sw) / 2, 0, sw, sh);
+
+        // Gradient overlay over photo
+        const ov = ctx.createLinearGradient(0, SIZE * 0.25, 0, SIZE);
+        ov.addColorStop(0, 'rgba(0,0,0,0)');
+        ov.addColorStop(0.45, hexToRgba(tpl.bg1, 0.92));
+        ov.addColorStop(1, hexToRgba(tpl.bg2, 1));
+        ctx.fillStyle = ov; ctx.fillRect(0, 0, SIZE, SIZE);
+
+        drawContent(SIZE * 0.52, true);
+        if (download) doDownload(canvas);
+      };
+      img.src = userImg;
+    } else {
+      // Design mode: full gradient background
+      const grad = ctx.createLinearGradient(0, 0, SIZE, SIZE);
+      grad.addColorStop(0, tpl.bg1); grad.addColorStop(1, tpl.bg2);
+      ctx.fillStyle = grad; ctx.fillRect(0, 0, SIZE, SIZE);
+
+      // Decorative circles
+      ctx.save();
+      ctx.globalAlpha = 0.07;
+      ctx.fillStyle = tpl.accent;
+      ctx.beginPath(); ctx.arc(SIZE * 0.85, SIZE * 0.18, 280, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(SIZE * 0.1, SIZE * 0.75, 180, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+
+      // Top accent line
+      ctx.fillStyle = tpl.accent;
+      ctx.fillRect(60, 72, 80, 6);
+
+      drawContent(220, false);
+      if (download) doDownload(canvas);
+    }
+  };
+
+  const drawContent = (startY, hasPhoto) => {
+    const PAD = 64;
+    const MAXW = SIZE - PAD * 2;
+
+    // Date chip
+    ctx.fillStyle = hexToRgba(tpl.accent, 0.18);
+    ctx.beginPath(); ctx.roundRect(PAD, startY - (hasPhoto ? 0 : 60), 0, 0, 6);
+    ctx.font = `500 26px sans-serif`;
+    const dateW = ctx.measureText(dateStr).width + 28;
+    ctx.fillStyle = hexToRgba(tpl.accent, 0.2);
+    ctx.beginPath(); ctx.roundRect(PAD, startY - (hasPhoto ? 0 : 56), dateW, 40, 20); ctx.fill();
+    ctx.fillStyle = tpl.accent;
+    ctx.font = `600 24px sans-serif`;
+    ctx.fillText(dateStr, PAD + 14, startY - (hasPhoto ? 0 : 56) + 27);
+
+    const headY = startY + (hasPhoto ? 52 : 20);
+
+    // Headline
+    ctx.fillStyle = tpl.text;
+    ctx.font = `700 64px sans-serif`;
+    const hLines = wrapText(ctx, headline, PAD, headY, MAXW, 78);
+
+    // Body text
+    if (bodyText) {
+      const bodyY = headY + hLines * 78 + 30;
+      ctx.fillStyle = tpl.sub;
+      ctx.font = `400 34px sans-serif`;
+      wrapText(ctx, bodyText, PAD, bodyY, MAXW, 50);
+    }
+
+    // Bottom bar
+    ctx.fillStyle = tpl.bar;
+    ctx.fillRect(0, SIZE - 130, SIZE, 130);
+
+    // Divider line
+    ctx.fillStyle = tpl.accent;
+    ctx.fillRect(PAD, SIZE - 128, 50, 4);
+
+    // Branding
+    ctx.fillStyle = tpl.text;
+    ctx.font = `700 38px sans-serif`;
+    ctx.fillText('Weber 理財筆記', PAD, SIZE - 76);
+    ctx.fillStyle = tpl.sub;
+    ctx.font = `400 26px sans-serif`;
+    ctx.fillText('LINE / IG : weber917', PAD, SIZE - 38);
+  };
+
+  draw();
+}
+
+function doDownload(canvas) {
+  const link = document.createElement('a');
+  link.download = `weber_post_${Date.now()}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function downloadCard() { renderCard(true); }
+
+function hexToRgba(hex, a) {
+  if (hex.startsWith('rgba') || hex.startsWith('rgb')) return hex;
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+// Drag & drop
+const dropArea = document.getElementById('img-drop-area');
+['dragover','dragleave','drop'].forEach(ev => dropArea.addEventListener(ev, e => {
+  e.preventDefault();
+  if (ev === 'drop') {
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) previewImg({ files: [file] });
+  }
+  dropArea.style.borderColor = ev === 'dragover' ? 'var(--blue)' : 'var(--border)';
+}));
+
+// Auto-render preview when typing
+['card-headline','card-body-text'].forEach(id =>
+  document.getElementById(id).addEventListener('input', () => renderCard(false))
+);
+
+// Initial preview render
+setTimeout(() => renderCard(false), 500);
+
 // ── INIT ──
 loadMarket();
+loadCalendar();
+loadUSNews();
+loadCrypto();
+loadCryptoNews();
+loadFX();
 </script>
 </body>
 </html>
