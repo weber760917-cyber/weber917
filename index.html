@@ -133,16 +133,33 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .copy-tabs-s .copy-ptab { font-size: 11px; padding: 3px 10px; }
 
 /* ── ABOUT ── */
-.about-hero { background: linear-gradient(135deg, var(--navy), var(--blue)); color: white; border-radius: 14px; padding: 22px 20px; margin-bottom: 14px; }
-.about-hero h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-.about-hero p { font-size: 13px; color: #90b4d4; margin-bottom: 14px; }
-.about-hero .line-btn { display: inline-block; background: #06c755; color: white; padding: 11px 24px; border-radius: 25px; font-size: 14px; font-weight: 700; text-decoration: none; }
-.about-list { background: white; border-radius: 14px; padding: 16px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-.about-list-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #f0f3f7; }
-.about-list-item:last-child { border-bottom: none; }
-.about-icon { font-size: 22px; flex-shrink: 0; }
-.about-item-title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
-.about-item-sub { font-size: 12px; color: var(--sub); line-height: 1.6; }
+.about-profile { background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%); border-radius: 18px; padding: 28px 20px 24px; margin-bottom: 14px; color: white; text-align: center; }
+.about-avatar { width: 76px; height: 76px; border-radius: 50%; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 14px; border: 2px solid rgba(255,255,255,0.2); }
+.about-name { font-size: 22px; font-weight: 800; letter-spacing: 1px; margin-bottom: 4px; }
+.about-title { font-size: 12px; color: #7ec8e3; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
+.about-tagline { font-size: 13px; color: #b0c8e0; line-height: 1.7; margin-bottom: 20px; max-width: 280px; margin-left: auto; margin-right: auto; }
+.about-stats { display: flex; justify-content: center; gap: 0; margin-bottom: 22px; background: rgba(255,255,255,0.07); border-radius: 12px; overflow: hidden; }
+.about-stat { flex: 1; padding: 12px 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.1); }
+.about-stat:last-child { border-right: none; }
+.about-stat-num { font-size: 20px; font-weight: 800; color: #7ec8e3; }
+.about-stat-label { font-size: 10px; color: rgba(255,255,255,0.55); margin-top: 2px; letter-spacing: 0.5px; }
+.about-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.about-btn { display: inline-flex; align-items: center; gap: 6px; padding: 11px 20px; border-radius: 25px; font-size: 13px; font-weight: 700; text-decoration: none; transition: opacity 0.15s; }
+.about-btn:hover { opacity: 0.85; }
+.about-btn-line { background: #06c755; color: white; }
+.about-btn-ig { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); color: white; }
+.about-services { background: white; border-radius: 14px; padding: 18px 16px 8px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.about-services-title { font-size: 11px; font-weight: 700; color: var(--sub); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+.service-item { display: flex; gap: 14px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f0f3f7; }
+.service-item:last-child { border-bottom: none; padding-bottom: 6px; }
+.service-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.service-icon.c1 { background: #ebf4ff; }
+.service-icon.c2 { background: #fff3e0; }
+.service-icon.c3 { background: #e8f5e9; }
+.service-icon.c4 { background: #fce4ec; }
+.service-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; color: var(--navy); }
+.service-desc { font-size: 12px; color: var(--sub); line-height: 1.6; }
+.about-note { background: #f8faff; border: 1px solid #e0e8f5; border-radius: 12px; padding: 13px 16px; font-size: 12px; color: var(--sub); line-height: 1.8; }
 
 /* ── CARD TEMPLATES ── */
 .tpl-btn { cursor:pointer; opacity:0.6; transition:opacity 0.15s; flex-shrink:0; }
@@ -494,34 +511,68 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 
 <!-- ===== TAB: 關於我 ===== -->
 <div id="panel-about" class="panel">
-  <div class="about-hero">
-    <h2>Weber</h2>
-    <p>保險業務 × 理財顧問 × 你身邊懂金融的朋友<br>做這行超過十年，最常聽到客戶說「早知道就好了。」<br>所以我寫這些，希望你在遇到之前就先知道。</p>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <a class="line-btn" href="https://line.me/ti/p/~weber917" target="_blank" style="background:#06c755">💬 LINE：weber917</a>
-      <a class="line-btn" href="https://instagram.com/weber917" target="_blank" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)">📸 IG：weber917</a>
+
+  <!-- Profile Hero -->
+  <div class="about-profile">
+    <div class="about-avatar">💼</div>
+    <div class="about-name">Weber</div>
+    <div class="about-title">Financial Advisor · Insurance Consultant</div>
+    <div class="about-tagline">幫你把複雜的金融產品說清楚、算明白，讓每一分錢都放對地方。</div>
+    <div class="about-stats">
+      <div class="about-stat">
+        <div class="about-stat-num">10+</div>
+        <div class="about-stat-label">年資歷</div>
+      </div>
+      <div class="about-stat">
+        <div class="about-stat-num">300+</div>
+        <div class="about-stat-label">服務客戶</div>
+      </div>
+      <div class="about-stat">
+        <div class="about-stat-num">4</div>
+        <div class="about-stat-label">專業領域</div>
+      </div>
+    </div>
+    <div class="about-btns">
+      <a class="about-btn about-btn-line" href="https://line.me/ti/p/~weber917" target="_blank">💬 LINE 我</a>
+      <a class="about-btn about-btn-ig" href="https://instagram.com/weber917" target="_blank">📸 追蹤 IG</a>
     </div>
   </div>
-  <div class="about-list">
-    <div class="about-list-item">
-      <div class="about-icon">🔒</div>
-      <div><div class="about-item-title">信託與資產保全</div><div class="about-item-sub">安養信託、不動產信託、遺囑規劃，讓你的財產只為你服務</div></div>
+
+  <!-- Services -->
+  <div class="about-services">
+    <div class="about-services-title">專業服務</div>
+    <div class="service-item">
+      <div class="service-icon c1">🔒</div>
+      <div>
+        <div class="service-name">信託與資產保全</div>
+        <div class="service-desc">安養信託、不動產信託、遺囑規劃，讓你的財產只為你服務，不被外力侵佔</div>
+      </div>
     </div>
-    <div class="about-list-item">
-      <div class="about-icon">💸</div>
-      <div><div class="about-item-title">退休規劃</div><div class="about-item-sub">長照準備、退休缺口試算、通膨對策，算清楚才能睡得著</div></div>
+    <div class="service-item">
+      <div class="service-icon c2">💸</div>
+      <div>
+        <div class="service-name">退休規劃</div>
+        <div class="service-desc">長照準備、退休缺口試算、通膨對策，把退休的每一個變數都算進去</div>
+      </div>
     </div>
-    <div class="about-list-item">
-      <div class="about-icon">🏠</div>
-      <div><div class="about-item-title">不動產活化</div><div class="about-item-sub">以房養老、不動產信託，讓房子變成你的退休月薪</div></div>
+    <div class="service-item">
+      <div class="service-icon c3">🏠</div>
+      <div>
+        <div class="service-name">不動產活化</div>
+        <div class="service-desc">以房養老、不動產信託，讓房子從沉睡資產變成每月穩定的現金流</div>
+      </div>
     </div>
-    <div class="about-list-item">
-      <div class="about-icon">🛡️</div>
-      <div><div class="about-item-title">保險規劃</div><div class="about-item-sub">壽險、醫療險、長照險，只買你真正需要的</div></div>
+    <div class="service-item">
+      <div class="service-icon c4">🛡️</div>
+      <div>
+        <div class="service-name">保險規劃</div>
+        <div class="service-desc">壽險、醫療險、長照險，精準評估需求，只買真正需要的保障</div>
+      </div>
     </div>
   </div>
-  <div style="background:white;border-radius:14px;padding:14px 16px;font-size:12px;color:var(--sub);line-height:1.8;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
-    📌 本頁案例均為真實事件改編，細節經調整以保護當事人隱私。內容僅供參考，實際規劃請依個人狀況評估。
+
+  <div class="about-note">
+    📌 本頁案例均為真實事件改編，細節經過調整以保護當事人隱私。內容僅供參考，實際規劃請依個人狀況評估，歡迎直接聯繫 Weber 討論。
   </div>
 </div>
 
