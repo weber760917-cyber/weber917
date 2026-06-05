@@ -68,8 +68,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .mkt-r { text-align: right; }
 .mkt-price { font-size: 15px; font-weight: 700; }
 .mkt-chg { font-size: 12px; margin-top: 2px; font-weight: 600; }
-.up { color: var(--up); }
-.down { color: var(--down); }
+.up   { color: var(--up); }    /* TW: red=up */
+.down { color: var(--down); }  /* TW: green=down */
+.up-us   { color: #2a9d8f; }   /* US/Crypto: green=up */
+.down-us { color: #e63946; }   /* US/Crypto: red=down */
+.copy-pane-s { display: none; }
+.copy-pane-s.active { display: block; }
 .flat { color: var(--sub); }
 .loading-row { text-align: center; padding: 20px; color: var(--sub); font-size: 13px; }
 .spin { display: inline-block; animation: spin 0.8s linear infinite; }
@@ -589,6 +593,7 @@ function switchTab(name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
   if (name === 'fx' && !document.getElementById('fx-rows').querySelector('.mkt-row')) loadFX();
+  try { localStorage.setItem('activeTab', name); } catch(e) {}
 }
 
 // ── COPY UTILS ──
@@ -601,7 +606,7 @@ function cp(id, btn) {
 function switchCopyS(btn, paneId) {
   const wrap = btn.closest('.story-copy');
   wrap.querySelectorAll('.copy-ptab').forEach(t=>t.classList.remove('active'));
-  wrap.querySelectorAll('.copy-pane').forEach(p=>p.classList.remove('active'));
+  wrap.querySelectorAll('.copy-pane-s').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById(paneId).classList.add('active');
 }
@@ -632,20 +637,20 @@ const SYMBOLS = {
     { sym: '%5EOTC',   name: '櫃買指數', flag: '🇹🇼', code: 'OTC'  },
   ],
   us: [
-    { sym: '%5EGSPC',  name: 'S&P 500',  flag: '🇺🇸', code: 'SPX'  },
-    { sym: '%5EIXIC',  name: '那斯達克', flag: '🇺🇸', code: 'COMP' },
-    { sym: '%5ESOX',   name: '費半',     flag: '🇺🇸', code: 'SOX'  },
+    { sym: '%5EGSPC',  name: 'S&P 500',  flag: '🇺🇸', code: 'SPX',  usStyle: true },
+    { sym: '%5EIXIC',  name: '那斯達克', flag: '🇺🇸', code: 'COMP', usStyle: true },
+    { sym: '%5ESOX',   name: '費半',     flag: '🇺🇸', code: 'SOX',  usStyle: true },
   ],
   ot: [
-    { sym: 'GC%3DF',   name: '黃金',     flag: '✨', code: 'USD/oz' },
-    { sym: 'CL%3DF',   name: '布蘭特油', flag: '🛢️', code: 'USD/桶' },
-    { sym: 'DX-Y.NYB', name: '美元指數', flag: '💵', code: 'DXY'   },
+    { sym: 'GC%3DF',   name: '黃金',     flag: '✨', code: 'USD/oz', usStyle: true },
+    { sym: 'CL%3DF',   name: '布蘭特油', flag: '🛢️', code: 'USD/桶', usStyle: true },
+    { sym: 'DX-Y.NYB', name: '美元指數', flag: '💵', code: 'DXY',   usStyle: true },
   ],
   crypto: [
-    { sym: 'BTC-USD', name: 'Bitcoin',  flag: '₿',  code: 'BTC' },
-    { sym: 'ETH-USD', name: 'Ethereum', flag: '⟠',  code: 'ETH' },
-    { sym: 'SOL-USD', name: 'Solana',   flag: '◎',  code: 'SOL' },
-    { sym: 'DOGE-USD',name: 'Dogecoin', flag: '🐶', code: 'DOGE'},
+    { sym: 'BTC-USD', name: 'Bitcoin',  flag: '₿',  code: 'BTC', usStyle: true },
+    { sym: 'ETH-USD', name: 'Ethereum', flag: '⟠',  code: 'ETH', usStyle: true },
+    { sym: 'SOL-USD', name: 'Solana',   flag: '◎',  code: 'SOL', usStyle: true },
+    { sym: 'DOGE-USD',name: 'Dogecoin', flag: '🐶', code: 'DOGE', usStyle: true },
   ],
   fx: [
     { sym: 'TWD%3DX',    name: '美元／台幣',  flag: '🇺🇸', code: 'USD/TWD', key: 'USD' },
@@ -674,8 +679,10 @@ async function fetchPrice(sym) {
     const meta = data.chart.result[0].meta;
     const price = meta.regularMarketPrice;
     const prev  = meta.chartPreviousClose || meta.previousClose;
-    // Yahoo sometimes returns 0 or tiny fraction — always recalculate from prices
-    const chg = (price && prev && prev !== 0) ? ((price - prev) / prev * 100) : 0;
+    // Use Yahoo's own change% when available (more accurate)
+    const chg = meta.regularMarketChangePercent != null
+      ? meta.regularMarketChangePercent
+      : (price && prev && prev !== 0) ? ((price - prev) / prev * 100) : 0;
     const closes = data.chart.result[0].indicators.quote[0].close || [];
     return { price, chg, closes };
   } catch { return null; }
@@ -689,9 +696,14 @@ function mktRowHTML(item, res) {
     <div class="mkt-r"><div class="mkt-price flat">—</div><div class="mkt-chg flat">無資料</div></div>
   </div>`;
   const up = res.chg >= 0;
-  const cls = Math.abs(res.chg) < 0.005 ? 'flat' : (up ? 'up' : 'down');
-  const arr = cls === 'flat' ? '—' : (up ? '▲' : '▼');
-  // Use 3 decimal places for FX (small numbers like JPY use fewer)
+  const isFlat = Math.abs(res.chg) < 0.005;
+  // TW stocks: red=up (台灣慣例) / US+crypto+ot: green=up (國際慣例)
+  const usStyle = item.usStyle;
+  let cls;
+  if (isFlat) cls = 'flat';
+  else if (usStyle) cls = up ? 'up-us' : 'down-us';
+  else cls = up ? 'up' : 'down';
+  const arr = isFlat ? '—' : (up ? '▲' : '▼');
   const isFX = item.code && item.code.includes('/TWD');
   const decimals = isFX ? (res.price < 1 ? 4 : 3) : 2;
   const priceStr = res.price.toLocaleString('en', {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
@@ -1424,6 +1436,14 @@ async function loadStories() {
 }
 
 // ── INIT ──
+(function() {
+  try {
+    const saved = localStorage.getItem('activeTab');
+    if (saved && ['stories','about','market','fx','copy'].includes(saved)) {
+      switchTab(saved);
+    }
+  } catch(e) {}
+})();
 loadStories();
 loadBrief();
 loadMarket();
