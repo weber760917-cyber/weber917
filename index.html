@@ -516,70 +516,104 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 <!-- ===== TAB: 關於我 ===== -->
 <div id="panel-about" class="panel">
 
-  <!-- Profile Hero -->
-  <div class="about-profile">
-    <div class="about-avatar">💼</div>
-    <div class="about-name">Weber</div>
-    <div class="about-title">Financial Advisor · Insurance Consultant</div>
-    <div class="about-tagline">幫你把複雜的金融產品說清楚、算明白，讓每一分錢都放對地方。</div>
-    <div class="about-stats">
-      <div class="about-stat">
-        <div class="about-stat-num">10+</div>
-        <div class="about-stat-label">年資歷</div>
-      </div>
-      <div class="about-stat">
-        <div class="about-stat-num">300+</div>
-        <div class="about-stat-label">服務客戶</div>
-      </div>
-      <div class="about-stat">
-        <div class="about-stat-num">4</div>
-        <div class="about-stat-label">專業領域</div>
-      </div>
+<!-- Hero Card -->
+<div style="background:linear-gradient(135deg,#0f3460 0%,#1a1a2e 100%);border-radius:20px;padding:28px 20px 24px;margin-bottom:14px;color:white;text-align:center">
+  <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 14px">💼</div>
+  <div style="font-size:24px;font-weight:800;letter-spacing:1px;margin-bottom:4px">Weber</div>
+  <div style="font-size:11px;color:#7ec8e3;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px">Insurance & Financial Advisor</div>
+  <div style="font-size:13px;color:#b8d4ea;line-height:1.8;margin-bottom:22px;max-width:300px;margin-left:auto;margin-right:auto">
+    做這行超過十年，幫超過三百位客戶<br>把複雜的金融產品說清楚、算明白。<br>不是要賣你東西，是幫你做對的決定。
+  </div>
+  <!-- Stats -->
+  <div style="display:flex;background:rgba(255,255,255,0.08);border-radius:14px;overflow:hidden;margin-bottom:22px">
+    <div style="flex:1;padding:14px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.1)">
+      <div style="font-size:22px;font-weight:800;color:#7ec8e3">10+</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:3px;letter-spacing:0.5px">年執業資歷</div>
     </div>
-    <div class="about-btns">
-      <a class="about-btn about-btn-line" href="https://line.me/ti/p/~weber917" target="_blank">💬 LINE 我</a>
-      <a class="about-btn about-btn-ig" href="https://instagram.com/weber917" target="_blank">📸 追蹤 IG</a>
+    <div style="flex:1;padding:14px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.1)">
+      <div style="font-size:22px;font-weight:800;color:#7ec8e3">300+</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:3px;letter-spacing:0.5px">服務客戶數</div>
+    </div>
+    <div style="flex:1;padding:14px 8px;text-align:center">
+      <div style="font-size:22px;font-weight:800;color:#7ec8e3">4</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:3px;letter-spacing:0.5px">專業領域</div>
     </div>
   </div>
-
-  <!-- Services -->
-  <div class="about-services">
-    <div class="about-services-title">專業服務</div>
-    <div class="service-item">
-      <div class="service-icon c1">🔒</div>
-      <div>
-        <div class="service-name">信託與資產保全</div>
-        <div class="service-desc">安養信託、不動產信託、遺囑規劃，讓你的財產只為你服務，不被外力侵佔</div>
-      </div>
-    </div>
-    <div class="service-item">
-      <div class="service-icon c2">💸</div>
-      <div>
-        <div class="service-name">退休規劃</div>
-        <div class="service-desc">長照準備、退休缺口試算、通膨對策，把退休的每一個變數都算進去</div>
-      </div>
-    </div>
-    <div class="service-item">
-      <div class="service-icon c3">🏠</div>
-      <div>
-        <div class="service-name">不動產活化</div>
-        <div class="service-desc">以房養老、不動產信託，讓房子從沉睡資產變成每月穩定的現金流</div>
-      </div>
-    </div>
-    <div class="service-item">
-      <div class="service-icon c4">🛡️</div>
-      <div>
-        <div class="service-name">保險規劃</div>
-        <div class="service-desc">壽險、醫療險、長照險，精準評估需求，只買真正需要的保障</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="about-note">
-    📌 本頁案例均為真實事件改編，細節經過調整以保護當事人隱私。內容僅供參考，實際規劃請依個人狀況評估，歡迎直接聯繫 Weber 討論。
+  <!-- Buttons -->
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+    <a href="https://line.me/ti/p/~weber917" target="_blank"
+       style="display:inline-flex;align-items:center;gap:7px;background:#06c755;color:white;padding:12px 22px;border-radius:25px;font-size:13px;font-weight:700;text-decoration:none">
+      💬 LINE 我
+    </a>
+    <a href="https://instagram.com/weber917" target="_blank"
+       style="display:inline-flex;align-items:center;gap:7px;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:white;padding:12px 22px;border-radius:25px;font-size:13px;font-weight:700;text-decoration:none">
+      📸 IG 追蹤
+    </a>
   </div>
 </div>
 
+<!-- 我能幫你做什麼 -->
+<div style="background:white;border-radius:16px;padding:18px 16px 10px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+  <div style="font-size:11px;font-weight:700;color:#8a9ab5;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px">我能幫你做什麼</div>
+
+  <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #f0f3f7">
+    <div style="width:42px;height:42px;border-radius:12px;background:#ebf4ff;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🔒</div>
+    <div>
+      <div style="font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:4px">信託與資產保全</div>
+      <div style="font-size:12px;color:#8a9ab5;line-height:1.7">安養信託、不動產信託、遺囑規劃<br>讓你的財產只為你自己服務，不被外力侵佔</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #f0f3f7">
+    <div style="width:42px;height:42px;border-radius:12px;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">💸</div>
+    <div>
+      <div style="font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:4px">退休規劃</div>
+      <div style="font-size:12px;color:#8a9ab5;line-height:1.7">長照準備、退休缺口試算、通膨對策<br>把每一個變數都算進去，睡得著才算規劃</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #f0f3f7">
+    <div style="width:42px;height:42px;border-radius:12px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🏠</div>
+    <div>
+      <div style="font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:4px">不動產活化</div>
+      <div style="font-size:12px;color:#8a9ab5;line-height:1.7">以房養老、不動產信託<br>讓房子從沉睡資產，變成每月穩定的現金流</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0">
+    <div style="width:42px;height:42px;border-radius:12px;background:#fce4ec;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🛡️</div>
+    <div>
+      <div style="font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:4px">保險規劃</div>
+      <div style="font-size:12px;color:#8a9ab5;line-height:1.7">壽險、醫療險、長照險<br>精準評估需求，只買你真正需要的保障</div>
+    </div>
+  </div>
+</div>
+
+<!-- 我的工作方式 -->
+<div style="background:white;border-radius:16px;padding:18px 16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+  <div style="font-size:11px;font-weight:700;color:#8a9ab5;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px">我的工作方式</div>
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:32px;height:32px;border-radius:50%;background:#ebf4ff;color:#0f3460;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+      <div style="font-size:13px;color:#3d4f6e;line-height:1.6">先了解你的狀況和目標，不急著推產品</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:32px;height:32px;border-radius:50%;background:#ebf4ff;color:#0f3460;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+      <div style="font-size:13px;color:#3d4f6e;line-height:1.6">把每個選項的優缺點說清楚，讓你自己判斷</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:32px;height:32px;border-radius:50%;background:#ebf4ff;color:#0f3460;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+      <div style="font-size:13px;color:#3d4f6e;line-height:1.6">簽約後持續追蹤，有變化隨時調整</div>
+    </div>
+  </div>
+</div>
+
+<!-- 免責聲明 -->
+<div style="background:#f8faff;border:1px solid #e0e8f5;border-radius:12px;padding:13px 16px;font-size:11.5px;color:#8a9ab5;line-height:1.8">
+  📌 本頁案例均為真實事件改編，細節經調整以保護當事人隱私。內容僅供參考，實際規劃請依個人狀況評估，歡迎直接聯繫 Weber 討論。
+</div>
+
+</div>
 <script>
 // ── DATE ──
 const NOW = new Date();
