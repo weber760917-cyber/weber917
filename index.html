@@ -206,7 +206,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <div class="tab active"  onclick="switchTab('stories')">📖 案例故事</div>
     <div class="tab" onclick="switchTab('about')">👤 關於我</div>
     <div class="tab" onclick="switchTab('market')">📈 今日行情</div>
-    <div class="tab" onclick="switchTab('crypto')">₿ 加密貨幣</div>
     <div class="tab" onclick="switchTab('fx')">💱 匯率</div>
     <div class="tab" onclick="switchTab('copy')">✍️ 社群文案</div>
   </div>
@@ -254,14 +253,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     </div>
   </div>
 
-  <div class="refresh-area">
-    <button class="refresh-mini" onclick="loadMarket()">↺ 重新整理行情</button>
-    <span id="market-countdown" style="font-size:11px;color:var(--sub);margin-left:8px"></span>
-  </div>
-</div>
-
-<!-- ===== TAB: 加密貨幣 ===== -->
-<div id="panel-crypto" class="panel">
+  <!-- 加密貨幣（整合進今日行情） -->
   <div class="card">
     <div class="card-head"><div class="card-title">₿ 加密貨幣（USD）</div></div>
     <div class="card-body" id="crypto-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
@@ -272,22 +264,67 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       <div class="chart-wrap"><canvas id="chartBTC"></canvas></div>
     </div>
   </div>
-  <!-- 加密新聞 -->
   <div class="card">
     <div class="card-head"><div class="card-title">📰 加密貨幣新聞</div></div>
     <div class="card-body" id="crypto-news"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
   </div>
 
   <div class="refresh-area">
-    <button class="refresh-mini" onclick="loadCrypto()">↺ 重新整理</button>
-    <span id="crypto-countdown" style="font-size:11px;color:var(--sub);margin-left:8px"></span>
+    <button class="refresh-mini" onclick="loadMarket();loadCrypto();">↺ 重新整理行情</button>
+    <span id="market-countdown" style="font-size:11px;color:var(--sub);margin-left:8px"></span>
   </div>
 </div>
 
 <!-- ===== TAB: 匯率 ===== -->
 <div id="panel-fx" class="panel">
+
+  <!-- 匯率換算器 -->
   <div class="card">
-    <div class="card-head"><div class="card-title">💱 對台幣匯率（TWD）</div></div>
+    <div class="card-head"><div class="card-title">🔄 匯率換算器</div></div>
+    <div class="card-body">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div style="flex:1;min-width:120px">
+          <select id="fx-from" onchange="calcFX()" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;margin-bottom:6px">
+            <option value="USD">🇺🇸 美元 USD</option>
+            <option value="TWD" selected>🇹🇼 台幣 TWD</option>
+            <option value="JPY">🇯🇵 日圓 JPY</option>
+            <option value="EUR">🇪🇺 歐元 EUR</option>
+            <option value="CNY">🇨🇳 人民幣 CNY</option>
+            <option value="GBP">🇬🇧 英鎊 GBP</option>
+            <option value="AUD">🇦🇺 澳幣 AUD</option>
+            <option value="CAD">🇨🇦 加幣 CAD</option>
+            <option value="HKD">🇭🇰 港幣 HKD</option>
+            <option value="SGD">🇸🇬 星幣 SGD</option>
+            <option value="CHF">🇨🇭 瑞郎 CHF</option>
+          </select>
+          <input id="fx-amount" type="number" value="1000" min="0" oninput="calcFX()"
+            style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:16px;font-weight:700;font-family:inherit;outline:none">
+        </div>
+        <div style="font-size:22px;color:var(--sub)">=</div>
+        <div style="flex:1;min-width:120px">
+          <select id="fx-to" onchange="calcFX()" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;margin-bottom:6px">
+            <option value="USD" selected>🇺🇸 美元 USD</option>
+            <option value="TWD">🇹🇼 台幣 TWD</option>
+            <option value="JPY">🇯🇵 日圓 JPY</option>
+            <option value="EUR">🇪🇺 歐元 EUR</option>
+            <option value="CNY">🇨🇳 人民幣 CNY</option>
+            <option value="GBP">🇬🇧 英鎊 GBP</option>
+            <option value="AUD">🇦🇺 澳幣 AUD</option>
+            <option value="CAD">🇨🇦 加幣 CAD</option>
+            <option value="HKD">🇭🇰 港幣 HKD</option>
+            <option value="SGD">🇸🇬 星幣 SGD</option>
+            <option value="CHF">🇨🇭 瑞郎 CHF</option>
+          </select>
+          <div id="fx-result" style="border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:16px;font-weight:700;background:#f8faff;color:var(--blue);min-height:38px">—</div>
+        </div>
+      </div>
+      <div id="fx-rate-note" style="font-size:11px;color:var(--sub);margin-top:8px;text-align:center">載入匯率後即可換算</div>
+    </div>
+  </div>
+
+  <!-- 匯率列表 -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">💱 對台幣即時匯率</div></div>
     <div class="card-body" id="fx-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
   </div>
   <div class="card">
@@ -297,10 +334,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     </div>
   </div>
   <div style="background:white;border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:12px;color:var(--sub);box-shadow:0 1px 4px rgba(0,0,0,0.06)">
-    💡 匯率上漲代表台幣貶值（需要更多台幣換外幣）
+    💡 數字越大代表台幣越弱（需要更多台幣換外幣）
   </div>
   <div class="refresh-area">
-    <button class="refresh-mini" onclick="loadFX()">↺ 重新整理</button>
+    <button class="refresh-mini" onclick="loadFX()">↺ 重新整理匯率</button>
   </div>
 </div>
 
@@ -924,12 +961,11 @@ document.getElementById('datePill').textContent =
 
 // ── TABS ──
 function switchTab(name) {
-  const names = ['stories','about','market','crypto','fx','copy'];
+  const names = ['stories','about','market','fx','copy'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
-  if (name === 'crypto' && !document.getElementById('crypto-rows').querySelector('.mkt-row')) loadCrypto();
-  if (name === 'fx'     && !document.getElementById('fx-rows').querySelector('.mkt-row'))     loadFX();
+  if (name === 'fx' && !document.getElementById('fx-rows').querySelector('.mkt-row')) loadFX();
 }
 
 // ── COPY UTILS ──
@@ -989,10 +1025,16 @@ const SYMBOLS = {
     { sym: 'DOGE-USD',name: 'Dogecoin', flag: '🐶', code: 'DOGE'},
   ],
   fx: [
-    { sym: 'TWD%3DX',    name: '美元／台幣', flag: '🇺🇸', code: 'USD/TWD' },
-    { sym: 'JPYTWD%3DX', name: '日圓／台幣', flag: '🇯🇵', code: 'JPY/TWD' },
-    { sym: 'EURTWD%3DX', name: '歐元／台幣', flag: '🇪🇺', code: 'EUR/TWD' },
-    { sym: 'CNYTWD%3DX', name: '人民幣／台幣',flag: '🇨🇳', code: 'CNY/TWD' },
+    { sym: 'TWD%3DX',    name: '美元／台幣',  flag: '🇺🇸', code: 'USD/TWD', key: 'USD' },
+    { sym: 'JPYTWD%3DX', name: '日圓／台幣',  flag: '🇯🇵', code: 'JPY/TWD', key: 'JPY' },
+    { sym: 'EURTWD%3DX', name: '歐元／台幣',  flag: '🇪🇺', code: 'EUR/TWD', key: 'EUR' },
+    { sym: 'CNYTWD%3DX', name: '人民幣／台幣', flag: '🇨🇳', code: 'CNY/TWD', key: 'CNY' },
+    { sym: 'GBPTWD%3DX', name: '英鎊／台幣',  flag: '🇬🇧', code: 'GBP/TWD', key: 'GBP' },
+    { sym: 'AUDTWD%3DX', name: '澳幣／台幣',  flag: '🇦🇺', code: 'AUD/TWD', key: 'AUD' },
+    { sym: 'CADTWD%3DX', name: '加幣／台幣',  flag: '🇨🇦', code: 'CAD/TWD', key: 'CAD' },
+    { sym: 'HKDTWD%3DX', name: '港幣／台幣',  flag: '🇭🇰', code: 'HKD/TWD', key: 'HKD' },
+    { sym: 'SGDTWD%3DX', name: '星幣／台幣',  flag: '🇸🇬', code: 'SGD/TWD', key: 'SGD' },
+    { sym: 'CHFTWD%3DX', name: '瑞郎／台幣',  flag: '🇨🇭', code: 'CHF/TWD', key: 'CHF' },
   ]
 };
 
@@ -1008,7 +1050,9 @@ async function fetchPrice(sym) {
     const data = await fetchQuote(sym);
     const meta = data.chart.result[0].meta;
     const price = meta.regularMarketPrice;
-    const chg   = meta.regularMarketChangePercent ?? 0;  // 直接用 Yahoo 官方漲跌幅
+    const prev  = meta.chartPreviousClose || meta.previousClose;
+    // Yahoo sometimes returns 0 or tiny fraction — always recalculate from prices
+    const chg = (price && prev && prev !== 0) ? ((price - prev) / prev * 100) : 0;
     const closes = data.chart.result[0].indicators.quote[0].close || [];
     return { price, chg, closes };
   } catch { return null; }
@@ -1022,14 +1066,18 @@ function mktRowHTML(item, res) {
     <div class="mkt-r"><div class="mkt-price flat">—</div><div class="mkt-chg flat">無資料</div></div>
   </div>`;
   const up = res.chg >= 0;
-  const cls = Math.abs(res.chg) < 0.01 ? 'flat' : (up ? 'up' : 'down');
+  const cls = Math.abs(res.chg) < 0.005 ? 'flat' : (up ? 'up' : 'down');
   const arr = cls === 'flat' ? '—' : (up ? '▲' : '▼');
+  // Use 3 decimal places for FX (small numbers like JPY use fewer)
+  const isFX = item.code && item.code.includes('/TWD');
+  const decimals = isFX ? (res.price < 1 ? 4 : 3) : 2;
+  const priceStr = res.price.toLocaleString('en', {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
   return `<div class="mkt-row">
     <div class="mkt-l"><span class="mkt-flag">${item.flag}</span>
       <div><div class="mkt-name">${item.name}</div><div class="mkt-code">${item.code}</div></div>
     </div>
     <div class="mkt-r">
-      <div class="mkt-price ${cls}">${res.price.toLocaleString('en',{maximumFractionDigits:2})}</div>
+      <div class="mkt-price ${cls}">${priceStr}</div>
       <div class="mkt-chg ${cls}">${arr} ${Math.abs(res.chg).toFixed(2)}%</div>
     </div>
   </div>`;
@@ -1137,11 +1185,34 @@ async function loadCrypto() {
 
 // ── FX ──
 let chartFX = null;
+const fxRates = {}; // key -> TWD rate
+
+function calcFX() {
+  const from = document.getElementById('fx-from').value;
+  const to   = document.getElementById('fx-to').value;
+  const amt  = parseFloat(document.getElementById('fx-amount').value) || 0;
+  if (!Object.keys(fxRates).length) { document.getElementById('fx-result').textContent = '匯率載入中…'; return; }
+  // All rates stored as X/TWD. TWD=1 (implicit)
+  const fromRate = from === 'TWD' ? 1 : (fxRates[from] || 0);
+  const toRate   = to   === 'TWD' ? 1 : (fxRates[to]   || 0);
+  if (!fromRate || !toRate) { document.getElementById('fx-result').textContent = '部分匯率未載入'; return; }
+  const result = amt * fromRate / toRate;
+  const decimals = result < 1 ? 4 : result < 100 ? 3 : 2;
+  document.getElementById('fx-result').textContent = result.toLocaleString('en',{minimumFractionDigits:decimals,maximumFractionDigits:decimals});
+  const rate1 = (fromRate / toRate);
+  document.getElementById('fx-rate-note').textContent =
+    `1 ${from} = ${rate1 < 1 ? rate1.toFixed(4) : rate1.toFixed(3)} ${to}  ·  最後更新 ${new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}`;
+}
+
 async function loadFX() {
   document.getElementById('fx-rows').innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
   const results = await Promise.all(SYMBOLS.fx.map(item => fetchPrice(item.sym)));
+  // Store rates
+  SYMBOLS.fx.forEach((item, i) => { if (results[i] && item.key) fxRates[item.key] = results[i].price; });
+  fxRates['TWD'] = 1;
   document.getElementById('fx-rows').innerHTML =
     SYMBOLS.fx.map((item, i) => mktRowHTML(item, results[i])).join('');
+  calcFX();
   // USD/TWD chart
   try {
     const d = await fetchQuote('TWD%3DX');
@@ -1615,18 +1686,13 @@ function startCountdown() {
     marketSec--;
     cryptoSec--;
     const mc = document.getElementById('market-countdown');
-    const cc = document.getElementById('crypto-countdown');
     if (mc) mc.textContent = `${marketSec}s 後自動更新`;
-    if (cc) cc.textContent = `${cryptoSec}s 後自動更新`;
 
     if (marketSec <= 0) {
       marketSec = REFRESH_SEC;
       loadMarket();
-      loadUSNews();
-    }
-    if (cryptoSec <= 0) {
-      cryptoSec = REFRESH_SEC;
       loadCrypto();
+      loadUSNews();
       loadCryptoNews();
     }
   }, 1000);
