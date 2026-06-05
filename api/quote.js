@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     });
     if (!response.ok) throw new Error(`Yahoo returned ${response.status}`);
     const data = await response.json();
-    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=120');
     res.json(data);
   } catch (e) {
     res.status(502).json({ error: e.message });
