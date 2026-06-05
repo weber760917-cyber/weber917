@@ -89,7 +89,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .copy-ptab.active { background: var(--blue); color: white; border-color: var(--blue); }
 .copy-pane { display: none; }
 .copy-pane.active { display: block; }
-.copy-text { font-size: 13px; line-height: 1.9; color: #2d3748; background: #fafbfd; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; white-space: pre-wrap; word-break: break-word; margin-bottom: 8px; }
+.copy-text { font-size: 15px; line-height: 2; color: #2d3748; background: #fafbfd; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; white-space: pre-wrap; word-break: break-word; margin-bottom: 8px; }
 .copy-action { text-align: right; }
 .copy-btn { background: var(--blue); color: white; border: none; border-radius: 8px; padding: 7px 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
 .copy-btn:hover { opacity: 0.85; }
@@ -256,6 +256,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 
   <div class="refresh-area">
     <button class="refresh-mini" onclick="loadMarket()">↺ 重新整理行情</button>
+    <span id="market-countdown" style="font-size:11px;color:var(--sub);margin-left:8px"></span>
   </div>
 </div>
 
@@ -279,6 +280,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 
   <div class="refresh-area">
     <button class="refresh-mini" onclick="loadCrypto()">↺ 重新整理</button>
+    <span id="crypto-countdown" style="font-size:11px;color:var(--sub);margin-left:8px"></span>
   </div>
 </div>
 
@@ -357,6 +359,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
         <img id="img-preview" style="display:none;max-width:100%;max-height:160px;border-radius:8px;object-fit:cover" />
       </div>
       <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="previewImg(this)">
+
+      <!-- 照片暗度 -->
+      <div id="dark-slider-wrap" style="display:none;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:0.5px">照片暗度</span>
+          <span id="dark-val" style="font-size:11px;color:var(--blue);font-weight:700">65%</span>
+        </div>
+        <input type="range" id="darkSlider" min="20" max="95" value="65" step="5"
+          style="width:100%;accent-color:var(--blue)"
+          oninput="document.getElementById('dark-val').textContent=this.value+'%';renderCard(false)">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--sub);margin-top:2px">
+          <span>淺（照片清楚）</span><span>深（文字明顯）</span>
+        </div>
+      </div>
 
       <!-- 預覽 -->
       <canvas id="cardCanvas" style="width:100%;border-radius:10px;margin-bottom:10px;display:block"></canvas>
@@ -1313,44 +1329,84 @@ async function loadCryptoNews() {
 }
 
 // ── CALENDAR ──
-async function loadCalendar() {
-  // Fetch Taiwan market earnings/calendar events from Yahoo Finance
-  const items = await fetchNews('台股 法說會 股東會 財報 earnings call Taiwan', 6);
+function loadCalendar() {
   const el = document.getElementById('cal-rows');
-  if (!items.length) {
-    // Fallback: show static upcoming common events
-    const today = new Date();
-    const upcoming = [
-      { daysAhead: 1, type: 'econ', label: '🌐 總經', name: '美國非農就業數據' },
-      { daysAhead: 3, type: 'ir',   label: '📊 法說', name: '台積電法人說明會' },
-      { daysAhead: 5, type: 'agm',  label: '📋 股東', name: '台股股東會旺季' },
-      { daysAhead: 7, type: 'econ', label: '🌐 總經', name: 'Fed 利率決策會議' },
-    ];
-    el.innerHTML = upcoming.map(ev => {
-      const d = new Date(today); d.setDate(d.getDate() + ev.daysAhead);
-      const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
-      return `<div class="cal-item">
-        <div class="cal-date">${dateStr}</div>
-        <div class="cal-type cal-${ev.type}">${ev.label}</div>
-        <div class="cal-name">${ev.name}</div>
-      </div>`;
-    }).join('');
+  const today = new Date();
+  const y = today.getFullYear();
+  const m = today.getMonth(); // 0-based
+
+  // 固定重要財經事件（每月/每季規律）
+  const fixedEvents = [
+    // 每月第一個週五：美國非農
+    { fn: () => nthWeekday(y, m, 5, 1), type: 'econ', label: '🌐 總經', name: '美國非農就業報告（NFP）' },
+    // 每月約第10天：美國CPI
+    { fn: () => new Date(y, m, 12), type: 'econ', label: '🌐 總經', name: '美國 CPI 通膨數據' },
+    // 每月約第15天：台灣出口訂單
+    { fn: () => new Date(y, m, 20), type: 'tw',   label: '🇹🇼 台灣', name: '台灣出口訂單統計' },
+    // Fed 每6週開會（用近似值）
+    { fn: () => nextFed(today),      type: 'econ', label: '🏦 Fed',  name: 'FOMC 利率決策會議' },
+    // 台積電法說（每季：1/16, 4/17, 7/17, 10/17 附近）
+    { fn: () => nextTSMCCall(today), type: 'ir',   label: '📊 法說', name: '台積電（2330）法人說明會' },
+    // 台股股東會旺季（6月）
+    ...(m === 5 ? [{ fn: () => new Date(y, 5, 20), type: 'agm', label: '📋 股東', name: '台股股東會旺季（6月高峰）' }] : []),
+    // 美國企業財報季（1/4月/7/10月初）
+    ...[0,3,6,9].includes(m) ? [{ fn: () => new Date(y, m, 15), type: 'ir', label: '📊 財報', name: '美國企業財報季開始' }] : [],
+  ];
+
+  const events = fixedEvents
+    .map(ev => { try { return { date: ev.fn(), type: ev.type, label: ev.label, name: ev.name }; } catch { return null; } })
+    .filter(ev => ev && ev.date >= today)
+    .sort((a, b) => a.date - b.date)
+    .slice(0, 7);
+
+  if (!events.length) {
+    el.innerHTML = '<div class="error-note">本月暫無重大財經事件</div>';
     return;
   }
-  // Use news items as calendar entries
-  el.innerHTML = items.slice(0,5).map(n => {
-    const ts = n.providerPublishTime ? new Date(n.providerPublishTime*1000) : new Date();
-    const dateStr = `${ts.getMonth()+1}/${ts.getDate()}`;
-    const isAgm = n.title && (n.title.includes('股東') || n.title.includes('AGM'));
-    const isEcon = n.title && (n.title.includes('Fed') || n.title.includes('利率') || n.title.includes('通膨'));
-    const typeClass = isAgm ? 'agm' : isEcon ? 'econ' : 'ir';
-    const typeLabel = isAgm ? '📋 股東' : isEcon ? '🌐 總經' : '📊 法說';
-    return `<div class="cal-item">
+
+  el.innerHTML = events.map(ev => {
+    const isPast = ev.date < today;
+    const d = ev.date;
+    const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+    const typeMap = { econ:'cal-econ', tw:'cal-ir', ir:'cal-ir', agm:'cal-agm' };
+    return `<div class="cal-item" style="${isPast?'opacity:0.4':''}">
       <div class="cal-date">${dateStr}</div>
-      <div class="cal-type cal-${typeClass}">${typeLabel}</div>
-      <div class="cal-name" style="font-size:12px;line-height:1.4">${(n.title||'').substring(0,40)}…</div>
+      <div class="cal-type ${typeMap[ev.type]||'cal-ir'}">${ev.label}</div>
+      <div class="cal-name">${ev.name}</div>
     </div>`;
   }).join('');
+}
+
+function nthWeekday(y, m, dow, n) {
+  // nth occurrence of weekday (1=Mon...5=Fri) in month
+  let count = 0, d = new Date(y, m, 1);
+  while (true) {
+    if (d.getDay() === dow % 7) { count++; if (count === n) return new Date(d); }
+    d.setDate(d.getDate() + 1);
+    if (d.getMonth() !== m) break;
+  }
+  return new Date(y, m, 7);
+}
+
+function nextFed(from) {
+  // Approximate Fed meeting dates 2025-2026
+  const fedDates = [
+    new Date(2025,0,29), new Date(2025,2,19), new Date(2025,4,7),
+    new Date(2025,5,18), new Date(2025,6,30), new Date(2025,8,17),
+    new Date(2025,10,5), new Date(2025,11,17),
+    new Date(2026,0,28), new Date(2026,2,18), new Date(2026,4,6),
+    new Date(2026,5,17), new Date(2026,6,29), new Date(2026,8,16),
+    new Date(2026,10,4), new Date(2026,11,16),
+  ];
+  return fedDates.find(d => d >= from) || new Date(from.getFullYear(), from.getMonth()+2, 1);
+}
+
+function nextTSMCCall(from) {
+  const calls = [
+    new Date(2025,0,16), new Date(2025,3,17), new Date(2025,6,17), new Date(2025,9,16),
+    new Date(2026,0,15), new Date(2026,3,16), new Date(2026,6,16), new Date(2026,9,15),
+  ];
+  return calls.find(d => d >= from) || new Date(from.getFullYear(), from.getMonth()+3, 16);
 }
 
 // ── CARD GENERATOR ──
@@ -1381,6 +1437,7 @@ function previewImg(input) {
     document.getElementById('img-preview').src = userImg;
     document.getElementById('img-preview').style.display = 'block';
     document.getElementById('img-placeholder').style.display = 'none';
+    document.getElementById('dark-slider-wrap').style.display = 'block';
     renderCard(false);
   };
   reader.readAsDataURL(file);
@@ -1390,6 +1447,7 @@ function clearImg() {
   userImg = null;
   document.getElementById('img-preview').style.display = 'none';
   document.getElementById('img-placeholder').style.display = 'block';
+  document.getElementById('dark-slider-wrap').style.display = 'none';
   document.getElementById('imgInput').value = '';
   renderCard(false);
 }
@@ -1429,11 +1487,12 @@ function renderCard(download = false) {
         const sw = img.width * scale, sh = img.height * scale;
         ctx.drawImage(img, (SIZE - sw) / 2, 0, sw, sh);
 
-        // Gradient overlay over photo
-        const ov = ctx.createLinearGradient(0, SIZE * 0.25, 0, SIZE);
-        ov.addColorStop(0, 'rgba(0,0,0,0)');
-        ov.addColorStop(0.45, hexToRgba(tpl.bg1, 0.92));
-        ov.addColorStop(1, hexToRgba(tpl.bg2, 1));
+        // Gradient overlay over photo — controlled by dark slider
+        const darkPct = parseInt(document.getElementById('darkSlider')?.value || 65) / 100;
+        const ov = ctx.createLinearGradient(0, SIZE * 0.15, 0, SIZE);
+        ov.addColorStop(0, `rgba(0,0,0,0)`);
+        ov.addColorStop(0.35, hexToRgba(tpl.bg1, darkPct * 0.85));
+        ov.addColorStop(1,    hexToRgba(tpl.bg2, Math.min(darkPct + 0.15, 1)));
         ctx.fillStyle = ov; ctx.fillRect(0, 0, SIZE, SIZE);
 
         drawContent(SIZE * 0.52, true);
@@ -1482,15 +1541,15 @@ function renderCard(download = false) {
 
     // Headline
     ctx.fillStyle = tpl.text;
-    ctx.font = `700 64px sans-serif`;
-    const hLines = wrapText(ctx, headline, PAD, headY, MAXW, 78);
+    ctx.font = `700 72px sans-serif`;
+    const hLines = wrapText(ctx, headline, PAD, headY, MAXW, 90);
 
     // Body text
     if (bodyText) {
-      const bodyY = headY + hLines * 78 + 30;
+      const bodyY = headY + hLines * 90 + 36;
       ctx.fillStyle = tpl.sub;
-      ctx.font = `400 34px sans-serif`;
-      wrapText(ctx, bodyText, PAD, bodyY, MAXW, 50);
+      ctx.font = `400 40px sans-serif`;
+      wrapText(ctx, bodyText, PAD, bodyY, MAXW, 60);
     }
 
     // Bottom bar
@@ -1547,6 +1606,32 @@ const dropArea = document.getElementById('img-drop-area');
 // Initial preview render
 setTimeout(() => renderCard(false), 500);
 
+// ── AUTO REFRESH ──
+const REFRESH_SEC = 60;
+let marketSec = REFRESH_SEC, cryptoSec = REFRESH_SEC;
+
+function startCountdown() {
+  setInterval(() => {
+    marketSec--;
+    cryptoSec--;
+    const mc = document.getElementById('market-countdown');
+    const cc = document.getElementById('crypto-countdown');
+    if (mc) mc.textContent = `${marketSec}s 後自動更新`;
+    if (cc) cc.textContent = `${cryptoSec}s 後自動更新`;
+
+    if (marketSec <= 0) {
+      marketSec = REFRESH_SEC;
+      loadMarket();
+      loadUSNews();
+    }
+    if (cryptoSec <= 0) {
+      cryptoSec = REFRESH_SEC;
+      loadCrypto();
+      loadCryptoNews();
+    }
+  }, 1000);
+}
+
 // ── INIT ──
 loadMarket();
 loadCalendar();
@@ -1554,6 +1639,7 @@ loadUSNews();
 loadCrypto();
 loadCryptoNews();
 loadFX();
+startCountdown();
 </script>
 </body>
 </html>
