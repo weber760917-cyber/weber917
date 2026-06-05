@@ -173,6 +173,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .refresh-area { text-align: center; margin-bottom: 12px; }
 .refresh-mini { background: none; border: 1px solid var(--border); color: var(--sub); border-radius: 20px; padding: 5px 14px; font-size: 12px; cursor: pointer; }
 .refresh-mini:hover { border-color: var(--blue); color: var(--blue); }
+
+  /* Brief section */
+  .brief-keyword { display:inline-block; background:#ebf4ff; color:#0f3460; font-size:11px; font-weight:700; padding:3px 9px; border-radius:10px; margin:2px 3px 2px 0; }
+  .brief-summary { font-size:13.5px; line-height:1.9; color:#3d4f6e; white-space:pre-wrap; }
+  .brief-date-note { font-size:11px; color:var(--sub); margin-bottom:10px; }
+  .ai-badge { display:inline-block; background:linear-gradient(135deg,#667eea,#764ba2); color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:8px; margin-left:6px; vertical-align:middle; }
+  .story-new-badge { display:inline-block; background:#e94560; color:white; font-size:9px; font-weight:700; padding:1px 6px; border-radius:6px; margin-left:5px; vertical-align:middle; }
 </style>
 </head>
 <body>
@@ -213,6 +220,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 
 <!-- ===== TAB: 今日行情 ===== -->
 <div id="panel-market" class="panel">
+
+  <!-- Daily Brief Card -->
+  <div class="card" id="brief-card" style="display:none">
+    <div class="card-head">
+      <div class="card-title">🧠 Weber 今日觀點 <span class="ai-badge">AI</span></div>
+    </div>
+    <div class="card-body">
+      <div class="brief-date-note" id="brief-date-note"></div>
+      <div id="brief-keywords" style="margin-bottom:10px"></div>
+      <div class="brief-summary" id="brief-summary"></div>
+    </div>
+  </div>
+
+
 
   <!-- 台灣 -->
   <div class="card">
@@ -346,6 +367,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 
   <div class="section-label">根據今日行情自動生成，可直接複製發佈</div>
 
+  <!-- Weber AI 每日文案 -->
+  <div class="card" id="brief-copy-card" style="display:none">
+    <div class="card-head">
+      <div class="card-title">✍️ Weber 今日文案 <span class="ai-badge">AI</span></div>
+    </div>
+    <div class="card-body" id="brief-copy-body">
+      <div class="loading-row"><span class="spin">⟳</span> 載入中…</div>
+    </div>
+  </div>
+
+
+
   <!-- 貼文卡片生成器 -->
   <div class="card">
     <div class="card-head"><div class="card-title">🎨 貼文卡片生成器</div></div>
@@ -447,478 +480,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 
   <!-- Tag Filter -->
   <div class="tag-filter" id="tagFilter">
-    <div class="filter-tag active" data-color="all"    data-tag="all"       onclick="filterTag(this)">全部</div>
-    <div class="filter-tag"        data-color="trust"  data-tag="trust"     onclick="filterTag(this)">🔒 信託保全</div>
-    <div class="filter-tag"        data-color="retire" data-tag="retire"    onclick="filterTag(this)">💸 退休警示</div>
-    <div class="filter-tag"        data-color="estate" data-tag="estate"    onclick="filterTag(this)">🏠 不動產</div>
-    <div class="filter-tag"        data-color="insurance" data-tag="insurance" onclick="filterTag(this)">🛡️ 保險陷阱</div>
+    <div class="filter-tag active" data-color="all"       data-tag="all"        onclick="filterTag(this)">全部</div>
+    <div class="filter-tag"        data-color="trust"     data-tag="trust"      onclick="filterTag(this)">🔒 信託保全</div>
+    <div class="filter-tag"        data-color="retire"    data-tag="retire"     onclick="filterTag(this)">💸 退休警示</div>
+    <div class="filter-tag"        data-color="realestate" data-tag="realestate" onclick="filterTag(this)">🏠 不動產</div>
+    <div class="filter-tag"        data-color="insurance" data-tag="insurance"  onclick="filterTag(this)">🛡️ 保險陷阱</div>
   </div>
 
-  <!-- Story 1 -->
-  <div class="story-card" data-tags="trust insurance">
-    <div class="story-top">
-      <span class="stag stag-insurance">保險陷阱</span><span class="stag stag-trust">信託保全</span>
-      <div class="story-title">79歲的陳伯伯，620萬就這樣不見了</div>
-      <div class="story-meta">改編自2024年真實案例</div>
-    </div>
-    <div class="story-mid">
-      <div class="story-quote">陳伯伯退休後，熟識的理專打電話說：<br>「利息比定存高，每月還有固定配息喔！」<br><br>他當天就簽了，買了兩張各310萬的投資型保單。<br><br>幾年後才發現——配息其實來自本金，解約要扣大筆費用。<br>620萬，正在慢慢縮水。</div>
-      <div class="sol-box">
-        <div class="sol-title">🛡️ Weber 的解法</div>
-        <ul class="sol-list">
-          <li>這錢我幾歲以後才會用？能鎖多久？</li>
-          <li>配息從哪裡來？會動到本金嗎？</li>
-          <li>不懂就不簽，任何商品都是</li>
-        </ul>
-      </div>
-    </div>
-    <div class="story-toggle"><button class="toggle-btn" onclick="toggleCopy(this)">▼ 展開社群文案</button></div>
-    <div class="story-copy" style="display:none">
-      <div class="copy-tabs-s">
-        <div class="copy-ptab active" onclick="switchCopyS(this,'s1-fb')">FB</div>
-        <div class="copy-ptab" onclick="switchCopyS(this,'s1-ig')">IG</div>
-        <div class="copy-ptab" onclick="switchCopyS(this,'s1-line')">LINE</div>
-      </div>
-      <div id="s1-fb" class="copy-pane active">
-        <div class="copy-text" id="s1-fb-t">有個真實案例讓我很揪心 😔
-
-79歲的阿伯，被理專推薦「利息比定存高、每月固定配息」的商品。
-他當場簽了，總共買了620萬投資型保單。
-
-後來才發現——配息可能來自本金，解約還要被扣大筆費用。
-那個「穩穩的配息」，其實在吃他的老本。
-
-我常說，年紀越大，買金融商品要越謹慎。
-
-✅ 這錢你幾歲才用得到？能鎖幾年？
-✅ 配息從哪來？會動本金嗎？
-✅ 你真的看得懂嗎？不懂就先別簽。
-
-有問題歡迎直接私訊我，不賣你東西，幫你搞清楚就好 👇</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s1-fb-t',this)">複製</button></div>
-      </div>
-      <div id="s1-ig" class="copy-pane">
-        <div class="copy-text" id="s1-ig-t">79歲，620萬，就這樣不見了 😶
-
-「利息比定存高、每月固定配息」
-聽起來很安全，其實不然
-
-配息來自本金
-解約要扣大筆費用
-他根本不知道自己在承擔風險
-
-年紀越大，越要謹慎
-不懂的商品，就是不簽
-
-有疑問私訊我 🙋
-
-#理財顧問 #保險規劃 #退休準備 #保險陷阱 #財務自由</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s1-ig-t',this)">複製</button></div>
-      </div>
-      <div id="s1-line" class="copy-pane">
-        <div class="copy-text" id="s1-line-t">【今日分享】
-79歲阿伯，買了620萬保單。
-「利息比定存高」聽起來很棒。
-結果配息是吃本金，解約還要被扣。
-年紀越大越要謹慎。
-不懂的商品就不簽，有問題問我 😊</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s1-line-t',this)">複製</button></div>
-      </div>
-    </div>
+  <!-- Dynamic Stories Container -->
+  <div id="stories-container">
+    <div class="loading-row"><span class="spin">⟳</span> 載入案例中…</div>
   </div>
-
-  <!-- Story 2 -->
-  <div class="story-card" data-tags="trust">
-    <div class="story-top">
-      <span class="stag stag-trust">信託保全</span>
-      <div class="story-title">媽媽的1200萬，被兒子「借」走了</div>
-      <div class="story-meta">安養信託真實諮詢案例</div>
-    </div>
-    <div class="story-mid">
-      <div class="story-quote">林媽媽70歲，存了一輩子1200萬放銀行。<br><br>大兒子說「先借200萬周轉」，她捨不得拒絕。<br>半年後又借，再半年又借。<br><br>幾年後她生病需要照護，帳戶只剩400萬。<br>那800萬，借出去了，沒打算還。<br><br>她最後悔的是：「當初為什麼沒有把錢鎖起來？」</div>
-      <div class="sol-box">
-        <div class="sol-title">🛡️ Weber 的解法：安養信託</div>
-        <ul class="sol-list">
-          <li>設立後，錢只能用於你的醫療和生活</li>
-          <li>子女、親屬無法任意動用</li>
-          <li>即使失智，財產仍照你意願被保護</li>
-        </ul>
-      </div>
-    </div>
-    <div class="story-toggle"><button class="toggle-btn" onclick="toggleCopy(this)">▼ 展開社群文案</button></div>
-    <div class="story-copy" style="display:none">
-      <div class="copy-tabs-s">
-        <div class="copy-ptab active" onclick="switchCopyS(this,'s2-fb')">FB</div>
-        <div class="copy-ptab" onclick="switchCopyS(this,'s2-ig')">IG</div>
-        <div class="copy-ptab" onclick="switchCopyS(this,'s2-line')">LINE</div>
-      </div>
-      <div id="s2-fb" class="copy-pane active">
-        <div class="copy-text" id="s2-fb-t">我有個客戶，媽媽存了一輩子1200萬 💰
-
-大兒子說「先借我200萬周轉」，她捨不得拒絕。
-然後又借。又借。又借。
-
-幾年後媽媽生病，帳戶只剩400萬。
-其他的，「借」出去了，沒有要還。
-
-她說：「我當初為什麼沒有把錢鎖起來？」
-
-這就是安養信託的用途——
-不是不信任家人，是保護自己的晚年。
-
-設立後，這筆錢只能用在：
-✅ 你的醫療費用
-✅ 你的日常生活
-✅ 你自己同意的事
-
-子女、親人，動不了。
-
-想了解更多，私訊我，免費聊 😊</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s2-fb-t',this)">複製</button></div>
-      </div>
-      <div id="s2-ig" class="copy-pane">
-        <div class="copy-text" id="s2-ig-t">「媽，先借我200萬…」
-
-借了又借，1200萬只剩400萬 😔
-媽媽生病的錢，差點不夠用
-
-不是不信任孩子
-是老後的錢，要先保護好自己
-
-安養信託：
-✅ 只能用於你的醫療和生活
-✅ 子女無法任意動用
-✅ 失智也能被保護
-
-想了解？私訊我 👇
-
-#安養信託 #退休規劃 #資產保全 #理財顧問 #老後準備</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s2-ig-t',this)">複製</button></div>
-      </div>
-      <div id="s2-line" class="copy-pane">
-        <div class="copy-text" id="s2-line-t">【今日分享】
-媽媽1200萬，被兒子「借」走800萬。
-等到生病要用錢，才後悔沒保護好自己。
-安養信託把錢鎖起來，只能用在你自己身上。
-有興趣了解，私訊我 😊</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s2-line-t',this)">複製</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Story 3 -->
-  <div class="story-card" data-tags="retire">
-    <div class="story-top">
-      <span class="stag stag-retire">退休警示</span>
-      <div class="story-title">他以為1000萬夠用，73歲就見底了</div>
-      <div class="story-meta">長照費用沒算進去的退休規劃</div>
-    </div>
-    <div class="story-mid">
-      <div class="story-quote">張先生65歲退休，帳戶有1000萬，心想夠了。<br><br>每月生活費3萬、幫小孩出了頭期款、太太中風，請了看護每月6萬……<br><br>73歲，帳戶見底。<br><br>他跟我說：「我以為我很有錢，沒想到8年就燒完了。」</div>
-      <div class="sol-box">
-        <div class="sol-title">🛡️ Weber 的解法：四筆錢要分開算</div>
-        <ul class="sol-list">
-          <li>日常生活費：20年預算，通膨算進去</li>
-          <li>醫療備用金：最少200萬，不能動</li>
-          <li>長照準備金：平均每月5～8萬，最少7年</li>
-          <li>緊急備用金：隨時可動用的現金水位</li>
-        </ul>
-      </div>
-    </div>
-    <div class="story-toggle"><button class="toggle-btn" onclick="toggleCopy(this)">▼ 展開社群文案</button></div>
-    <div class="story-copy" style="display:none">
-      <div class="copy-tabs-s">
-        <div class="copy-ptab active" onclick="switchCopyS(this,'s3-fb')">FB</div>
-        <div class="copy-ptab" onclick="switchCopyS(this,'s3-ig')">IG</div>
-        <div class="copy-ptab" onclick="switchCopyS(this,'s3-line')">LINE</div>
-      </div>
-      <div id="s3-fb" class="copy-pane active">
-        <div class="copy-text" id="s3-fb-t">65歲退休，帳戶有1000萬——聽起來夠了吧？😅
-
-但張先生73歲，帳戶見底了。
-
-8年，1000萬就沒了。
-
-怎麼燒的？
-👉 每月生活費3萬
-👉 幫小孩付了一次頭期款
-👉 太太中風，看護費每月6萬
-
-長照費用，是很多人完全沒算到的。
-
-台灣平均長照時間：7.3年
-每個月費用：5～8萬
-光這個就要500～700萬
-
-退休前，錢要這樣分：
-✅ 日常生活費（通膨算進去）
-✅ 醫療備用金（最少200萬別動）
-✅ 長照準備金（提早買保險才是正解）
-✅ 緊急備用金
-
-1000萬聽起來多，算仔細才知道夠不夠。
-想算算你的數字，私訊我 👇</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s3-fb-t',this)">複製</button></div>
-      </div>
-      <div id="s3-ig" class="copy-pane">
-        <div class="copy-text" id="s3-ig-t">退休有1000萬，73歲見底了 😮
-
-每月生活費 + 孩子頭期款 + 太太長照
-8年，燒完了
-
-台灣平均長照時間：7.3年
-每月費用：5～8萬
-這一塊，很多人根本沒算到
-
-退休前，四筆錢要分開規劃
-不然1000萬也不夠用
-
-想知道你的退休缺口有多大？
-私訊我算給你看 👇
-
-#退休規劃 #長照保險 #理財顧問 #退休金 #財務自由</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s3-ig-t',this)">複製</button></div>
-      </div>
-      <div id="s3-line" class="copy-pane">
-        <div class="copy-text" id="s3-line-t">【今日分享】
-退休有1000萬，8年就燒完了。
-長照費每月5～8萬，台灣平均要撐7年以上。
-這筆錢你準備好了嗎？
-沒準備的，現在開始還來得及。私訊我 😊</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s3-line-t',this)">複製</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Story 4 -->
-  <div class="story-card" data-tags="retire">
-    <div class="story-top">
-      <span class="stag stag-retire">退休警示</span>
-      <div class="story-title">定存族的噩夢：錢沒少，但買不到東西了</div>
-      <div class="story-meta">通膨侵蝕退休金的真實影響</div>
-    </div>
-    <div class="story-mid">
-      <div class="story-quote">黃媽媽55歲退休，500萬全放定存。「很安全，不會賠。」<br><br>20年後她75歲，帳戶還是差不多500萬。<br>但當年可以買3間小套房，現在只能付一間的頭期款。<br><br>錢沒有少，但她的生活水準，每年都在悄悄下降。</div>
-      <div class="sol-box">
-        <div class="sol-title">🛡️ Weber 的解法：錢要會動</div>
-        <ul class="sol-list">
-          <li>短期（1～3年）：定存、貨幣型商品保流動性</li>
-          <li>中期（3～10年）：儲蓄險、債券型穩定增值</li>
-          <li>長期（10年以上）：ETF、股票型對抗通膨</li>
-        </ul>
-      </div>
-    </div>
-    <div class="story-toggle"><button class="toggle-btn" onclick="toggleCopy(this)">▼ 展開社群文案</button></div>
-    <div class="story-copy" style="display:none">
-      <div class="copy-tabs-s">
-        <div class="copy-ptab active" onclick="switchCopyS(this,'s4-fb')">FB</div>
-        <div class="copy-ptab" onclick="switchCopyS(this,'s4-ig')">IG</div>
-        <div class="copy-ptab" onclick="switchCopyS(this,'s4-line')">LINE</div>
-      </div>
-      <div id="s4-fb" class="copy-pane active">
-        <div class="copy-text" id="s4-fb-t">帳戶的錢沒有少，但她的生活水準，每年都在悄悄下降 📉
-
-黃媽媽55歲退休，500萬全放定存。
-20年過去，帳戶還是500萬。
-
-但當年能買3間小套房的錢，現在只夠付一間頭期款。
-
-這就是通膨——不搶你的錢，只讓你的錢越來越不值錢。
-
-退休的錢，要分三層放：
-✅ 近期要用：定存、活存（保流動性）
-✅ 中期規劃：儲蓄險、債券型（穩定增值）
-✅ 長期備用：ETF、股票型（對抗通膨）
-
-放對地方，退休金才撐得住。
-不知道怎麼分？私訊我 👇</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s4-fb-t',this)">複製</button></div>
-      </div>
-      <div id="s4-ig" class="copy-pane">
-        <div class="copy-text" id="s4-ig-t">錢沒少，但買不到東西了 😶
-
-500萬放定存20年
-帳戶還是500萬
-但當年能買3間套房
-現在只夠付頭期款
-
-通膨不是搶你的錢
-是讓你的錢越來越薄
-
-退休金要分三層：
-近期 → 定存
-中期 → 儲蓄險
-長期 → ETF
-
-放對了，才真的有保障
-
-#退休規劃 #通膨 #理財 #ETF #財務自由</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s4-ig-t',this)">複製</button></div>
-      </div>
-      <div id="s4-line" class="copy-pane">
-        <div class="copy-text" id="s4-line-t">【今日分享】
-500萬放定存20年，帳戶還是500萬。
-但能買的東西越來越少。
-通膨不偷你的錢，只讓錢越來越薄。
-退休的錢要分層放，才能對抗通膨。
-有興趣聊，私訊我 😊</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s4-line-t',this)">複製</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Story 5 -->
-  <div class="story-card" data-tags="estate">
-    <div class="story-top">
-      <span class="stag stag-estate">不動產活化</span>
-      <div class="story-title">有房沒錢，買東西都要想很久</div>
-      <div class="story-meta">2025年以房養老件數年增42%的背後</div>
-    </div>
-    <div class="story-mid">
-      <div class="story-quote">王伯伯有一間市值1500萬的房子，但每月生活費只有1萬多。<br><br>他說：「我有一間好房子，但口袋沒錢，去買個東西都要想很久。」<br><br>台灣2025年以房養老件數暴增42%，代表越來越多人面對「有房無現金」的困境。</div>
-      <div class="sol-box">
-        <div class="sol-title">🛡️ Weber 的解法：房子可以變成月薪</div>
-        <ul class="sol-list">
-          <li>以房養老：不搬家，每月領固定生活費</li>
-          <li>不動產信託：保障晚年居住安全</li>
-          <li>提早規劃：60歲前佈局，選擇更多</li>
-        </ul>
-      </div>
-    </div>
-    <div class="story-toggle"><button class="toggle-btn" onclick="toggleCopy(this)">▼ 展開社群文案</button></div>
-    <div class="story-copy" style="display:none">
-      <div class="copy-tabs-s">
-        <div class="copy-ptab active" onclick="switchCopyS(this,'s5-fb')">FB</div>
-        <div class="copy-ptab" onclick="switchCopyS(this,'s5-ig')">IG</div>
-        <div class="copy-ptab" onclick="switchCopyS(this,'s5-line')">LINE</div>
-      </div>
-      <div id="s5-fb" class="copy-pane active">
-        <div class="copy-text" id="s5-fb-t">「我有一間好房子，但口袋沒錢，買個東西都要想很久。」🏠
-
-這是我聽過最心酸的退休描述。
-
-台灣2025年以房養老件數，年增了42%。
-背後是越來越多長輩，面對「有房，沒現金」的困境。
-
-房子是資產，但資產要能用，才有意義。
-
-幾個方式可以評估：
-✅ 以房養老：繼續住在自己家，銀行每月給你生活費
-✅ 不動產信託：保障居住安全，避免被人騙走
-✅ 提早規劃：趁還有選擇時，先做好佈局
-
-房子不是只能留給下一代。
-它也可以是你安穩晚年的底氣。
-
-想了解怎麼規劃，私訊我 👇</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s5-fb-t',this)">複製</button></div>
-      </div>
-      <div id="s5-ig" class="copy-pane">
-        <div class="copy-text" id="s5-ig-t">有房，沒錢 😔
-
-1500萬的房子
-每個月生活費只有1萬多
-買東西都要想很久
-
-2025年以房養老年增42%
-越來越多人面對這困境
-
-房子可以變成月薪
-不用賣、不用搬
-繼續住，每月領錢
-
-想了解怎麼規劃？私訊我 👇
-
-#以房養老 #退休規劃 #不動產 #理財顧問 #老後生活</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s5-ig-t',this)">複製</button></div>
-      </div>
-      <div id="s5-line" class="copy-pane">
-        <div class="copy-text" id="s5-line-t">【今日分享】
-有房沒錢，是很多人退休後的真實狀況。
-以房養老讓你不用賣房、不用搬家，
-每個月還有固定生活費入帳。
-想知道自己適不適合，私訊我評估 😊</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s5-line-t',this)">複製</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Story 6 -->
-  <div class="story-card" data-tags="estate trust">
-    <div class="story-top">
-      <span class="stag stag-estate">不動產活化</span><span class="stag stag-trust">信託保全</span>
-      <div class="story-title">房子讓給兒子，老了卻被趕出去</div>
-      <div class="story-meta">不動產信託的重要性</div>
-    </div>
-    <div class="story-mid">
-      <div class="story-quote">李阿姨好心把房子過戶給兒子，說方便他貸款，「反正還是我住的啦。」<br><br>五年後，兒子婚姻出問題，房子要被拍賣抵債。<br><br>李阿姨才知道，她讓出的房子，法律上已經不是她的了。<br><br>「我以為是幫他，沒想到把自己的家也弄沒了。」</div>
-      <div class="sol-box">
-        <div class="sol-title">🛡️ Weber 的解法：愛家人，也要保護自己</div>
-        <ul class="sol-list">
-          <li>不動產信託：就算過戶，居住權受法律保障</li>
-          <li>保留條款：白紙黑字寫清楚，感情歸感情</li>
-          <li>遺囑規劃：身後分配提前安排，減少糾紛</li>
-        </ul>
-      </div>
-    </div>
-    <div class="story-toggle"><button class="toggle-btn" onclick="toggleCopy(this)">▼ 展開社群文案</button></div>
-    <div class="story-copy" style="display:none">
-      <div class="copy-tabs-s">
-        <div class="copy-ptab active" onclick="switchCopyS(this,'s6-fb')">FB</div>
-        <div class="copy-ptab" onclick="switchCopyS(this,'s6-ig')">IG</div>
-        <div class="copy-ptab" onclick="switchCopyS(this,'s6-line')">LINE</div>
-      </div>
-      <div id="s6-fb" class="copy-pane active">
-        <div class="copy-text" id="s6-fb-t">「我以為是幫他，沒想到把自己的家也弄沒了。」😢
-
-李阿姨好心把房子過戶給兒子，說方便他貸款，「反正還是我住的啦。」
-
-後來兒子離婚，房子被拍賣抵債。
-住了幾十年的家，就這樣沒了。
-
-這種事每年都在發生。
-
-不是不能幫孩子，是幫之前要先保護自己：
-✅ 不動產信託：就算過戶，居住權受法律保障
-✅ 保留條款：白紙黑字寫清楚，感情歸感情
-✅ 遺囑規劃：身後分配提前安排好
-
-愛家人，但也要愛自己。
-有這方面的煩惱，私訊我聊聊 👇</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s6-fb-t',this)">複製</button></div>
-      </div>
-      <div id="s6-ig" class="copy-pane">
-        <div class="copy-text" id="s6-ig-t">好心幫兒子，把自己的家弄沒了 😔
-
-房子過戶給兒子
-以為「反正還是我住的」
-結果兒子離婚，房子被拍賣
-
-住了幾十年的家，就這樣沒了
-
-愛家人，也要先保護自己
-
-不動產信託
-幫了孩子，也留住自己的家
-
-私訊我了解 👇
-
-#不動產信託 #退休規劃 #資產保全 #理財顧問 #老後安全</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s6-ig-t',this)">複製</button></div>
-      </div>
-      <div id="s6-line" class="copy-pane">
-        <div class="copy-text" id="s6-line-t">【今日分享】
-阿姨把房子過戶給兒子，以為還是自己住的。
-結果兒子離婚，房子被拍賣了。
-幫孩子之前，先保護自己。
-不動產信託可以兩全其美。
-有疑問，私訊我 😊</div>
-        <div class="copy-action"><button class="copy-btn" onclick="cp('s6-line-t',this)">複製</button></div>
-      </div>
-    </div>
-  </div>
-
-</div>
 
 <!-- ===== TAB: 關於我 ===== -->
 <div id="panel-about" class="panel">
@@ -1698,7 +1270,111 @@ function startCountdown() {
   }, 1000);
 }
 
+
+// ── BRIEF (daily AI summary) ──
+async function loadBrief() {
+  try {
+    const r = await fetch('/data/brief.json?_=' + Date.now());
+    if (!r.ok) return;
+    const d = await r.json();
+
+    // Market panel — Weber 觀點 card
+    if (d.date) {
+      document.getElementById('brief-date-note').textContent = d.dateLabel || d.date;
+      document.getElementById('brief-keywords').innerHTML =
+        (d.keywords || []).map(k => `<span class="brief-keyword">${k}</span>`).join('');
+      document.getElementById('brief-summary').textContent = d.summary || '';
+      document.getElementById('brief-card').style.display = 'block';
+    }
+
+    // Copy panel — AI social copy
+    const bc = document.getElementById('brief-copy-card');
+    const bcBody = document.getElementById('brief-copy-body');
+    if (bc && d.fb) {
+      bcBody.innerHTML = makeCopyCard('Weber AI 文案', d.fb, d.ig, d.line, 'br');
+      bc.style.display = 'block';
+    }
+  } catch(e) { console.warn('brief load failed', e); }
+}
+
+// ── STORIES (dynamic from JSON) ──
+const TAG_META = {
+  trust:       { label: '🔒 信託保全', cls: 'stag-trust' },
+  retire:      { label: '💸 退休警示', cls: 'stag-retire' },
+  realestate:  { label: '🏠 不動產',   cls: 'stag-estate' },
+  insurance:   { label: '🛡️ 保險陷阱', cls: 'stag-insurance' },
+};
+
+function storyCardHTML(s, idx) {
+  const isNew = idx === 0;
+  const tags = (s.tags || []).map(t => {
+    const m = TAG_META[t] || { label: t, cls: '' };
+    return `<span class="stag ${m.cls}">${m.label}</span>`;
+  }).join('');
+  const sol = s.solution ? `
+    <div class="sol-box">
+      <div class="sol-title">🛡️ ${s.solution.title}</div>
+      <ul class="sol-list">
+        ${(s.solution.points || []).map(p => `<li>${p}</li>`).join('')}
+      </ul>
+    </div>` : '';
+  const quoteHtml = (s.quote || '').replace(/\n/g, '<br>');
+  const id = s.id || ('s' + idx);
+  return `
+<div class="story-card" data-tags="${(s.tags||[]).join(' ')}">
+  <div class="story-top">
+    ${tags}${isNew ? '<span class="story-new-badge">NEW</span>' : ''}
+    <div class="story-title">${s.title || ''}</div>
+    <div class="story-meta">${s.meta || ''}</div>
+  </div>
+  <div class="story-mid">
+    <div class="story-quote">${quoteHtml}</div>
+    ${sol}
+  </div>
+  <div class="story-toggle"><button class="toggle-btn" onclick="toggleCopy(this)">▼ 展開社群文案</button></div>
+  <div class="story-copy" style="display:none">
+    <div class="copy-tabs-s">
+      <div class="copy-ptab active" onclick="switchCopyS(this,'${id}-fb')">FB</div>
+      <div class="copy-ptab" onclick="switchCopyS(this,'${id}-ig')">IG</div>
+      <div class="copy-ptab" onclick="switchCopyS(this,'${id}-line')">LINE</div>
+    </div>
+    <div id="${id}-fb" class="copy-pane-s active">
+      <div class="copy-text" id="${id}-fb-t">${(s.fb||'').replace(/</g,'&lt;')}</div>
+      <div class="copy-action"><button class="copy-btn" onclick="cp('${id}-fb-t',this)">複製</button></div>
+    </div>
+    <div id="${id}-ig" class="copy-pane-s">
+      <div class="copy-text" id="${id}-ig-t">${(s.ig||'').replace(/</g,'&lt;')}</div>
+      <div class="copy-action"><button class="copy-btn" onclick="cp('${id}-ig-t',this)">複製</button></div>
+    </div>
+    <div id="${id}-line" class="copy-pane-s">
+      <div class="copy-text" id="${id}-line-t">${(s.line||'').replace(/</g,'&lt;')}</div>
+      <div class="copy-action"><button class="copy-btn" onclick="cp('${id}-line-t',this)">複製</button></div>
+    </div>
+  </div>
+</div>`;
+}
+
+async function loadStories() {
+  const container = document.getElementById('stories-container');
+  if (!container) return;
+  try {
+    const r = await fetch('/data/stories.json?_=' + Date.now());
+    if (!r.ok) throw new Error('failed');
+    const stories = await r.json();
+    // Newest first
+    const sorted = [...stories].reverse();
+    container.innerHTML = sorted.map((s, i) => storyCardHTML(s, i)).join('');
+    // Re-apply active filter
+    const activeTag = document.querySelector('.filter-tag.active');
+    if (activeTag && activeTag.dataset.tag !== 'all') filterTag(activeTag);
+  } catch(e) {
+    container.innerHTML = '<div class="error-note">案例載入失敗，請重新整理</div>';
+  }
+}
+
 // ── INIT ──
+loadStories();
+loadBrief();
 loadMarket();
 loadCalendar();
 loadUSNews();
