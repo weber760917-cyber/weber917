@@ -187,6 +187,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .cal-ir   { background: #ebf4ff; color: #0f3460; }
 .cal-econ { background: #f0eaff; color: #6d28d9; }
 .cal-name { font-size: 13px; font-weight: 500; }
+.cal-link { text-decoration: none; color: inherit; border-bottom: 1px dashed #b0bdd4; transition: color 0.15s; }
+.cal-link:hover { color: var(--blue); }
 
 /* ── UTILS ── */
 .section-label { font-size: 11px; font-weight: 700; color: var(--sub); letter-spacing: 1px; padding: 4px 2px 10px; text-transform: uppercase; }
@@ -718,8 +720,11 @@ async function fetchPrice(sym) {
     const chg = meta.regularMarketChangePercent != null
       ? meta.regularMarketChangePercent
       : (price && prev && prev !== 0) ? ((price - prev) / prev * 100) : 0;
+    const changeAbs = meta.regularMarketChange != null
+      ? meta.regularMarketChange
+      : (price && prev) ? (price - prev) : 0;
     const closes = data.chart.result[0].indicators.quote[0].close || [];
-    return { price, chg, closes };
+    return { price, chg, changeAbs, closes };
   } catch { return null; }
 }
 
@@ -742,13 +747,24 @@ function mktRowHTML(item, res) {
   const isFX = item.code && item.code.includes('/TWD');
   const decimals = isFX ? (res.price < 1 ? 4 : 3) : 2;
   const priceStr = res.price.toLocaleString('en', {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
+  // Format absolute change
+  let absStr = '';
+  if (!isFlat && res.changeAbs != null && !isNaN(res.changeAbs)) {
+    const prefix = res.changeAbs >= 0 ? '+' : '';
+    const p = Math.abs(res.price);
+    if (p >= 10000) absStr = prefix + Math.round(res.changeAbs).toLocaleString('en');
+    else if (p >= 100) absStr = prefix + res.changeAbs.toFixed(2);
+    else if (p >= 1)   absStr = prefix + res.changeAbs.toFixed(3);
+    else               absStr = prefix + res.changeAbs.toFixed(6);
+  }
+  const chgLine = isFlat ? '—' : (absStr ? `${arr} ${absStr} (${Math.abs(res.chg).toFixed(2)}%)` : `${arr} ${Math.abs(res.chg).toFixed(2)}%`);
   return `<div class="mkt-row">
     <div class="mkt-l"><span class="mkt-flag">${item.flag}</span>
       <div><div class="mkt-name">${item.name}</div><div class="mkt-code">${item.code}</div></div>
     </div>
     <div class="mkt-r">
       <div class="mkt-price ${cls}">${priceStr}</div>
-      <div class="mkt-chg ${cls}">${arr} ${Math.abs(res.chg).toFixed(2)}%</div>
+      <div class="mkt-chg ${cls}">${chgLine}</div>
     </div>
   </div>`;
 }
@@ -1079,19 +1095,19 @@ function loadCalendar() {
   // 固定重要財經事件（每月/每季規律）
   const fixedEvents = [
     // 每月第一個週五：美國非農
-    { fn: () => nthWeekday(y, m, 5, 1), type: 'econ', label: '🌐 總經', name: '美國非農就業報告（NFP）' },
+    { fn: () => nthWeekday(y, m, 5, 1), type: 'econ', label: '🌐 總經', name: '美國非農就業報告（NFP）', url: 'https://www.bls.gov/news.release/empsit.toc.htm' },
     // 每月約第10天：美國CPI
-    { fn: () => new Date(y, m, 12), type: 'econ', label: '🌐 總經', name: '美國 CPI 通膨數據' },
+    { fn: () => new Date(y, m, 12), type: 'econ', label: '🌐 總經', name: '美國 CPI 通膨數據', url: 'https://www.bls.gov/news.release/cpi.toc.htm' },
     // 每月約第15天：台灣出口訂單
-    { fn: () => new Date(y, m, 20), type: 'tw',   label: '🇹🇼 台灣', name: '台灣出口訂單統計' },
+    { fn: () => new Date(y, m, 20), type: 'tw',   label: '🇹🇼 台灣', name: '台灣出口訂單統計', url: 'https://www.moea.gov.tw/MNS/dos/content/ContentLink.aspx?menu_id=9432' },
     // Fed 每6週開會（用近似值）
-    { fn: () => nextFed(today),      type: 'econ', label: '🏦 Fed',  name: 'FOMC 利率決策會議' },
+    { fn: () => nextFed(today),      type: 'econ', label: '🏦 Fed',  name: 'FOMC 利率決策會議', url: 'https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm' },
     // 台積電法說（每季：1/16, 4/17, 7/17, 10/17 附近）
-    { fn: () => nextTSMCCall(today), type: 'ir',   label: '📊 法說', name: '台積電（2330）法人說明會' },
+    { fn: () => nextTSMCCall(today), type: 'ir',   label: '📊 法說', name: '台積電（2330）法人說明會', url: 'https://investor.tsmc.com/chinese/quarterly-results' },
     // 台股股東會旺季（6月）
-    ...(m === 5 ? [{ fn: () => new Date(y, 5, 20), type: 'agm', label: '📋 股東', name: '台股股東會旺季（6月高峰）' }] : []),
+    ...(m === 5 ? [{ fn: () => new Date(y, 5, 20), type: 'agm', label: '📋 股東', name: '台股股東會旺季（6月高峰）', url: 'https://mops.twse.com.tw/mops/web/t100sb03_1' }] : []),
     // 美國企業財報季（1/4月/7/10月初）
-    ...[0,3,6,9].includes(m) ? [{ fn: () => new Date(y, m, 15), type: 'ir', label: '📊 財報', name: '美國企業財報季開始' }] : [],
+    ...[0,3,6,9].includes(m) ? [{ fn: () => new Date(y, m, 15), type: 'ir', label: '📊 財報', name: '美國企業財報季開始', url: 'https://finance.yahoo.com/calendar/earnings' }] : [],
   ];
 
   const events = fixedEvents
@@ -1106,14 +1122,16 @@ function loadCalendar() {
   }
 
   el.innerHTML = events.map(ev => {
-    const isPast = ev.date < today;
     const d = ev.date;
     const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
     const typeMap = { econ:'cal-econ', tw:'cal-ir', ir:'cal-ir', agm:'cal-agm' };
-    return `<div class="cal-item" style="${isPast?'opacity:0.4':''}">
+    const nameEl = ev.url
+      ? `<a class="cal-name cal-link" href="${ev.url}" target="_blank" rel="noopener">${ev.name} <span style="font-size:10px;opacity:0.6">🔗</span></a>`
+      : `<div class="cal-name">${ev.name}</div>`;
+    return `<div class="cal-item">
       <div class="cal-date">${dateStr}</div>
       <div class="cal-type ${typeMap[ev.type]||'cal-ir'}">${ev.label}</div>
-      <div class="cal-name">${ev.name}</div>
+      ${nameEl}
     </div>`;
   }).join('');
 }
