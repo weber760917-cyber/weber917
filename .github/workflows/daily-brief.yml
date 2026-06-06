@@ -1,0 +1,41 @@
+name: 每日社群文案生成
+
+on:
+  schedule:
+    # 每天 22:00 UTC = 台灣時間 06:00 AM
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+    # 允許手動執行（測試用）
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd scripts
+          npm install
+
+      - name: Generate daily brief
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node scripts/generate-brief.js
+
+      - name: Commit and push brief.json
+        run: |
+          git config user.name "Weber Bot"
+          git config user.email "weber760917@gmail.com"
+          git add data/brief.json
+          git diff --staged --quiet || git commit -m "chore: 每日文案更新 $(TZ=Asia/Taipei date +%Y-%m-%d)"
+          git push
