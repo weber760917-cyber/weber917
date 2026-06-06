@@ -879,9 +879,29 @@ async function renderCustomSym(market, sym, displayCode, usStyle) {
   const klineWrap = document.getElementById(`${market}-kline-wrap`);
   dataEl.innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
   klineWrap.style.display = 'none';
+
+  // Try fetching — for TW stocks also fall back to .TWO (上櫃)
+  let result = null;
+  const candidates = [sym];
+  if (!usStyle && !sym.includes('.TWO') && sym.endsWith('.TW')) {
+    candidates.push(sym.replace('.TW', '.TWO'));
+  }
+
+  for (const candidate of candidates) {
+    try {
+      // Try 1mo first, fall back to 5d if chart result is empty
+      let data = await fetchQuote(candidate, '1mo');
+      if (!data.chart?.result?.[0]) data = await fetchQuote(candidate, '5d');
+      if (data.chart?.result?.[0]) { result = data.chart.result[0]; break; }
+    } catch { /* try next */ }
+  }
+
+  if (!result) {
+    dataEl.innerHTML = '<div class="mkt-row"><span style="color:var(--sub);font-size:13px">查無資料，請確認代號（台股直接輸入數字如 5347）</span></div>';
+    return;
+  }
+
   try {
-    const data = await fetchQuote(sym, '1mo');
-    const result = data.chart.result[0];
     const meta = result.meta;
     const q = result.indicators.quote[0];
     const validCloses = (q.close || []).filter(c => c != null);
@@ -889,14 +909,15 @@ async function renderCustomSym(market, sym, displayCode, usStyle) {
     const prev  = validCloses[validCloses.length - 2];
     const changeAbs = prev != null ? price - prev : 0;
     const chg = prev ? (changeAbs / prev * 100) : 0;
-    const nameStr = meta.shortName || meta.symbol || displayCode;
-    const item = { name: nameStr, flag: usStyle ? '🇺🇸' : '🇹🇼', code: displayCode, usStyle };
+    // Show code as name for TW (Yahoo returns English names); show shortName for US
+    const nameStr = usStyle ? (meta.shortName || displayCode) : displayCode;
+    const item = { name: nameStr, flag: usStyle ? '🇺🇸' : '🇹🇼', code: usStyle ? displayCode : meta.exchangeName || '', usStyle };
     dataEl.innerHTML = mktRowHTML(item, { price, chg, changeAbs, closes: validCloses });
     klineWrap.style.display = 'block';
     const canvas = document.getElementById(`${market}-kline`);
     drawKLine(canvas, result.timestamp, q.open, q.high, q.low, q.close, usStyle);
-  } catch {
-    dataEl.innerHTML = '<div class="mkt-row"><span style="color:var(--sub);font-size:13px">查無資料，請確認代號格式</span></div>';
+  } catch(e) {
+    dataEl.innerHTML = '<div class="mkt-row"><span style="color:var(--sub);font-size:13px">資料解析錯誤，請重試</span></div>';
   }
 }
 
@@ -1446,29 +1467,7 @@ function renderCard(download = false) {
     const MAXW = SIZE - PAD * 2;
 
     // Date chip
-    ctx.fillStyle = hexToRgba(tpl.accent, 0.18);
-    ctx.beginPath(); ctx.roundRect(PAD, startY - (hasPhoto ? 0 : 60), 0, 0, 6);
-    ctx.font = `500 26px sans-serif`;
-    const dateW = ctx.measureText(dateStr).width + 28;
-    ctx.fillStyle = hexToRgba(tpl.accent, 0.2);
-    ctx.beginPath(); ctx.roundRect(PAD, startY - (hasPhoto ? 0 : 56), dateW, 40, 20); ctx.fill();
-    ctx.fillStyle = tpl.accent;
-    ctx.font = `600 24px sans-serif`;
-    ctx.fillText(dateStr, PAD + 14, startY - (hasPhoto ? 0 : 56) + 27);
-
-    const headY = startY + (hasPhoto ? 52 : 20);
-
-    // Headline
-    ctx.fillStyle = tpl.text;
-    ctx.font = `700 72px sans-serif`;
-    const hLines = wrapText(ctx, headline, PAD, headY, MAXW, 90);
-
-    // Body text
-    if (bodyText) {
-      const bodyY = headY + hLines * 90 + 36;
-      ctx.fillStyle = tpl.sub;
-      ctx.font = `400 40px sans-serif`;
-
+    ctx.fillStyle = hexTo
       wrapText(ctx, bodyText, PAD, bodyY, MAXW, 60);
     }
 
