@@ -2,10 +2,22 @@ name: 每日社群文案生成
 
 on:
   schedule:
-    # 每天 22:00 UTC = 台灣時間 06:00 AM
-    - cron: '0 22 * * *'
+    # 週一~五 7:00 AM 台灣時間 → 生成案例故事 (UTC 前一天 23:00)
+    - cron: '0 23 * * 0-4'
+    # 週一~五 8:00 AM 台灣時間 → 早盤觀點 (UTC 00:00)
+    - cron: '0 0 * * 1-5'
+    # 週一~五 16:00 台灣時間 → 收盤觀點 (UTC 08:00)
+    - cron: '0 8 * * 1-5'
+    # 週六日 6:00 AM 台灣時間 → 保險/信託文案 (UTC 前一天 22:00)
+    - cron: '0 22 * * 5,6'
   workflow_dispatch:
-    # 允許手動執行（測試用）
+    inputs:
+      mode:
+        description: '執行模式（留空自動判斷）'
+        required: false
+        default: 'auto'
+        type: choice
+        options: [auto, story, morning, afternoon, weekend]
 
 jobs:
   generate:
@@ -23,19 +35,4 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: |
-          cd scripts
-          npm install
-
-      - name: Generate daily brief
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: node scripts/generate-brief.js
-
-      - name: Commit and push brief.json
-        run: |
-          git config user.name "Weber Bot"
-          git config user.email "weber760917@gmail.com"
-          git add data/brief.json
-          git diff --staged --quiet || git commit -m "chore: 每日文案更新 $(TZ=Asia/Taipei date +%Y-%m-%d)"
-          git push
+        run: cd scripts && npm 
