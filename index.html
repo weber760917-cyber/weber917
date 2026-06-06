@@ -1467,7 +1467,28 @@ function renderCard(download = false) {
     const MAXW = SIZE - PAD * 2;
 
     // Date chip
-    ctx.fillStyle = hexTo
+    ctx.fillStyle = hexToRgba(tpl.accent, 0.18);
+    ctx.beginPath(); ctx.roundRect(PAD, startY - (hasPhoto ? 0 : 60), 0, 0, 6);
+    ctx.font = `500 26px sans-serif`;
+    const dateW = ctx.measureText(dateStr).width + 28;
+    ctx.fillStyle = hexToRgba(tpl.accent, 0.2);
+    ctx.beginPath(); ctx.roundRect(PAD, startY - (hasPhoto ? 0 : 56), dateW, 40, 20); ctx.fill();
+    ctx.fillStyle = tpl.accent;
+    ctx.font = `600 24px sans-serif`;
+    ctx.fillText(dateStr, PAD + 14, startY - (hasPhoto ? 0 : 56) + 27);
+
+    const headY = startY + (hasPhoto ? 52 : 20);
+
+    // Headline
+    ctx.fillStyle = tpl.text;
+    ctx.font = `700 72px sans-serif`;
+    const hLines = wrapText(ctx, headline, PAD, headY, MAXW, 90);
+
+    // Body text
+    if (bodyText) {
+      const bodyY = headY + hLines * 90 + 36;
+      ctx.fillStyle = tpl.sub;
+      ctx.font = `400 40px sans-serif`;
       wrapText(ctx, bodyText, PAD, bodyY, MAXW, 60);
     }
 
