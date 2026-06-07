@@ -2,14 +2,10 @@ name: 每日社群文案生成
 
 on:
   schedule:
-    # 週一~五 7:00 AM 台灣時間 → 生成案例故事 (UTC 前一天 23:00)
-    - cron: '0 23 * * 0-4'
-    # 週一~五 8:00 AM 台灣時間 → 早盤觀點 (UTC 00:00)
-    - cron: '0 0 * * 1-5'
-    # 週一~五 16:00 台灣時間 → 收盤觀點 (UTC 08:00)
-    - cron: '0 8 * * 1-5'
-    # 週六日 6:00 AM 台灣時間 → 保險/信託文案 (UTC 前一天 22:00)
-    - cron: '0 22 * * 5,6'
+    - cron: '0 23 * * 0-4'   # 週一~五 7:00 AM 台灣 → 案例故事
+    - cron: '0 0 * * 1-5'    # 週一~五 8:00 AM 台灣 → 早盤觀點
+    - cron: '0 8 * * 1-5'    # 週一~五 16:00 台灣  → 收盤觀點
+    - cron: '0 22 * * 5,6'   # 週六日 6:00 AM 台灣  → 保險/信託文案
   workflow_dispatch:
     inputs:
       mode:
@@ -35,4 +31,46 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: cd scripts && npm 
+        run: cd scripts && npm install
+
+      - name: Detect mode
+        id: mode
+        run: |
+          INPUT="${{ github.event.inputs.mode }}"
+          if [ "$INPUT" != "" ] && [ "$INPUT" != "auto" ]; then
+            echo "mode=$INPUT" >> $GITHUB_OUTPUT
+          else
+            TW_HOUR=$(TZ=Asia/Taipei date +%H)
+            TW_DOW=$(TZ=Asia/Taipei date +%u)
+            echo "Taiwan hour=$TW_HOUR, dow=$TW_DOW"
+            if [ "$TW_DOW" -ge 6 ]; then
+              echo "mode=weekend" >> $GITHUB_OUTPUT
+            elif [ "$TW_HOUR" -eq 7 ]; then
+              echo "mode=story" >> $GITHUB_OUTPUT
+            elif [ "$TW_HOUR" -eq 8 ]; then
+              echo "mode=morning" >> $GITHUB_OUTPUT
+            else
+              echo "mode=afternoon" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Generate story
+        if: steps.mode.outputs.mode == 'story'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node scripts/generate-story.js
+
+      - name: Generate brief
+        if: steps.mode.outputs.mode != 'story'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          BRIEF_MODE: ${{ steps.mode.outputs.mode }}
+        run: node scripts/generate-brief.js
+
+      - name: Commit and push
+        run: |
+          git config user.name "Weber Bot"
+          git config user.email "weber760917@gmail.com"
+          git add data/brief.json data/stories.json
+          git diff --staged --quiet || git commit -m "chore: 自動更新 $(TZ=Asia/Taipei date '+%Y-%m-%d %H:%M')"
+          git push
