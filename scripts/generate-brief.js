@@ -137,28 +137,55 @@ function getWeekendTopic(d) {
 
 async function enhanceWithClaude(mode, base, d) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return null;
+  if (!apiKey) { console.log('ℹ️  無 ANTHROPIC_API_KEY，使用模板'); return null; }
   try {
     const { default: Anthropic } = await import('@anthropic-ai/sdk');
     const client = new Anthropic({ apiKey });
-    const modeDesc = {
-      morning:'早盤觀點，幽默風趣的華爾街菁英/基金分析師口吻，帶梗但專業',
-      afternoon:'收盤觀點，同樣幽默有深度的分析師口吻，帶點收盤後的反思',
-      weekend:'Weber顧問親切有溫度的風格',
+
+    const styleGuide = {
+      morning:  '幽默風趣的華爾街菁英/基金分析師，帶點台灣接地氣的比喻，讓人覺得你很懂又很好笑',
+      afternoon:'收盤後的資深分析師，帶一點「我早說了吧」的語氣，但結尾要給建設性建議',
+      weekend:  'Weber顧問親切有溫度，像在和老朋友聊財務規劃，不說術語，說故事',
     };
-    const prompt = `你是 Weber，資深理財顧問。今天是 ${d.dateLabel}。
-以下初稿請用更生動有個性的方式重寫，風格：${modeDesc[mode]}。
 
-初稿 summary：${base.summary}
+    const marketCtx = mode === 'weekend'
+      ? '今天是週末，不聊盤，聊長期財務規劃。'
+      : `今天市場摘要：${base.summary || '（行情資料取得中）'}`;
 
-回傳 JSON：{"keywords":[...],"summary":"...","fb":"...","ig":"...","line":"..."}
-只回 JSON。`;
-    const msg = await client.messages.create({ model:'claude-haiku-4-5-20251001', max_tokens:1500, messages:[{role:'user',content:prompt}] });
+    const prompt = `你是 Weber，台灣的資深理財顧問，專注保險金信託、退休規劃、不動產活化。
+今天是 ${d.dateLabel}，要發的內容模式：${mode}。
+${marketCtx}
+
+風格要求：${styleGuide[mode]}
+
+請生成適合分享在 Facebook、Instagram、LINE 的繁體中文社群文案。
+
+回傳格式（只回這個 JSON，不要其他說明）：
+{
+  "keywords": ["關鍵字1","關鍵字2","關鍵字3","關鍵字4","關鍵字5"],
+  "summary": "200字內的市場觀點或主題摘要",
+  "fb": "Facebook 文案（300-500字，可換行，結尾要有 CTA 邀請私訊）",
+  "ig": "Instagram 文案（150字內，含 3-5 個 hashtag）",
+  "line": "LINE 文案（100字內，口語化，結尾有 emoji）"
+}`;
+
+    console.log('🤖 呼叫 Claude API...');
+    const msg = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 2000,
+      messages: [{ role: 'user', content: prompt }]
+    });
     const text = msg.content[0].text.trim();
+    console.log('Claude 回應長度:', text.length);
     const match = text.match(/\{[\s\S]+\}/);
-    if (!match) return null;
-    return JSON.parse(match[0]);
-  } catch(e) { console.warn('Claude API:', e.message); return null; }
+    if (!match) { console.warn('⚠️  Claude 回應無法解析為 JSON:', text.slice(0,200)); return null; }
+    const parsed = JSON.parse(match[0]);
+    console.log('✅ Claude 增強成功');
+    return parsed;
+  } catch(e) {
+    console.warn('⚠️  Claude API 失敗:', e.message);
+    return null;
+  }
 }
 
 async function main() {
@@ -179,9 +206,10 @@ async function main() {
     content = WEEKEND_TEMPLATES[topic];
   }
 
-  if (process.env.ANTHROPIC_API_KEY && mode !== 'weekend') {
+  // 所有模式都嘗試 Claude 增強（包含 weekend）
+  if (process.env.ANTHROPIC_API_KEY) {
     const enhanced = await enhanceWithClaude(mode, content, d);
-    if (enhanced) { content = enhanced; console.log('✅ Claude 增強成功'); }
+    if (enhanced) content = { ...content, ...enhanced };
   }
 
   writeFileSync(OUTPUT, JSON.stringify({
