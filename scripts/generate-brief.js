@@ -143,30 +143,32 @@ async function enhanceWithClaude(mode, base, d) {
     const client = new Anthropic({ apiKey });
 
     const styleGuide = {
-      morning:  '幽默風趣的華爾街菁英/基金分析師，帶點台灣接地氣的比喻，讓人覺得你很懂又很好笑',
-      afternoon:'收盤後的資深分析師，帶一點「我早說了吧」的語氣，但結尾要給建設性建議',
-      weekend:  'Weber顧問親切有溫度，像在和老朋友聊財務規劃，不說術語，說故事',
+      morning:  '像貝萊德頂級基金分析師剛看完早報，用白話文幫客戶點評市場——專業有深度，但不講讓人聽不懂的術語，偶爾一個神比喻或幽默的自嘲讓人莞爾',
+      afternoon:'像收盤後在辦公室喝咖啡的華爾街老手，語氣帶點「我就說嘛」的從容，給今天操作的點評和明天的方向感，結尾要有讓人想行動的建議',
+      weekend:  'Weber 顧問週末模式：像高爾夫球場上跟高資產客戶聊財務規劃，輕鬆有溫度，不說艱深術語，用故事和比喻讓複雜的事變得簡單',
     };
 
     const marketCtx = mode === 'weekend'
-      ? '今天是週末，不聊盤，聊長期財務規劃。'
+      ? '今天是週末，不聊盤，聊長期財務規劃和資產保全。'
       : `今天市場摘要：${base.summary || '（行情資料取得中）'}`;
 
-    const prompt = `你是 Weber，台灣的資深理財顧問，專注保險金信託、退休規劃、不動產活化。
-今天是 ${d.dateLabel}，要發的內容模式：${mode}。
+    const prompt = `你是 Weber，擁有貝萊德（BlackRock）等級的市場視野，同時是台灣在地的資深理財顧問，專注保險金信託、退休規劃、不動產活化。
+你的受眾：一般上班族到高資產客戶都有，所以要讓兩種人都看得懂、都覺得有收穫。
+今天是 ${d.dateLabel}，內容模式：${mode}。
 ${marketCtx}
 
 風格要求：${styleGuide[mode]}
+語言要求：繁體中文、白話文、適度幽默但不失專業、不用過多金融術語（要用就解釋）
 
-請生成適合分享在 Facebook、Instagram、LINE 的繁體中文社群文案。
+請生成適合分享在 Facebook、Instagram、LINE 的社群文案。
 
 回傳格式（只回這個 JSON，不要其他說明）：
 {
   "keywords": ["關鍵字1","關鍵字2","關鍵字3","關鍵字4","關鍵字5"],
-  "summary": "200字內的市場觀點或主題摘要",
-  "fb": "Facebook 文案（300-500字，可換行，結尾要有 CTA 邀請私訊）",
-  "ig": "Instagram 文案（150字內，含 3-5 個 hashtag）",
-  "line": "LINE 文案（100字內，口語化，結尾有 emoji）"
+  "summary": "200字內的市場觀點，有深度但白話，像在跟朋友說話",
+  "fb": "Facebook 文案（300-500字，有觀點有故事感，結尾邀請私訊討論）",
+  "ig": "Instagram 文案（150字內精華版，含 3-5 個 hashtag）",
+  "line": "LINE 文案（80-100字，最口語化，結尾要有 emoji）"
 }`;
 
     console.log('🤖 呼叫 Claude API...');
