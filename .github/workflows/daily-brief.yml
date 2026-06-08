@@ -4,6 +4,13 @@ on:
   schedule:
     - cron: '0 23 * * 0-4'   # 週一~五 7:00 AM 台灣時間
   workflow_dispatch:
+    inputs:
+      topic:
+        description: '故事主題（留空自動）'
+        required: false
+        default: 'auto'
+        type: choice
+        options: [auto, trust, retire, insurance, estate]
 
 jobs:
   generate:
@@ -26,6 +33,7 @@ jobs:
       - name: 生成案例故事
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          STORY_TOPIC: ${{ github.event.inputs.topic }}
         run: node scripts/generate-story.js
 
       - name: 生成市場早盤觀點
