@@ -25,7 +25,7 @@ function getTaiwanDate() {
   };
 }
 
-// ── 今日主題（依星期幾輪替）──
+// ── 今日主題（依星期幾輪替，可被 STORY_TOPIC 環境變數覆蓋）──
 const DAY_TOPIC = {
   1: 'trust',      // 週一
   2: 'retire',     // 週二
@@ -328,7 +328,8 @@ async function generateWithClaude(topic, dateInfo) {
 // ── 主程式 ──
 async function main() {
   const dateInfo = getTaiwanDate();
-  const topic = DAY_TOPIC[dateInfo.dayOfWeek] || 'trust';
+  const envTopic = process.env.STORY_TOPIC;
+  const topic = (envTopic && envTopic !== 'auto') ? envTopic : (DAY_TOPIC[dateInfo.dayOfWeek] || 'trust');
   console.log(`📅 ${dateInfo.dateLabel}  📌 主題：${topic}`);
 
   // 讀取現有 stories.json
