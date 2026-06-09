@@ -16,302 +16,242 @@ const IMG_DIR = join(DATA_DIR, 'images');
 if (!existsSync(IMG_DIR)) mkdirSync(IMG_DIR, { recursive: true });
 
 // ── 色票（Weber 品牌色）──
-const COLORS = {
+const C = {
   navy:    '#1B2A4A',
-  navyDark:'#111E35',
+  navyDk:  '#111E35',
   gold:    '#D4A843',
   orange:  '#E8520A',
   teal:    '#1E6B4F',
   white:   '#FFFFFF',
-  offWhite:'#F7F8FA',
+  off:     '#F7F8FA',
   grey:    '#8A95A3',
-  lightBg: '#EEF1F6',
+  light:   '#EEF1F6',
+  red:     '#C0392B',
 };
+
+// ── W Logo HTML snippet ──
+const wLogo = (size=72, goldBg=true) => `
+<div style="
+  width:${size}px; height:${size}px; border-radius:50%;
+  background:${goldBg ? C.gold : C.navy};
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+  <span style="font-size:${Math.round(size*0.5)}px; font-weight:900;
+    color:${goldBg ? C.navyDk : C.gold}; line-height:1; font-family:'Noto Sans TC',sans-serif;">W</span>
+</div>`;
+
+// ── 共用 CSS ──
+const BASE_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1080px; height:1080px; overflow:hidden;
+    font-family:'Noto Sans TC','PingFang TC',sans-serif; }
+`;
 
 // ── HTML 模板：Story 封面卡 ──
 function storyTitleCard(story) {
-  const title = story.title || '';
-  const hook = (story.quote || '').split('\n')[0].slice(0, 60);
-  return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
-  * { margin:0; padding:0; box-sizing:border-box; }
+  const title = (story.title || '').replace(/，/g, '，\n').slice(0, 30);
+  const hook  = (story.quote || story.hook || '').split('\n')[0].slice(0, 50);
+
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>${BASE_CSS}
   body {
-    width: 1080px; height: 1080px; overflow: hidden;
-    font-family: 'Noto Sans TC', 'PingFang TC', sans-serif;
-    background: linear-gradient(150deg, ${COLORS.navyDark} 0%, ${COLORS.navy} 60%, #243759 100%);
-    color: ${COLORS.white};
-    position: relative;
+    background: linear-gradient(150deg, ${C.navyDk} 0%, ${C.navy} 65%, #243759 100%);
+    color:${C.white}; position:relative;
   }
-  /* 背景裝飾圓 */
-  .bg-circle1 {
-    position:absolute; width:500px; height:500px; border-radius:50%;
-    background: radial-gradient(circle, rgba(212,168,67,0.08) 0%, transparent 70%);
-    top:-100px; right:-100px;
+  /* 裝飾 */
+  .ring {
+    position:absolute; border-radius:50%; border:1px solid rgba(212,168,67,0.15);
   }
-  .bg-circle2 {
-    position:absolute; width:400px; height:400px; border-radius:50%;
-    background: radial-gradient(circle, rgba(30,107,79,0.12) 0%, transparent 70%);
-    bottom:-80px; left:-80px;
-  }
-  /* 頂部 tag */
+  /* 頂部 TAG */
   .tag {
-    position:absolute; top:72px; left:72px;
-    background:${COLORS.gold}; color:${COLORS.navyDark};
-    font-size:30px; font-weight:900; letter-spacing:2px;
-    padding:10px 28px; border-radius:6px;
+    position:absolute; top:68px; left:72px;
+    background:${C.gold}; color:${C.navyDk};
+    font-size:26px; font-weight:900; letter-spacing:3px;
+    padding:8px 24px; border-radius:6px;
   }
-  /* 主標題 */
+  /* 主標題 — 佔滿中央，最重要 */
   .title {
-    position:absolute; top:200px; left:72px; right:72px;
-    font-size:62px; font-weight:900; line-height:1.25;
-    color:${COLORS.gold};
-    text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+    position:absolute; top:190px; left:72px; right:72px;
+    font-size:72px; font-weight:900; line-height:1.2;
+    color:${C.gold};
+    text-shadow: 0 4px 32px rgba(0,0,0,0.5);
+    white-space:pre-wrap;
   }
-  /* 分隔線 */
-  .divider {
-    position:absolute; top:560px; left:72px;
-    width:80px; height:5px; background:${COLORS.gold}; border-radius:3px;
+  /* 金條 */
+  .bar {
+    position:absolute; top:580px; left:72px;
+    width:60px; height:5px; background:${C.gold}; border-radius:3px;
   }
-  /* 副標 */
+  /* Hook — 只有一行 */
   .hook {
-    position:absolute; top:590px; left:72px; right:72px;
-    font-size:34px; font-weight:400; line-height:1.6;
-    color:rgba(255,255,255,0.85);
+    position:absolute; top:612px; left:72px; right:72px;
+    font-size:32px; font-weight:400; line-height:1.5;
+    color:rgba(255,255,255,0.80);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   /* 底部品牌 */
   .brand {
-    position:absolute; bottom:72px; left:72px; right:72px;
+    position:absolute; bottom:64px; left:72px; right:72px;
     display:flex; align-items:center; justify-content:space-between;
   }
-  .brand-name {
-    font-size:28px; font-weight:700; color:${COLORS.gold}; letter-spacing:1px;
-  }
-  .brand-sub {
-    font-size:20px; color:rgba(255,255,255,0.5);
-    margin-top:4px;
-  }
-  .w-logo {
-    width:72px; height:72px; border-radius:50%;
-    background:${COLORS.gold};
-    display:flex; align-items:center; justify-content:center;
-    flex-shrink:0;
-  }
-  .w-logo span {
-    font-size:36px; font-weight:900;
-    color:${COLORS.navyDark}; line-height:1;
-  }
-</style>
-</head>
-<body>
-  <div class="bg-circle1"></div>
-  <div class="bg-circle2"></div>
-  <div class="tag">【 Story 】</div>
+  .brand-name { font-size:26px; font-weight:700; color:${C.gold}; }
+  .brand-sub  { font-size:18px; color:rgba(255,255,255,0.4); margin-top:3px; }
+</style></head><body>
+  <!-- 裝飾圈 -->
+  <div class="ring" style="width:520px;height:520px;top:-140px;right:-140px;"></div>
+  <div class="ring" style="width:300px;height:300px;bottom:-60px;left:-60px;"></div>
+  <div class="tag">案例故事</div>
   <div class="title">${title}</div>
-  <div class="divider"></div>
+  <div class="bar"></div>
   <div class="hook">${hook}</div>
   <div class="brand">
     <div>
       <div class="brand-name">樂爸 Weber</div>
       <div class="brand-sub">LINE / IG : weber917</div>
     </div>
-    <div class="w-logo"><span>W</span></div>
+    ${wLogo(68, true)}
   </div>
-</body>
-</html>`;
+</body></html>`;
 }
 
 // ── HTML 模板：Story 解法卡 ──
 function storySolutionCard(story) {
-  const sol = story.solution || {};
+  const sol    = story.solution || {};
   const points = (sol.points || []).slice(0, 4);
-  const boxColors = [COLORS.navy, COLORS.teal, COLORS.orange, '#6B3FA0'];
-  const pointsHTML = points.map((p, i) => `
-    <div class="point" style="background:${boxColors[i] || COLORS.navy}">
-      <div class="point-num">${String(i+1).padStart(2,'0')}</div>
-      <div class="point-text">${p}</div>
-    </div>
-  `).join('');
-  return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    width:1080px; height:1080px; overflow:hidden;
-    font-family:'Noto Sans TC','PingFang TC',sans-serif;
-    background:${COLORS.offWhite};
-    position:relative;
-  }
-  /* 頂部色帶 */
+  const boxColors = [C.navy, C.teal, C.orange, '#5B3FA0'];
+  const boxHTML = points.map((p, i) => {
+    const short = p.slice(0, 22);
+    return `<div style="
+      background:${boxColors[i]||C.navy}; border-radius:20px;
+      padding:36px 30px; display:flex; flex-direction:column; justify-content:space-between;">
+      <div style="font-size:52px;font-weight:900;color:${C.white};opacity:0.2;line-height:1;">${String(i+1).padStart(2,'0')}</div>
+      <div style="font-size:28px;font-weight:700;color:${C.white};line-height:1.4;margin-top:12px;">${short}</div>
+    </div>`;
+  }).join('');
+
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>${BASE_CSS}
+  body { background:${C.off}; }
   .header {
-    background: linear-gradient(90deg, ${COLORS.navyDark} 0%, ${COLORS.navy} 100%);
-    padding: 52px 72px 44px;
+    background:linear-gradient(90deg,${C.navyDk} 0%,${C.navy} 100%);
+    padding:52px 72px 44px;
   }
-  .header-label {
-    font-size:24px; color:${COLORS.gold}; font-weight:700;
-    letter-spacing:2px; margin-bottom:12px;
-  }
-  .header-title {
-    font-size:42px; font-weight:900; color:${COLORS.white}; line-height:1.3;
-  }
-  /* 解法區 */
-  .points {
-    padding: 44px 72px 0;
-    display:grid; grid-template-columns:1fr 1fr; gap:24px;
-  }
-  .point {
-    border-radius:16px; padding:32px 28px;
-    color:${COLORS.white}; min-height:180px;
-    display:flex; flex-direction:column; justify-content:space-between;
-  }
-  .point-num {
-    font-size:48px; font-weight:900; opacity:0.25; line-height:1;
-    margin-bottom:8px;
-  }
-  .point-text {
-    font-size:26px; font-weight:700; line-height:1.5;
-  }
-  /* 底部 */
+  .header-label { font-size:22px;color:${C.gold};font-weight:700;letter-spacing:2px;margin-bottom:10px; }
+  .header-title { font-size:44px;font-weight:900;color:${C.white};line-height:1.25; }
+  .grid { padding:40px 72px 0; display:grid; grid-template-columns:1fr 1fr; gap:24px; }
   .footer {
-    position:absolute; bottom:48px; left:72px; right:72px;
+    position:absolute; bottom:44px; left:72px; right:72px;
     display:flex; justify-content:space-between; align-items:center;
   }
-  .footer-name { font-size:26px; font-weight:700; color:${COLORS.navy}; }
-  .footer-sub  { font-size:18px; color:${COLORS.grey}; margin-top:2px; }
-  .w-logo {
-    width:64px; height:64px; border-radius:50%;
-    background:${COLORS.navy};
-    display:flex; align-items:center; justify-content:center;
-    flex-shrink:0;
-  }
-  .w-logo span {
-    font-size:32px; font-weight:900;
-    color:${COLORS.gold}; line-height:1;
-  }
-</style>
-</head>
-<body>
+  .footer-name { font-size:24px;font-weight:700;color:${C.navy}; }
+  .footer-sub  { font-size:16px;color:${C.grey};margin-top:2px; }
+</style></head><body>
   <div class="header">
     <div class="header-label">Weber 的建議</div>
-    <div class="header-title">${sol.title || '行動方案'}</div>
+    <div class="header-title">${(sol.title||'行動方案').slice(0,20)}</div>
   </div>
-  <div class="points">${pointsHTML}</div>
+  <div class="grid">${boxHTML}</div>
   <div class="footer">
     <div>
       <div class="footer-name">樂爸 Weber</div>
       <div class="footer-sub">LINE / IG : weber917</div>
     </div>
-    <div class="w-logo"><span>W</span></div>
+    ${wLogo(62, false)}
   </div>
-</body>
-</html>`;
+</body></html>`;
 }
 
-// ── HTML 模板：市場早盤觀點卡 ──
+// ── HTML 模板：市場早盤/收盤觀點卡 ──
 function briefCard(brief) {
-  const keywords = (brief.keywords || []).slice(0, 5);
-  const summary = (brief.summary || '').slice(0, 120);
-  const keywordsHTML = keywords.map(k =>
-    `<span class="kw">${k}</span>`
-  ).join('');
-  return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    width:1080px; height:1080px; overflow:hidden;
-    font-family:'Noto Sans TC','PingFang TC',sans-serif;
-    background: linear-gradient(150deg, ${COLORS.navyDark} 0%, ${COLORS.navy} 60%, #1e3560 100%);
-    color:${COLORS.white};
-    position:relative;
-  }
-  .bg-accent {
-    position:absolute; top:0; right:0;
-    width:400px; height:400px;
-    background: radial-gradient(circle at top right, rgba(212,168,67,0.15) 0%, transparent 60%);
-  }
-  /* 頂部日期 tag */
-  .date-tag {
-    position:absolute; top:72px; left:72px;
-    font-size:24px; color:rgba(255,255,255,0.5); letter-spacing:1px;
-  }
-  .mode-tag {
-    position:absolute; top:64px; right:72px;
-    background:${COLORS.gold}; color:${COLORS.navyDark};
-    font-size:22px; font-weight:900; padding:8px 22px; border-radius:6px;
-  }
-  /* 主標題 */
-  .main-title {
-    position:absolute; top:148px; left:72px; right:72px;
-    font-size:56px; font-weight:900; line-height:1.25; color:${COLORS.white};
-  }
-  .gold { color:${COLORS.gold}; }
-  /* 分隔線 */
-  .divider {
-    position:absolute; top:380px; left:72px;
-    width:60px; height:4px; background:${COLORS.gold}; border-radius:2px;
-  }
-  /* 摘要 */
-  .summary {
-    position:absolute; top:418px; left:72px; right:72px;
-    font-size:30px; line-height:1.7; color:rgba(255,255,255,0.85);
-  }
-  /* 關鍵字 */
-  .keywords {
-    position:absolute; bottom:160px; left:72px; right:72px;
-    display:flex; flex-wrap:wrap; gap:14px;
-  }
-  .kw {
-    background:rgba(255,255,255,0.1); border:1px solid rgba(212,168,67,0.4);
-    color:${COLORS.gold}; font-size:22px; font-weight:700;
-    padding:8px 20px; border-radius:8px; letter-spacing:0.5px;
-  }
-  /* 底部品牌 */
-  .brand {
-    position:absolute; bottom:64px; left:72px; right:72px;
-    display:flex; justify-content:space-between; align-items:center;
-    border-top:1px solid rgba(255,255,255,0.1); padding-top:32px;
-  }
-  .brand-name { font-size:28px; font-weight:700; color:${COLORS.gold}; }
-  .brand-sub  { font-size:18px; color:rgba(255,255,255,0.4); margin-top:4px; }
-  .w-logo {
-    width:72px; height:72px; border-radius:50%;
-    background:${COLORS.gold};
-    display:flex; align-items:center; justify-content:center;
-    flex-shrink:0;
-  }
-  .w-logo span {
-    font-size:36px; font-weight:900;
-    color:${COLORS.navyDark}; line-height:1;
-  }
-</style>
-</head>
-<body>
-  <div class="bg-accent"></div>
-  <div class="date-tag">${brief.dateLabel || ''}</div>
-  <div class="mode-tag">早盤觀點</div>
-  <div class="main-title">今日<span class="gold">市場</span><br>重點速覽</div>
-  <div class="divider"></div>
-  <div class="summary">${summary}</div>
-  <div class="keywords">${keywordsHTML}</div>
-  <div class="brand">
-    <div>
-      <div class="brand-name">樂爸 Weber</div>
-      <div class="brand-sub">LINE / IG : weber917</div>
+  const marketData = (brief.marketData || []).slice(0, 3);
+  const punchline  = (brief.punchline || brief.summary || '').slice(0, 32);
+  const keywords   = (brief.keywords || []).slice(0, 4);
+  const modeLabel  = brief.mode === 'afternoon' ? '收盤觀點' : brief.mode === 'weekend' ? '週末分享' : '早盤觀點';
+
+  const statsHTML = marketData.map(m => `
+    <div style="flex:1;text-align:center;">
+      <div style="font-size:20px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:1px;margin-bottom:10px;">${m.label}</div>
+      <div style="font-size:52px;font-weight:900;color:${C.white};letter-spacing:-1px;line-height:1;">${m.value}</div>
+      <div style="font-size:26px;font-weight:700;margin-top:8px;color:${m.up ? '#52C97A' : '#F06868'};">${m.change}</div>
     </div>
-    <div class="w-logo"><span>W</span></div>
+  `).join(`<div style="width:1px;background:rgba(255,255,255,0.1);margin:0 8px;"></div>`);
+
+  // 若無 marketData（週末），改顯示大標題
+  const centerBlock = marketData.length > 0 ? `
+    <div style="
+      position:absolute; top:220px; left:72px; right:72px;
+      display:flex; align-items:flex-start; justify-content:space-around;
+      gap:16px; padding:44px 32px;
+      background:rgba(255,255,255,0.05); border-radius:20px;
+      border:1px solid rgba(212,168,67,0.2);">
+      ${statsHTML}
+    </div>
+  ` : `
+    <div style="position:absolute;top:220px;left:72px;right:72px;text-align:center;">
+      <div style="font-size:52px;font-weight:900;color:${C.gold};line-height:1.3;">
+        ${(brief.summary||'').slice(0,28)}
+      </div>
+    </div>
+  `;
+
+  const kwHTML = keywords.map(k =>
+    `<span style="background:rgba(255,255,255,0.08);border:1px solid rgba(212,168,67,0.35);
+      color:${C.gold};font-size:22px;font-weight:700;
+      padding:7px 18px;border-radius:8px;letter-spacing:0.5px;">${k}</span>`
+  ).join('');
+
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>${BASE_CSS}
+  body {
+    background:linear-gradient(150deg,${C.navyDk} 0%,${C.navy} 60%,#1e3560 100%);
+    color:${C.white}; position:relative;
+  }
+  .bg-glow {
+    position:absolute;top:0;right:0;width:420px;height:420px;
+    background:radial-gradient(circle at top right,rgba(212,168,67,0.12) 0%,transparent 60%);
+  }
+</style></head><body>
+  <div class="bg-glow"></div>
+
+  <!-- 頂部：日期 + mode tag -->
+  <div style="position:absolute;top:68px;left:72px;right:72px;
+    display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:22px;color:rgba(255,255,255,0.45);letter-spacing:1px;">${brief.dateLabel||''}</div>
+    <div style="background:${C.gold};color:${C.navyDk};
+      font-size:22px;font-weight:900;padding:7px 20px;border-radius:6px;">${modeLabel}</div>
   </div>
-</body>
-</html>`;
+
+  <!-- 主標：今日市場 -->
+  <div style="position:absolute;top:140px;left:72px;
+    font-size:46px;font-weight:900;color:${C.white};">
+    今日<span style="color:${C.gold};">市場</span>快報
+  </div>
+
+  <!-- 數字區塊 -->
+  ${centerBlock}
+
+  <!-- 金條 + Punchline -->
+  <div style="position:absolute;top:570px;left:72px;
+    width:55px;height:4px;background:${C.gold};border-radius:2px;"></div>
+  <div style="position:absolute;top:606px;left:72px;right:72px;
+    font-size:36px;font-weight:700;line-height:1.45;
+    color:rgba(255,255,255,0.9);">${punchline}</div>
+
+  <!-- 關鍵字 -->
+  <div style="position:absolute;bottom:150px;left:72px;right:72px;
+    display:flex;flex-wrap:wrap;gap:12px;">${kwHTML}</div>
+
+  <!-- 品牌底部 -->
+  <div style="position:absolute;bottom:56px;left:72px;right:72px;
+    display:flex;justify-content:space-between;align-items:center;
+    border-top:1px solid rgba(255,255,255,0.1);padding-top:28px;">
+    <div>
+      <div style="font-size:26px;font-weight:700;color:${C.gold};">樂爸 Weber</div>
+      <div style="font-size:17px;color:rgba(255,255,255,0.35);margin-top:3px;">LINE / IG : weber917</div>
+    </div>
+    ${wLogo(68, true)}
+  </div>
+</body></html>`;
 }
 
 // ── 截圖主程式 ──
@@ -332,15 +272,25 @@ async function generateImage(html, outputPath) {
 }
 
 async function main() {
-  // 讀取資料
-  const briefPath  = join(DATA_DIR, 'brief.json');
+  const briefPath   = join(DATA_DIR, 'brief.json');
   const storiesPath = join(DATA_DIR, 'stories.json');
 
   const brief   = JSON.parse(readFileSync(briefPath, 'utf-8'));
   const stories = JSON.parse(readFileSync(storiesPath, 'utf-8'));
-  const story   = stories[stories.length - 1]; // 最新一篇
+  const story   = stories[stories.length - 1];
 
   const date = brief.date || new Date().toISOString().slice(0,10);
 
-  // 生成三張圖
-  await generateImage(storyTitleCard(story),    join(IMG_DIR, `s
+  await generateImage(storyTitleCard(story),    join(IMG_DIR, `story_title_${date}.png`));
+  await generateImage(storySolutionCard(story), join(IMG_DIR, `story_solution_${date}.png`));
+
+  await generateImage(briefCard(brief),         join(IMG_DIR, `brief_${date}.png`));
+
+  await generateImage(storyTitleCard(story),    join(IMG_DIR, 'story_title_latest.png'));
+  await generateImage(storySolutionCard(story), join(IMG_DIR, 'story_solution_latest.png'));
+  await generateImage(briefCard(brief),         join(IMG_DIR, 'brief_latest.png'));
+
+  console.log(`✅ 所有圖卡生成完成（${date}）`);
+}
+
+main().catch(e => { console.error(e); process.exit(1); });
