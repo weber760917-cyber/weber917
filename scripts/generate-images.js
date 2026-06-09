@@ -94,8 +94,15 @@ function storyTitleCard(story) {
     font-size:20px; color:rgba(255,255,255,0.5);
     margin-top:4px;
   }
-  .sparkle {
-    font-size:42px; color:${COLORS.gold}; opacity:0.6;
+  .w-logo {
+    width:72px; height:72px; border-radius:50%;
+    background:${COLORS.gold};
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .w-logo span {
+    font-size:36px; font-weight:900;
+    color:${COLORS.navyDark}; line-height:1;
   }
 </style>
 </head>
@@ -111,7 +118,7 @@ function storyTitleCard(story) {
       <div class="brand-name">樂爸 Weber</div>
       <div class="brand-sub">LINE / IG : weber917</div>
     </div>
-    <div class="sparkle">✦</div>
+    <div class="w-logo"><span>W</span></div>
   </div>
 </body>
 </html>`;
@@ -177,7 +184,15 @@ function storySolutionCard(story) {
   }
   .footer-name { font-size:26px; font-weight:700; color:${COLORS.navy}; }
   .footer-sub  { font-size:18px; color:${COLORS.grey}; margin-top:2px; }
-  .sparkle { font-size:38px; color:${COLORS.gold}; opacity:0.7; }
+  .w-logo {
+    width:64px; height:64px; border-radius:50%;
+    background:${COLORS.gold};
+    display:flex; align-items:center; justify-content:center;
+  }
+  .w-logo span {
+    font-size:32px; font-weight:900;
+    color:${COLORS.navyDark}; line-height:1;
+  }
 </style>
 </head>
 <body>
@@ -191,7 +206,7 @@ function storySolutionCard(story) {
       <div class="footer-name">樂爸 Weber</div>
       <div class="footer-sub">LINE / IG : weber917</div>
     </div>
-    <div class="sparkle">✦</div>
+    <div class="w-logo"><span>W</span></div>
   </div>
 </body>
 </html>`;
@@ -267,7 +282,15 @@ function briefCard(brief) {
   }
   .brand-name { font-size:28px; font-weight:700; color:${COLORS.gold}; }
   .brand-sub  { font-size:18px; color:rgba(255,255,255,0.4); margin-top:4px; }
-  .sparkle    { font-size:40px; color:${COLORS.gold}; opacity:0.6; }
+  .w-logo {
+    width:68px; height:68px; border-radius:50%;
+    background:${COLORS.gold};
+    display:flex; align-items:center; justify-content:center;
+  }
+  .w-logo span {
+    font-size:34px; font-weight:900;
+    color:${COLORS.navyDark}; line-height:1;
+  }
 </style>
 </head>
 <body>
@@ -283,7 +306,7 @@ function briefCard(brief) {
       <div class="brand-name">樂爸 Weber</div>
       <div class="brand-sub">LINE / IG : weber917</div>
     </div>
-    <div class="sparkle">✦</div>
+    <div class="w-logo"><span>W</span></div>
   </div>
 </body>
 </html>`;
