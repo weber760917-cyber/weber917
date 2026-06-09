@@ -66,14 +66,20 @@ async function buildMorning(d) {
     : spChg < -0.5
     ? '美股這樣收，台股今早開盤可能也得先喝杯苦茶醒神，注意跳空低開風險。'
     : '美股溫吞，台股今天就看內資自己的本事了，量能是關鍵。';
-  const spStr = sp ? `S&P 500 ${fmt(sp.price)} ${chgStr(sp.chg, sp.chgAbs)}` : 'S&P 500 資料載入中';
+  const spStr = sp ? `S&P 500 ${fmt(sp.price)} ${chgStr(sp.chg, sp.chgAbs)}` : 'S&P 500 資料取得中';
   const nqStr = nq ? `那斯達克 ${fmt(nq.price)} ${chgStr(nq.chg, nq.chgAbs)}` : '';
   const djStr = dj ? `道瓊 ${Math.round(dj.price).toLocaleString('en')} ${chgStr(dj.chg, dj.chgAbs, true)}` : '';
-  const summary = `【${d.dateLabel} 早盤觀點】\n\n${vibeUS}\n\n🇺🇸 美股昨日收盤\n${spStr}\n${nqStr ? nqStr+'\n' : ''}${djStr ? djStr+'\n' : ''}\n${twOutlook}\n\n操作提醒：行情數字是背景，資產配置才是主角。開盤前確認你的持倉比例，別讓單一事件影響長期規劃。`;
+  const summary = `${vibeUS}${twOutlook}`;
   const fb = `早安！昨晚美股 ${mood} ${moodEmoji}\n\n${spStr}\n${nqStr}\n${djStr}\n\n${twOutlook}\n\n市場每天都在考你的紀律，對的配置讓你不管漲跌都睡得著。有想聊配置的朋友，早上私訊我 ☕`;
-  const ig = `${d.dateLabel.split('（')[1]?.replace('）','')||''} 早盤 ${moodEmoji}\n\n${sp ? `S&P ${fmt(sp.price)} ${sp.chg>=0?'▲':'▼'}${fmt(Math.abs(sp.chg))}%` : ''}\n${nq ? `那斯達克 ${fmt(nq.price)} ${nq.chg>=0?'▲':'▼'}${fmt(Math.abs(nq.chg))}%` : ''}\n\n${twOutlook.slice(0,40)}...\n漲跌是常態，配置才是底氣 💼\n\n#台股開盤 #美股收盤 #早盤觀點 #理財顧問 #資產配置`;
+  const ig = `${d.dateLabel.split('（')[1]?.replace('）','')||''} 早盤 ${moodEmoji}\n\n${sp ? `S&P ${fmt(sp.price)} ${sp.chg>=0?'▲':'▼'}${fmt(Math.abs(sp.chg))}%` : ''}\n${nq ? `那斯達克 ${fmt(nq.price)} ${nq.chg>=0?'▲':'▼'}${fmt(Math.abs(nq.chg))}%` : ''}\n\n${twOutlook.slice(0,40)}\n漲跌是常態，配置才是底氣 💼\n\n#台股開盤 #美股收盤 #早盤觀點 #理財顧問 #資產配置 #樂爸Weber #workhardplayharder`;
   const line = `【早盤快報】美股昨收 S&P ${sp ? `${fmt(sp.price)} ${sp.chg>=0?'▲':'▼'}${fmt(Math.abs(sp.chg))}%` : ''}。${twOutlook.slice(0,30)}有問題私訊我 😊`;
-  return { keywords:['美股收盤','台股展望','早盤觀點','開盤策略','盤前必讀'], summary, fb, ig, line };
+  const punchline = spChg > 0.5 ? `美股收紅，今天台股跟漲機率高` : spChg < -0.5 ? `美股重挫，今早開盤先保守應對` : `美股溫吞，台股今天看量能決定`;
+  const marketData = [
+    sp && { label: 'S&P 500', value: fmt(sp.price), change: `${sp.chg>=0?'▲':'▼'}${fmt(Math.abs(sp.chg))}%`, up: sp.chg >= 0 },
+    nq && { label: '那斯達克', value: fmt(nq.price), change: `${nq.chg>=0?'▲':'▼'}${fmt(Math.abs(nq.chg))}%`, up: nq.chg >= 0 },
+    dj && { label: '道瓊', value: Math.round(dj.price).toLocaleString('en'), change: `${dj.chg>=0?'▲':'▼'}${fmt(Math.abs(dj.chg))}%`, up: dj.chg >= 0 },
+  ].filter(Boolean);
+  return { keywords:['美股收盤','台股展望','早盤觀點','開盤策略','盤前必讀'], summary, fb, ig, line, punchline, marketData };
 }
 
 async function buildAfternoon(d) {
@@ -83,18 +89,24 @@ async function buildAfternoon(d) {
   const twChg = twii?.chg ?? 0;
   const mood = twChg > 1 ? '大漲收紅' : twChg > 0.3 ? '小漲收紅' : twChg < -1 ? '重挫收黑' : twChg < -0.3 ? '小跌收黑' : '平盤收斂';
   const moodEmoji = twChg > 0.3 ? '📈' : twChg < -0.3 ? '📉' : '➡️';
-  const twStr = twii ? `加權指數 ${Math.round(twii.price).toLocaleString('en')} 點 ${chgStr(twii.chg, twii.chgAbs, true)}` : '加權指數資料載入中';
+  const twStr = twii ? `加權指數 ${Math.round(twii.price).toLocaleString('en')} 點 ${chgStr(twii.chg, twii.chgAbs, true)}` : '加權指數資料取得中';
   const tsmcStr = tsmc ? `台積電 ${fmt(tsmc.price)} 元 ${chgStr(tsmc.chg, tsmc.chgAbs)}` : '';
   const vibe = twChg > 0.5
     ? '今天台股算是給力，收盤前資金沒有落跑，尾盤守得住就是健康。'
     : twChg < -0.5
     ? '今天台股有點辛苦，但跌的時候才是搞清楚自己持倉的好機會。'
     : '今天台股溫吞，量能是觀察重點，方向確定前先按兵不動也是策略。';
-  const summary = `【${d.dateLabel} 收盤觀點】\n\n🇹🇼 今日台股 ${mood} ${moodEmoji}\n${twStr}\n${tsmcStr ? tsmcStr+'\n' : ''}\n${vibe}\n\n投資提醒：今天的漲跌不決定你的退休品質，長期配置才是。如果今天的走勢讓你睡不著，可能是配置需要重新校準了。`;
+  const summary = `${vibe}`;
   const fb = `收盤了，今天台股 ${mood} ${moodEmoji}\n\n${twStr}\n${tsmcStr}\n\n${vibe}\n\n市場每天都在考你的紀律，而不是你的眼光。想聊聊不用每天盯盤的配置？私訊我 📩`;
-  const ig = `${d.dateLabel.split('（')[1]?.replace('）','')||''} 收盤 ${moodEmoji}\n\n${twii ? `加權 ${Math.round(twii.price).toLocaleString('en')} ${twii.chg>=0?'▲':'▼'}${fmt(Math.abs(twii.chg))}%` : ''}\n${tsmc ? `台積電 ${fmt(tsmc.price)} ${tsmc.chg>=0?'▲':'▼'}${fmt(Math.abs(tsmc.chg))}%` : ''}\n\n${vibe.slice(0,35)}...\n配置對了，不用每天盯盤 📊\n\n#台股收盤 #加權指數 #台積電 #理財顧問 #資產配置`;
+  const ig = `${d.dateLabel.split('（')[1]?.replace('）','')||''} 收盤 ${moodEmoji}\n\n${twii ? `加權 ${Math.round(twii.price).toLocaleString('en')} ${twii.chg>=0?'▲':'▼'}${fmt(Math.abs(twii.chg))}%` : ''}\n${tsmc ? `台積電 ${fmt(tsmc.price)} ${tsmc.chg>=0?'▲':'▼'}${fmt(Math.abs(tsmc.chg))}%` : ''}\n\n${vibe.slice(0,35)}\n配置對了，不用每天盯盤 📊\n\n#台股收盤 #加權指數 #台積電 #理財顧問 #資產配置 #樂爸Weber #workhardplayharder`;
   const line = `【收盤快報】台股今日${mood}，${twStr.slice(0,20)}。${vibe.slice(0,25)}想聊配置，私訊我 😊`;
-  return { keywords:['台股收盤', twii?.chg > 0 ? '收紅':'收黑','台積電','收盤觀點','盤後分析'], summary, fb, ig, line };
+  const punchline = twChg > 0.5 ? `台股收紅，長線資金站穩` : twChg < -0.5 ? `台股收黑，檢視持倉的好時機` : `台股溫吞，量能是今日觀察重點`;
+  const marketData = [
+    twii && { label: '加權指數', value: Math.round(twii.price).toLocaleString('en'), change: `${twii.chg>=0?'▲':'▼'}${fmt(Math.abs(twii.chg))}%`, up: twii.chg >= 0 },
+    tsmc && { label: '台積電', value: fmt(tsmc.price), change: `${tsmc.chg>=0?'▲':'▼'}${fmt(Math.abs(tsmc.chg))}%`, up: tsmc.chg >= 0 },
+    otc  && { label: '櫃買指數', value: fmt(otc.price), change: `${otc.chg>=0?'▲':'▼'}${fmt(Math.abs(otc.chg))}%`, up: otc.chg >= 0 },
+  ].filter(Boolean);
+  return { keywords:['台股收盤', twii?.chg > 0 ? '收紅':'收黑','台積電','收盤觀點','盤後分析'], summary, fb, ig, line, punchline, marketData };
 }
 
 const WEEKEND_TOPICS = ['trust','retire','insurance','estate'];
@@ -143,89 +155,22 @@ async function enhanceWithClaude(mode, base, d) {
     const client = new Anthropic({ apiKey });
 
     const styleGuide = {
-      morning:  '像貝萊德頂級基金分析師剛看完早報，用白話文幫客戶點評市場——專業有深度，但不講讓人聽不懂的術語，偶爾一個神比喻或幽默的自嘲讓人莞爾',
-      afternoon:'像收盤後在辦公室喝咖啡的華爾街老手，語氣帶點「我就說嘛」的從容，給今天操作的點評和明天的方向感，結尾要有讓人想行動的建議',
-      weekend:  'Weber 顧問週末模式：像高爾夫球場上跟高資產客戶聊財務規劃，輕鬆有溫度，不說艱深術語，用故事和比喻讓複雜的事變得簡單',
+      morning:  '幽默風趣的華爾街菁英/基金分析師，帶點台灣接地氣的比喻，讓人覺得你很懂又很好笑',
+      afternoon:'收盤後的資深分析師，帶一點「我早說了吧」的語氣，但結尾要給建設性建議',
+      weekend:  'Weber顧問親切有溫度，像在和老朋友聊財務規劃，不說術語，說故事',
     };
 
+    const marketNumbers = (base.marketData || [])
+      .map(m => `${m.label} ${m.value} ${m.change}`)
+      .join('、') || '（盤中資料取得中）';
+
     const marketCtx = mode === 'weekend'
-      ? '今天是週末，不聊盤，聊長期財務規劃和資產保全。'
-      : `今天市場摘要：${base.summary || '（行情資料取得中）'}`;
+      ? '今天是週末，不聊盤，聊長期財務規劃與資產保全。'
+      : `今日${mode === 'morning' ? '早盤' : '收盤'}數據：${marketNumbers}`;
 
-    const prompt = `你是「樂爸 Weber」（也可以叫 Weber），台灣資深理財顧問，IG @weber917。
-你有貝萊德等級的市場視野，但說話像個懂很多的老朋友，不像在上課或打廣告。
-
-【核心人設】
-- 叫「樂爸」或「Weber」都行，偶爾自然帶入即可，不要每句都說
-- 語氣：像有點幽默、很懂行情的大學長，跟你喝咖啡講市場
-- 專業感來自「說得準、說得有深度」，不是來自術語堆砌
-- 術語要用，但要白話解釋（例：「Fed，就是美國的央行」）
-- 適度帶生活感（提到老婆、女兒樂樂、高爾夫等日常），但不要每篇都有
-- 幽默要自然，像說話時順口一句，不是刻意插梗
-- 結尾用問句邀請互動，不要命令式「請私訊我」
-
-今天是 ${d.dateLabel}，模式：${mode}。
+    const prompt = `你是「樂爸 Weber」，台灣的資深理財顧問，同時也是貝萊德合作顧問，專注保險金信託、退休規劃、不動產活化。
+今天是 ${d.dateLabel}，要發的內容模式：${mode}。
 ${marketCtx}
 
-風格指引：${styleGuide[mode]}
-
-回傳格式（只回 JSON，不要其他說明）：
-{
-  "keywords": ["關鍵字1","關鍵字2","關鍵字3","關鍵字4","關鍵字5"],
-  "summary": "150-200字市場觀點：開門見山說結論，再給理由，白話但有深度",
-  "fb": "300-400字：開頭抓眼球→市場分析（有觀點不是唸數字）→和個人財務的連結→問句結尾，像大學長在說話",
-  "ig": "100-130字精華版 + hashtag（必含 #樂爸Weber #workhardplayharder 加2-3個主題tag）",
-  "line": "60-80字，最口語最直接，1-2個emoji結尾"
-}`;
-
-    console.log('🤖 呼叫 Claude API...');
-    const msg = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 2000,
-      messages: [{ role: 'user', content: prompt }]
-    });
-    const text = msg.content[0].text.trim();
-    console.log('Claude 回應長度:', text.length);
-    const match = text.match(/\{[\s\S]+\}/);
-    if (!match) { console.warn('⚠️  Claude 回應無法解析為 JSON:', text.slice(0,200)); return null; }
-    const parsed = JSON.parse(match[0]);
-    console.log('✅ Claude 增強成功');
-    return parsed;
-  } catch(e) {
-    console.warn('⚠️  Claude API 失敗:', e.message);
-    return null;
-  }
-}
-
-async function main() {
-  const d = getTaiwanDate();
-  const mode = detectMode(d);
-  console.log(`📅 ${d.dateLabel}  🎯 模式：${mode}`);
-
-  let content;
-  if (mode === 'morning') {
-    console.log('📈 抓取美股數據...');
-    content = await buildMorning(d);
-  } else if (mode === 'afternoon') {
-    console.log('📉 抓取台股數據...');
-    content = await buildAfternoon(d);
-  } else {
-    const topic = getWeekendTopic(d);
-    console.log(`📌 週末主題：${topic}`);
-    content = WEEKEND_TEMPLATES[topic];
-  }
-
-  // 所有模式都嘗試 Claude 增強（包含 weekend）
-  if (process.env.ANTHROPIC_API_KEY) {
-    const enhanced = await enhanceWithClaude(mode, content, d);
-    if (enhanced) content = { ...content, ...enhanced };
-  }
-
-  writeFileSync(OUTPUT, JSON.stringify({
-    date: d.date, dateLabel: d.dateLabel, mode,
-    keywords: content.keywords, summary: content.summary,
-    fb: content.fb, ig: content.ig, line: content.line,
-  }, null, 2), 'utf-8');
-  console.log(`✅ brief.json 更新完成（${mode} 模式）`);
-}
-main().catch(e => { console.error(e); process.exit(1); });
+【風格要求】${styleGuide[mode]}
+- 語氣像一個很懂市場的老朋友，白話、接地氣�
