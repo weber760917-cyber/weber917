@@ -73,7 +73,7 @@ async function buildMorning(d) {
   const fb = `早安！昨晚美股 ${mood} ${moodEmoji}\n\n${spStr}\n${nqStr}\n${djStr}\n\n${twOutlook}\n\n市場每天都在考你的紀律，對的配置讓你不管漲跌都睡得著。有想聊配置的朋友，早上私訊我 ☕`;
   const ig = `${d.dateLabel.split('（')[1]?.replace('）','')||''} 早盤 ${moodEmoji}\n\n${sp ? `S&P ${fmt(sp.price)} ${sp.chg>=0?'▲':'▼'}${fmt(Math.abs(sp.chg))}%` : ''}\n${nq ? `那斯達克 ${fmt(nq.price)} ${nq.chg>=0?'▲':'▼'}${fmt(Math.abs(nq.chg))}%` : ''}\n\n${twOutlook.slice(0,40)}\n漲跌是常態，配置才是底氣 💼\n\n#台股開盤 #美股收盤 #早盤觀點 #理財顧問 #資產配置 #樂爸Weber #workhardplayharder`;
   const line = `【早盤快報】美股昨收 S&P ${sp ? `${fmt(sp.price)} ${sp.chg>=0?'▲':'▼'}${fmt(Math.abs(sp.chg))}%` : ''}。${twOutlook.slice(0,30)}有問題私訊我 😊`;
-  const punchline = spChg > 0.5 ? `美股收紅，今天台股跟漲機率高` : spChg < -0.5 ? `美股重挫，今早開盤先保守應對` : `美股溫吞，台股今天看量能決定`;
+  const punchline = spChg > 0.5 ? '美股收紅，今天台股跟漲機率高' : spChg < -0.5 ? '美股重挫，今早開盤先保守應對' : '美股溫吞，台股今天看量能決定';
   const marketData = [
     sp && { label: 'S&P 500', value: fmt(sp.price), change: `${sp.chg>=0?'▲':'▼'}${fmt(Math.abs(sp.chg))}%`, up: sp.chg >= 0 },
     nq && { label: '那斯達克', value: fmt(nq.price), change: `${nq.chg>=0?'▲':'▼'}${fmt(Math.abs(nq.chg))}%`, up: nq.chg >= 0 },
@@ -100,7 +100,7 @@ async function buildAfternoon(d) {
   const fb = `收盤了，今天台股 ${mood} ${moodEmoji}\n\n${twStr}\n${tsmcStr}\n\n${vibe}\n\n市場每天都在考你的紀律，而不是你的眼光。想聊聊不用每天盯盤的配置？私訊我 📩`;
   const ig = `${d.dateLabel.split('（')[1]?.replace('）','')||''} 收盤 ${moodEmoji}\n\n${twii ? `加權 ${Math.round(twii.price).toLocaleString('en')} ${twii.chg>=0?'▲':'▼'}${fmt(Math.abs(twii.chg))}%` : ''}\n${tsmc ? `台積電 ${fmt(tsmc.price)} ${tsmc.chg>=0?'▲':'▼'}${fmt(Math.abs(tsmc.chg))}%` : ''}\n\n${vibe.slice(0,35)}\n配置對了，不用每天盯盤 📊\n\n#台股收盤 #加權指數 #台積電 #理財顧問 #資產配置 #樂爸Weber #workhardplayharder`;
   const line = `【收盤快報】台股今日${mood}，${twStr.slice(0,20)}。${vibe.slice(0,25)}想聊配置，私訊我 😊`;
-  const punchline = twChg > 0.5 ? `台股收紅，長線資金站穩` : twChg < -0.5 ? `台股收黑，檢視持倉的好時機` : `台股溫吞，量能是今日觀察重點`;
+  const punchline = twChg > 0.5 ? '台股收紅，長線資金站穩' : twChg < -0.5 ? '台股收黑，檢視持倉的好時機' : '台股溫吞，量能是今日觀察重點';
   const marketData = [
     twii && { label: '加權指數', value: Math.round(twii.price).toLocaleString('en'), change: `${twii.chg>=0?'▲':'▼'}${fmt(Math.abs(twii.chg))}%`, up: twii.chg >= 0 },
     tsmc && { label: '台積電', value: fmt(tsmc.price), change: `${tsmc.chg>=0?'▲':'▼'}${fmt(Math.abs(tsmc.chg))}%`, up: tsmc.chg >= 0 },
@@ -113,31 +113,39 @@ const WEEKEND_TOPICS = ['trust','retire','insurance','estate'];
 const WEEKEND_TEMPLATES = {
   trust: {
     keywords:['保險金信託','保單受益人','資產保全','身後規劃','信託架構'],
-    summary:`保險金信託把「保險給付」和「信託保護」結合在一起。\n\n身故後，理賠金不直接給受益人，而是先進入信託帳戶，再依你設定的條件（每月生活費、年齡限制等）按時撥付。\n\n適合：子女未成年的家長、擔心繼承糾紛的長輩、有大額保單（300萬以上）的保戶。\n\n部分銀行信託最低30萬就可設立，是少數讓你「生前安心、身後也放心」的工具組合。`,
+    punchline:'理賠金不直接給人，交給信託按月撥',
+    summary:`保險金信託把「保險給付」和「信託保護」結合在一起。身故後，理賠金不直接給受益人，而是先進入信託帳戶，再依你設定的條件按時撥付。適合：子女未成年的家長、擔心繼承糾紛的長輩、有大額保單的保戶。部分銀行信託最低30萬就可設立。`,
     fb:`有個問題我常被問：「保險買了，受益人指定了，這樣就夠了嗎？」\n\n大多數情況夠了。但如果受益人是未成年小孩、花錢比較沒節制的家人、或有被借錢糾纏風險的人——那可能還差一步：保險金信託。\n\n理賠金不直接給人，而是先進信託帳戶，按你的規劃慢慢撥出去。你說了算，不是別人。\n\n身故之後，你的錢還在幫你保護家人。有興趣了解，私訊我 💬`,
-    ig:`保險買了就夠了嗎？🤔\n\n如果受益人是未成年小孩\n如果擔心錢一次花光\n→ 保險金信託是下一步\n\n理賠金進信託，按設定慢慢撥付\n身後的錢，還在保護家人\n\n想了解適不適合？私訊我 👇\n#保險金信託 #信託規劃 #資產保全 #理財顧問 #身後規劃`,
+    ig:`保險買了就夠了嗎？🤔\n\n如果受益人是未成年小孩\n如果擔心錢一次花光\n→ 保險金信託是下一步\n\n理賠金進信託，按設定慢慢撥付\n身後的錢，還在保護家人\n\n想了解？私訊我 👇\n#保險金信託 #信託規劃 #資產保全 #樂爸Weber #workhardplayharder`,
     line:`【今日分享】保險金信託：理賠金不直接給人，進信託帳戶按設定撥付，子女動不了。有興趣了解，私訊我 😊`,
+    marketData: [],
   },
   retire: {
     keywords:['退休缺口','長照費用','通膨侵蝕','退休金試算','老後現金流'],
-    summary:`退休準備三個盲點：\n\n1. 只算生活費，沒算長照。台灣平均長照 7.3 年，每月 5~8 萬，很少人提早準備。\n\n2. 只看帳戶數字，沒考慮通膨。500萬放定存20年，購買力縮水三分之一以上。\n\n3. 錢不分層。正確做法：近期定存保流動、中期儲蓄險穩增值、長期 ETF 對抗通膨。\n\n知道缺口在哪裡，才能提前補上。`,
-    fb:`「退休有1,000萬，應該夠了吧？」這句話我聽過很多次。\n\n然後我問：「長照費算進去了嗎？」\n\n台灣平均長照 7.3 年，每月 5~8 萬，光這個就要 440~700 萬。\n加上通膨吃掉購買力，1,000 萬可能真的不夠。\n\n退休金要分四層：生活費、醫療備用（200萬不動）、長照準備、緊急備用金。\n\n還沒算缺口的朋友，現在算才不慌。私訊我 👇`,
-    ig:`1,000萬退休夠嗎？🤔\n\n長照費每月5~8萬 × 7.3年\n通膨再吃20年\n\n退休金要分四層放\n近期定存 → 中期儲蓄險 → 長期ETF\n\n還沒算缺口的，現在算 👇\n#退休規劃 #長照保險 #退休金 #理財顧問 #財務自由`,
+    punchline:'1000萬退休夠嗎？長照7年算進去了嗎',
+    summary:`退休準備三個盲點：1. 只算生活費，沒算長照。台灣平均長照 7.3 年，每月 5~8 萬。2. 只看帳戶數字，沒考慮通膨。500萬放定存20年，購買力縮水三分之一。3. 錢不分層。正確做法：近期定存保流動、中期儲蓄險穩增值、長期ETF對抗通膨。知道缺口在哪，才能提前補上。`,
+    fb:`「退休有1,000萬，應該夠了吧？」這句話我聽過很多次。\n\n然後我問：「長照費算進去了嗎？」\n\n台灣平均長照 7.3 年，每月 5~8 萬，光這個就要 440~700 萬。\n加上通膨吃掉購買力，1,000 萬可能真的不夠。\n\n退休金要分四層：生活費、醫療備用、長照準備、緊急備用金。\n\n還沒算缺口的朋友，現在算才不慌。私訊我 👇`,
+    ig:`1,000萬退休夠嗎？🤔\n\n長照費每月5~8萬 × 7.3年\n通膨再吃20年\n\n退休金要分四層放\n近期定存→中期儲蓄險→長期ETF\n\n還沒算缺口的，現在算 👇\n#退休規劃 #長照保險 #退休金 #樂爸Weber #workhardplayharder`,
     line:`【今日分享】1,000萬退休夠嗎？長照每月5~8萬撐7年以上，加通膨缺口很大。現在算清楚，私訊我 😊`,
+    marketData: [],
   },
   insurance: {
     keywords:['壽險規劃','長照險','醫療險','保障缺口','保單健診'],
-    summary:`保險買對了是最便宜的風險轉移工具，買錯了每年白繳保費。\n\n四個常見問題：順序搞反（先買儲蓄險）、保額不夠（壽險只夠付喪葬費）、沒有長照險、保單從不健診。\n\n正確順序：意外險→醫療險→重疾險→壽險→才是儲蓄型。\n\n一年一次保單健診，通常可以用同樣保費提升一個等級的保障。`,
-    fb:`保險買了10年，你有多久沒「健診」了？\n\n很多人保費越繳越多，但保障沒跟上：壽險保額只夠喪葬費、長照沒有保障、條款已落後好幾代。\n\n保單健診不是要你換保單，是幫你搞清楚：現有保障夠不夠、有沒有重複浪費、有沒有明顯缺口。\n\n一年一次，同樣保費，保障升一個等級。\n免費幫你看，私訊我 👇`,
-    ig:`你的保單，多久沒健診了？🏥\n\n條款可能已落後\n長照缺口？壽險保額不夠？\n\n一年一次保單健診\n同樣保費，保障升級\n\n免費幫你看 👇\n#保單健診 #保險規劃 #長照險 #壽險 #理財顧問`,
+    punchline:'保費繳了10年，你的保障升級了嗎',
+    summary:`保險買對了是最便宜的風險轉移工具，買錯了每年白繳保費。四個常見問題：順序搞反（先買儲蓄險）、保額不夠、沒有長照險、保單從不健診。正確順序：意外險→醫療險→重疾險→壽險→才是儲蓄型。一年一次保單健診，通常可以用同樣保費提升一個等級的保障。`,
+    fb:`保險買了10年，你有多久沒「健診」了？\n\n很多人保費越繳越多，但保障沒跟上：壽險保額只夠喪葬費、長照沒有保障、條款已落後好幾代。\n\n保單健診不是要你換保單，是幫你搞清楚：現有保障夠不夠、有沒有重複浪費、有沒有明顯缺口。\n\n一年一次，同樣保費，保障升一個等級。免費幫你看，私訊我 👇`,
+    ig:`你的保單，多久沒健診了？🏥\n\n條款可能已落後\n長照缺口？壽險保額不夠？\n\n一年一次保單健診\n同樣保費，保障升級\n\n免費幫你看 👇\n#保單健診 #保險規劃 #長照險 #樂爸Weber #workhardplayharder`,
     line:`【今日分享】保單健診：同樣保費，可以有更好保障。免費幫你確認有沒有缺口，私訊我 😊`,
+    marketData: [],
   },
   estate: {
     keywords:['以房養老','不動產活化','不動產信託','老後現金流','沉睡資產'],
-    summary:`台灣越來越多長輩面對「有房沒錢」困境。2025年以房養老申辦件數年增42%。\n\n以房養老：不搬家，銀行每月給生活費。身故後繼承人決定是否贖回。\n\n不動產信託：信託給銀行管理，設定居住權保障，防止被子女處分或因債務拍賣。\n\n提早規劃的重要性：60歲前選擇多，70歲後很多條件已不同。`,
+    punchline:'有房沒錢？以房養老讓你不搬家每月領',
+    summary:`台灣越來越多長輩面對「有房沒錢」困境。2025年以房養老申辦件數年增42%。以房養老：不搬家，銀行每月給生活費，身故後繼承人決定是否贖回。不動產信託：信託給銀行管理，設定居住權保障，防止被子女處分或因債務拍賣。提早規劃的重要性：60歲前選擇多，70歲後很多條件已不同。`,
     fb:`「我有一間好房子，但口袋沒錢，買東西都要想一下。」\n\n這是最讓我揪心的退休描述。房子不只有「賣掉」或「留給孩子」這兩個選項。\n\n以房養老：不搬家，每月從銀行領生活費。\n不動產信託：保護居住安全，不怕子女財務出問題。\n\n趁還有選擇的時候提早規劃。60歲前佈局，選擇多；70歲才動，選擇就少了。私訊我聊聊 👇`,
-    ig:`有房沒錢，是真實的困境 🏠\n\n以房養老：不搬家，每月領生活費\n不動產信託：保護居住安全\n\n趁還有選擇，提早規劃 👇\n#以房養老 #不動產活化 #退休規劃 #老後生活 #理財顧問`,
+    ig:`有房沒錢，是真實的困境 🏠\n\n以房養老：不搬家，每月領生活費\n不動產信託：保護居住安全\n\n趁還有選擇，提早規劃 👇\n#以房養老 #不動產活化 #退休規劃 #樂爸Weber #workhardplayharder`,
     line:`【今日分享】有房沒現金，以房養老讓你不搬家不賣房、每月有生活費。趁有選擇時提早規劃，私訊我 😊`,
+    marketData: [],
   },
 };
 
@@ -173,4 +181,77 @@ async function enhanceWithClaude(mode, base, d) {
 ${marketCtx}
 
 【風格要求】${styleGuide[mode]}
-- 語氣像一個很懂市場的老朋友，白話、接地氣�
+- 語氣像一個很懂市場的老朋友，白話、接地氣，偶爾一點幽默
+- 不要講廢話、不要全是術語、不要千篇一律的「配置才是王道」
+- 數字要具體，要說得出為什麼漲跌跟你有關係
+- 結尾一定要有 CTA，讓人想私訊你
+
+【重要】summary 欄位是「今日行情分析」，要求：
+- 必須包含真實數字（用上面給你的行情數據）
+- 要說明這個數字代表什麼意思、對台灣投資人影響
+- 要有 Weber 的一句話建議（具體、不是廢話）
+- 100-180 字，繁體中文
+
+回傳格式（只回這個 JSON，不要其他說明）：
+{
+  "keywords": ["關鍵字1","關鍵字2","關鍵字3","關鍵字4","關鍵字5"],
+  "punchline": "圖卡用的一句話（20-30字，Weber 風格，有畫面感，不要廢話）",
+  "summary": "100-180字的今日行情分析（含數字、含影響、含建議）",
+  "fb": "Facebook 文案（300-400字，可換行，結尾要有 CTA 邀請私訊）",
+  "ig": "Instagram 文案（120字內，結尾必須含 #樂爸Weber #workhardplayharder）",
+  "line": "LINE 文案（80字內，口語化，結尾有 emoji）"
+}`;
+
+    console.log('🤖 呼叫 Claude API...');
+    const msg = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 2000,
+      messages: [{ role: 'user', content: prompt }]
+    });
+    const text = msg.content[0].text.trim();
+    console.log('Claude 回應長度:', text.length);
+    const match = text.match(/\{[\s\S]+\}/);
+    if (!match) { console.warn('⚠️  Claude 回應無法解析為 JSON:', text.slice(0,200)); return null; }
+    const parsed = JSON.parse(match[0]);
+    console.log('✅ Claude 增強成功');
+    return parsed;
+  } catch(e) {
+    console.warn('⚠️  Claude API 失敗:', e.message);
+    return null;
+  }
+}
+
+async function main() {
+  const d = getTaiwanDate();
+  const mode = detectMode(d);
+  console.log(`📅 ${d.dateLabel}  🎯 模式：${mode}`);
+
+  let content;
+  if (mode === 'morning') {
+    console.log('📈 抓取美股數據...');
+    content = await buildMorning(d);
+  } else if (mode === 'afternoon') {
+    console.log('📉 抓取台股數據...');
+    content = await buildAfternoon(d);
+  } else {
+    const topic = getWeekendTopic(d);
+    console.log(`📌 週末主題：${topic}`);
+    content = WEEKEND_TEMPLATES[topic];
+  }
+
+  if (process.env.ANTHROPIC_API_KEY) {
+    const enhanced = await enhanceWithClaude(mode, content, d);
+    if (enhanced) content = { ...content, ...enhanced };
+  }
+
+  writeFileSync(OUTPUT, JSON.stringify({
+    date: d.date, dateLabel: d.dateLabel, mode,
+    keywords: content.keywords,
+    punchline: content.punchline || '',
+    marketData: content.marketData || [],
+    summary: content.summary,
+    fb: content.fb, ig: content.ig, line: content.line,
+  }, null, 2), 'utf-8');
+  console.log(`✅ brief.json 更新完成（${mode} 模式）`);
+}
+main().catch(e => { console.error(e); process.exit(1); });
