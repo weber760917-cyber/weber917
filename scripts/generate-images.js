@@ -186,12 +186,13 @@ function storySolutionCard(story) {
   .footer-sub  { font-size:18px; color:${COLORS.grey}; margin-top:2px; }
   .w-logo {
     width:64px; height:64px; border-radius:50%;
-    background:${COLORS.gold};
+    background:${COLORS.navy};
     display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
   }
   .w-logo span {
     font-size:32px; font-weight:900;
-    color:${COLORS.navyDark}; line-height:1;
+    color:${COLORS.gold}; line-height:1;
   }
 </style>
 </head>
@@ -283,12 +284,13 @@ function briefCard(brief) {
   .brand-name { font-size:28px; font-weight:700; color:${COLORS.gold}; }
   .brand-sub  { font-size:18px; color:rgba(255,255,255,0.4); margin-top:4px; }
   .w-logo {
-    width:68px; height:68px; border-radius:50%;
+    width:72px; height:72px; border-radius:50%;
     background:${COLORS.gold};
     display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
   }
   .w-logo span {
-    font-size:34px; font-weight:900;
+    font-size:36px; font-weight:900;
     color:${COLORS.navyDark}; line-height:1;
   }
 </style>
@@ -341,16 +343,4 @@ async function main() {
   const date = brief.date || new Date().toISOString().slice(0,10);
 
   // 生成三張圖
-  await generateImage(storyTitleCard(story),    join(IMG_DIR, `story_title_${date}.png`));
-  await generateImage(storySolutionCard(story), join(IMG_DIR, `story_solution_${date}.png`));
-  await generateImage(briefCard(brief),         join(IMG_DIR, `brief_${date}.png`));
-
-  // 同時更新 latest 捷徑（方便網站直接讀）
-  await generateImage(storyTitleCard(story),    join(IMG_DIR, 'story_title_latest.png'));
-  await generateImage(storySolutionCard(story), join(IMG_DIR, 'story_solution_latest.png'));
-  await generateImage(briefCard(brief),         join(IMG_DIR, 'brief_latest.png'));
-
-  console.log(`✅ 所有圖卡生成完成（${date}）`);
-}
-
-main().catch(e => { console.error(e); process.exit(1); });
+  await generateImage(storyTitleCard(story),    join(IMG_DIR, `s
