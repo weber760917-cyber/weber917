@@ -42,11 +42,14 @@ jobs:
           BRIEF_MODE: morning
         run: node scripts/generate-brief.js
 
+      - name: 生成圖卡
+        run: node scripts/generate-images.js
+
       - name: Commit and push
         run: |
           git config user.name "Weber Bot"
           git config user.email "weber760917@gmail.com"
-          git add data/brief.json data/stories.json
+          git add data/brief.json data/stories.json data/images/
           git diff --staged --quiet || git commit -m "chore: 自動更新 $(TZ=Asia/Taipei date '+%Y-%m-%d %H:%M')"
           git push
 
