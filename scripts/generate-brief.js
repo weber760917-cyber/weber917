@@ -234,7 +234,9 @@ async function enhanceWithClaude(mode, base, d) {
 
     const marketCtx = mode === 'weekend'
       ? '今天是週末，不聊盤，聊長期財務規劃與資產保全。'
-      : `今日${mode === 'morning' ? '早盤' : '收盤'}數據：${marketNumbers}`;
+      : marketNumbers !== '（盤中資料取得中）'
+        ? `今日${mode === 'morning' ? '早盤' : '收盤'}數據：${marketNumbers}`
+        : `今天是${d.dateLabel}，市場數據暫時取得中。請根據近期市場趨勢（AI科技股、台積電、美元走勢）生成分析。`;
 
     const jin10Section = base.jin10
       ? `\n\n【金十數據全球財經早餐原文重點（請據此寫 jin10_summary）】\n${base.jin10.slice(0, 700)}`
@@ -253,7 +255,7 @@ ${marketCtx}${jin10Section}
 【summary 欄位要求】100-180字，含真實數字、影響說明、Weber的一句話建議
 ${base.jin10 ? '【jin10_summary 欄位要求】根據金十數據早餐原文，用300字整理成Weber華爾街菁英風格的繁體中文市場分析，要有具體數字、各市場表現、對台灣投資人的影響，以及Weber的一句話結論' : ''}
 
-回傳格式（只回這個 JSON，不要其他說明）：
+【絕對重要】不管有無數據，你必須直接回傳以下 JSON 格式，不要加任何說明文字，不要問問題：
 {
   "keywords": ["關鍵字1","關鍵字2","關鍵字3","關鍵字4","關鍵字5"],
   "punchline": "圖卡用的一句話（20-30字，Weber風格，有畫面感）",
