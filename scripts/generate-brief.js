@@ -1,5 +1,6 @@
 /**
  * generate-brief.js — morning / afternoon / weekend 三種模式
+ * morning 模式額外整合「金十數據全球財經早餐」，生成 300 字 Weber 版市場分析
  */
 import { writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
@@ -23,6 +24,64 @@ function detectMode(d) {
   if (m !== 'auto') return m;
   if (d.dayOfWeek === 0 || d.dayOfWeek === 6) return 'weekend';
   return d.hour < 12 ? 'morning' : 'afternoon';
+}
+
+async function fetchHtml(url) {
+  const r = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'Accept': 'text/html' },
+  });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.text();
+}
+
+// ── 抓取金十數據全球財經早餐 ──
+async function fetchJin10Breakfast() {
+  try {
+    console.log('📰 抓取金十數據全球財經早餐...');
+    // 從列表頁找連結（嘗試第一頁，找不到試第二頁）
+    let articleUrl = null;
+    for (let page = 1; page <= 3 && !articleUrl; page++) {
+      const listUrl = `https://www.capitalfutures.com.tw/zh-tw/Financial/Global/all${page > 1 ? `?PageID=${page}` : ''}`;
+      const html = await fetchHtml(listUrl);
+      // 尋找含「金十數據全球財經早餐」的連結
+      const re = /href="([^"]*GlobalArticle[^"]*)"[^>]*>\s*金十數據全球財經早餐/gi;
+      const m = re.exec(html);
+      if (m) {
+        articleUrl = m[1].startsWith('http') ? m[1] : `https://www.capitalfutures.com.tw${m[1]}`;
+        console.log(`✅ 找到文章：${articleUrl}`);
+      }
+    }
+    if (!articleUrl) { console.log('⚠️ 未找到金十數據早餐文章（可能今日尚未發布）'); return null; }
+
+    // 抓文章內容
+    const html = await fetchHtml(articleUrl);
+    // 去除 HTML 標籤，取純文字
+    const text = html
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    // 提取關鍵段落
+    const getSection = (start, end) => {
+      const s = text.indexOf(start);
+      const e = end ? text.indexOf(end, s) : s + 600;
+      if (s < 0) return '';
+      return text.slice(s + start.length, e > 0 ? e : s + 600).trim();
+    };
+
+    const highlights = getSection('今日優選', '市場盤點').slice(0, 200);
+    const marketReview = getSection('市場盤點', '國際要聞').slice(0, 900);
+    const intlNews = getSection('國際要聞', '國內要聞').slice(0, 500);
+
+    const result = `【今日優選】${highlights}\n\n【市場盤點】${marketReview}\n\n【國際要聞重點】${intlNews}`;
+    console.log(`✅ 金十數據內容擷取完成（${result.length} 字）`);
+    return result;
+  } catch(e) {
+    console.warn('⚠️ 金十數據抓取失敗:', e.message);
+    return null;
+  }
 }
 
 async function fetchQuote(sym) {
@@ -50,8 +109,9 @@ function chgStr(c, a, isIdx=false) {
 }
 
 async function buildMorning(d) {
-  const [sp, nq, dj, twii] = await Promise.all([
-    fetchQuote('%5EGSPC'), fetchQuote('%5EIXIC'), fetchQuote('%5EDJI'), fetchQuote('%5ETWII')
+  const [[sp, nq, dj, twii], jin10] = await Promise.all([
+    Promise.all([fetchQuote('%5EGSPC'), fetchQuote('%5EIXIC'), fetchQuote('%5EDJI'), fetchQuote('%5ETWII')]),
+    fetchJin10Breakfast(),
   ]);
   const spChg = sp?.chg ?? 0;
   const mood = spChg > 1 ? '大漲' : spChg > 0.3 ? '小漲' : spChg < -1 ? '重挫' : spChg < -0.3 ? '走弱' : '持平';
@@ -79,7 +139,7 @@ async function buildMorning(d) {
     nq && { label: '那斯達克', value: fmt(nq.price), change: `${nq.chg>=0?'▲':'▼'}${fmt(Math.abs(nq.chg))}%`, up: nq.chg >= 0 },
     dj && { label: '道瓊', value: Math.round(dj.price).toLocaleString('en'), change: `${dj.chg>=0?'▲':'▼'}${fmt(Math.abs(dj.chg))}%`, up: dj.chg >= 0 },
   ].filter(Boolean);
-  return { keywords:['美股收盤','台股展望','早盤觀點','開盤策略','盤前必讀'], summary, fb, ig, line, punchline, marketData };
+  return { keywords:['美股收盤','台股展望','早盤觀點','開盤策略','盤前必讀'], summary, fb, ig, line, punchline, marketData, jin10 };
 }
 
 async function buildAfternoon(d) {
@@ -106,7 +166,7 @@ async function buildAfternoon(d) {
     tsmc && { label: '台積電', value: fmt(tsmc.price), change: `${tsmc.chg>=0?'▲':'▼'}${fmt(Math.abs(tsmc.chg))}%`, up: tsmc.chg >= 0 },
     otc  && { label: '櫃買指數', value: fmt(otc.price), change: `${otc.chg>=0?'▲':'▼'}${fmt(Math.abs(otc.chg))}%`, up: otc.chg >= 0 },
   ].filter(Boolean);
-  return { keywords:['台股收盤', twii?.chg > 0 ? '收紅':'收黑','台積電','收盤觀點','盤後分析'], summary, fb, ig, line, punchline, marketData };
+  return { keywords:['台股收盤', twii?.chg > 0 ? '收紅':'收黑','台積電','收盤觀點','盤後分析'], summary, fb, ig, line, punchline, marketData, jin10: null };
 }
 
 const WEEKEND_TOPICS = ['trust','retire','insurance','estate'];
@@ -118,7 +178,7 @@ const WEEKEND_TEMPLATES = {
     fb:`有個問題我常被問：「保險買了，受益人指定了，這樣就夠了嗎？」\n\n大多數情況夠了。但如果受益人是未成年小孩、花錢比較沒節制的家人、或有被借錢糾纏風險的人——那可能還差一步：保險金信託。\n\n理賠金不直接給人，而是先進信託帳戶，按你的規劃慢慢撥出去。你說了算，不是別人。\n\n身故之後，你的錢還在幫你保護家人。有興趣了解，私訊我 💬`,
     ig:`保險買了就夠了嗎？🤔\n\n如果受益人是未成年小孩\n如果擔心錢一次花光\n→ 保險金信託是下一步\n\n理賠金進信託，按設定慢慢撥付\n身後的錢，還在保護家人\n\n想了解？私訊我 👇\n#保險金信託 #信託規劃 #資產保全 #樂爸Weber #workhardplayharder`,
     line:`【今日分享】保險金信託：理賠金不直接給人，進信託帳戶按設定撥付，子女動不了。有興趣了解，私訊我 😊`,
-    marketData: [],
+    marketData: [], jin10: null,
   },
   retire: {
     keywords:['退休缺口','長照費用','通膨侵蝕','退休金試算','老後現金流'],
@@ -127,7 +187,7 @@ const WEEKEND_TEMPLATES = {
     fb:`「退休有1,000萬，應該夠了吧？」這句話我聽過很多次。\n\n然後我問：「長照費算進去了嗎？」\n\n台灣平均長照 7.3 年，每月 5~8 萬，光這個就要 440~700 萬。\n加上通膨吃掉購買力，1,000 萬可能真的不夠。\n\n退休金要分四層：生活費、醫療備用、長照準備、緊急備用金。\n\n還沒算缺口的朋友，現在算才不慌。私訊我 👇`,
     ig:`1,000萬退休夠嗎？🤔\n\n長照費每月5~8萬 × 7.3年\n通膨再吃20年\n\n退休金要分四層放\n近期定存→中期儲蓄險→長期ETF\n\n還沒算缺口的，現在算 👇\n#退休規劃 #長照保險 #退休金 #樂爸Weber #workhardplayharder`,
     line:`【今日分享】1,000萬退休夠嗎？長照每月5~8萬撐7年以上，加通膨缺口很大。現在算清楚，私訊我 😊`,
-    marketData: [],
+    marketData: [], jin10: null,
   },
   insurance: {
     keywords:['壽險規劃','長照險','醫療險','保障缺口','保單健診'],
@@ -136,7 +196,7 @@ const WEEKEND_TEMPLATES = {
     fb:`保險買了10年，你有多久沒「健診」了？\n\n很多人保費越繳越多，但保障沒跟上：壽險保額只夠喪葬費、長照沒有保障、條款已落後好幾代。\n\n保單健診不是要你換保單，是幫你搞清楚：現有保障夠不夠、有沒有重複浪費、有沒有明顯缺口。\n\n一年一次，同樣保費，保障升一個等級。免費幫你看，私訊我 👇`,
     ig:`你的保單，多久沒健診了？🏥\n\n條款可能已落後\n長照缺口？壽險保額不夠？\n\n一年一次保單健診\n同樣保費，保障升級\n\n免費幫你看 👇\n#保單健診 #保險規劃 #長照險 #樂爸Weber #workhardplayharder`,
     line:`【今日分享】保單健診：同樣保費，可以有更好保障。免費幫你確認有沒有缺口，私訊我 😊`,
-    marketData: [],
+    marketData: [], jin10: null,
   },
   estate: {
     keywords:['以房養老','不動產活化','不動產信託','老後現金流','沉睡資產'],
@@ -145,7 +205,7 @@ const WEEKEND_TEMPLATES = {
     fb:`「我有一間好房子，但口袋沒錢，買東西都要想一下。」\n\n這是最讓我揪心的退休描述。房子不只有「賣掉」或「留給孩子」這兩個選項。\n\n以房養老：不搬家，每月從銀行領生活費。\n不動產信託：保護居住安全，不怕子女財務出問題。\n\n趁還有選擇的時候提早規劃。60歲前佈局，選擇多；70歲才動，選擇就少了。私訊我聊聊 👇`,
     ig:`有房沒錢，是真實的困境 🏠\n\n以房養老：不搬家，每月領生活費\n不動產信託：保護居住安全\n\n趁還有選擇，提早規劃 👇\n#以房養老 #不動產活化 #退休規劃 #樂爸Weber #workhardplayharder`,
     line:`【今日分享】有房沒現金，以房養老讓你不搬家不賣房、每月有生活費。趁有選擇時提早規劃，私訊我 😊`,
-    marketData: [],
+    marketData: [], jin10: null,
   },
 };
 
@@ -176,36 +236,38 @@ async function enhanceWithClaude(mode, base, d) {
       ? '今天是週末，不聊盤，聊長期財務規劃與資產保全。'
       : `今日${mode === 'morning' ? '早盤' : '收盤'}數據：${marketNumbers}`;
 
+    const jin10Section = base.jin10
+      ? `\n\n【金十數據全球財經早餐原文重點（請據此寫 jin10_summary）】\n${base.jin10.slice(0, 700)}`
+      : '';
+
     const prompt = `你是「樂爸 Weber」，台灣的資深理財顧問，同時也是貝萊德合作顧問，專注保險金信託、退休規劃、不動產活化。
 今天是 ${d.dateLabel}，要發的內容模式：${mode}。
-${marketCtx}
+${marketCtx}${jin10Section}
 
 【風格要求】${styleGuide[mode]}
 - 語氣像一個很懂市場的老朋友，白話、接地氣，偶爾一點幽默
-- 不要講廢話、不要全是術語、不要千篇一律的「配置才是王道」
+- 不要講廢話、不要全是術語
 - 數字要具體，要說得出為什麼漲跌跟你有關係
 - 結尾一定要有 CTA，讓人想私訊你
 
-【重要】summary 欄位是「今日行情分析」，要求：
-- 必須包含真實數字（用上面給你的行情數據）
-- 要說明這個數字代表什麼意思、對台灣投資人影響
-- 要有 Weber 的一句話建議（具體、不是廢話）
-- 100-180 字，繁體中文
+【summary 欄位要求】100-180字，含真實數字、影響說明、Weber的一句話建議
+${base.jin10 ? '【jin10_summary 欄位要求】根據金十數據早餐原文，用300字整理成Weber華爾街菁英風格的繁體中文市場分析，要有具體數字、各市場表現、對台灣投資人的影響，以及Weber的一句話結論' : ''}
 
 回傳格式（只回這個 JSON，不要其他說明）：
 {
   "keywords": ["關鍵字1","關鍵字2","關鍵字3","關鍵字4","關鍵字5"],
-  "punchline": "圖卡用的一句話（20-30字，Weber 風格，有畫面感，不要廢話）",
+  "punchline": "圖卡用的一句話（20-30字，Weber風格，有畫面感）",
   "summary": "100-180字的今日行情分析（含數字、含影響、含建議）",
-  "fb": "Facebook 文案（300-400字，可換行，結尾要有 CTA 邀請私訊）",
-  "ig": "Instagram 文案（120字內，結尾必須含 #樂爸Weber #workhardplayharder）",
-  "line": "LINE 文案（80字內，口語化，結尾有 emoji）"
+  "jin10_summary": "${base.jin10 ? '300字的金十數據重點整理（Weber華爾街菁英風格，繁體中文）' : ''}",
+  "fb": "Facebook文案（300-400字，可換行，結尾要有CTA邀請私訊）",
+  "ig": "Instagram文案（120字內，結尾必須含#樂爸Weber #workhardplayharder）",
+  "line": "LINE文案（80字內，口語化，結尾有emoji）"
 }`;
 
     console.log('🤖 呼叫 Claude API...');
     const msg = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 2000,
+      max_tokens: 2500,
       messages: [{ role: 'user', content: prompt }]
     });
     const text = msg.content[0].text.trim();
@@ -228,7 +290,7 @@ async function main() {
 
   let content;
   if (mode === 'morning') {
-    console.log('📈 抓取美股數據...');
+    console.log('📈 抓取美股數據 + 金十數據...');
     content = await buildMorning(d);
   } else if (mode === 'afternoon') {
     console.log('📉 抓取台股數據...');
@@ -250,6 +312,7 @@ async function main() {
     punchline: content.punchline || '',
     marketData: content.marketData || [],
     summary: content.summary,
+    jin10_summary: content.jin10_summary || '',
     fb: content.fb, ig: content.ig, line: content.line,
   }, null, 2), 'utf-8');
   console.log(`✅ brief.json 更新完成（${mode} 模式）`);
