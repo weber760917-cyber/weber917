@@ -275,9 +275,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   <div class="card">
     <div class="card-head">
       <div class="card-title">⚽ 2026 FIFA 世界盃</div>
-      <div style="font-size:11px;color:var(--sub);margin-top:2px">點球隊名查陣容 · 數據來源 ESPN</div>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <button class="copy-ptab active" onclick="switchWCView(this,'wc-schedule-pane')">📅 賽程</button>
+        <button class="copy-ptab" onclick="switchWCView(this,'wc-stand-pane')">📊 積分榜</button>
+      </div>
+      <div style="font-size:11px;color:var(--sub);margin-top:4px">點球隊名查陣容 · 資料來源 ESPN</div>
     </div>
-    <div class="card-body" id="wc-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+    <div class="card-body" style="padding:0">
+      <div id="wc-schedule-pane" style="padding:8px 16px 12px">
+        <div id="wc-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+      </div>
+      <div id="wc-stand-pane" style="display:none;padding:8px 16px 12px">
+        <div id="wc-stand-rows"><div class="loading-row"><span class="spin">⟳</span> 載入積分榜…</div></div>
+      </div>
+    </div>
   </div>
 
   <!-- 台股新聞 -->
@@ -1720,74 +1731,111 @@ async function loadStories() {
 
 
 // ── NEWS TAB ──
-function wcMatchHTML(m) {
-  const home = m.teams.find(t => t.homeAway === 'home') || m.teams[0];
-  const away = m.teams.find(t => t.homeAway === 'away') || m.teams[1];
-  if (!home || !away) return '';
-  const dt    = new Date(m.date);
-  const dtStr = dt.toLocaleDateString('zh-TW', {month:'numeric',day:'numeric',weekday:'short'});
-  const tStr  = dt.toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit'});
-  const isLive = m.status === 'in';
-  const isDone = m.status === 'post';
-  const isPre  = m.status === 'pre';
-  const scoreEl = isPre
-    ? `<div class="wc-score pre-score">${tStr}</div>`
-    : `<div class="wc-score${isLive ? ' live-score' : ''}">${home.score} - ${away.score}</div>`;
-  const statusEl = isLive
-    ? `<span class="live-dot"></span>進行中 ${m.statusDesc||''}`
-    : isDone
-      ? `完賽 · <a href="${m.matchUrl}" target="_blank">詳情 →</a>`
-      : `${dtStr} 開賽`;
-  const teamA = home.espnUrl
-    ? `<a href="${home.espnUrl}" target="_blank" class="wc-team wc-home">`
-    : `<div class="wc-team wc-home">`;
-  const teamB = away.espnUrl
-    ? `<a href="${away.espnUrl}" target="_blank" class="wc-team wc-away">`
-    : `<div class="wc-team wc-away">`;
-  const closeA = home.espnUrl ? `</a>` : `</div>`;
-  const closeB = away.espnUrl ? `</a>` : `</div>`;
-  return `<div class="wc-match">
-    <div class="wc-meta">${dtStr}${m.venue ? ` &middot; ${m.venue}` : ''}</div>
-    <div class="wc-teams">
-      ${teamA}
-        ${home.logo ? `<img src="${home.logo}" class="wc-flag" onerror="this.style.display='none'">` : ''}
-        <span>${home.name}</span>
-      ${closeA}
-      ${scoreEl}
-      ${teamB}
-        <span>${away.name}</span>
-        ${away.logo ? `<img src="${away.logo}" class="wc-flag" onerror="this.style.display='none'">` : ''}
-      ${closeB}
-    </div>
-    <div class="wc-status">${statusEl}</div>
-  </div>`;
+function switchWCView(btn, paneId) {
+  document.querySelectorAll('#panel-news .copy-ptab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['wc-schedule-pane','wc-stand-pane'].forEach(id => {
+    document.getElementById(id).style.display = id === paneId ? '' : 'none';
+  });
+  if (paneId === 'wc-stand-pane' && !document.getElementById('wc-stand-rows').dataset.loaded) {
+    loadWCStandings();
+  }
+}
+
+function wcTableHTML(matches) {
+  if (!matches || !matches.length) return '<div class="error-note">目前無賽程 · <a href="https://www.espn.com/soccer/league/_/name/fifa.world" target="_blank" style="color:var(--blue)">ESPN 查看 →</a></div>';
+  const logo = t => t.logo ? `<img src="${t.logo}" style="width:22px;height:16px;object-fit:contain;vertical-align:middle;flex-shrink:0" onerror="this.style.display='none'">` : '';
+  const teamCell = (t, align) => {
+    const inner = align === 'right' ? `<span>${t.name}</span>${logo(t)}` : `${logo(t)}<span>${t.name}</span>`;
+    return t.espnUrl
+      ? `<a href="${t.espnUrl}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:4px;${align==='right'?'justify-content:flex-end':''}">${inner}</a>`
+      : `<span style="display:flex;align-items:center;gap:4px;${align==='right'?'justify-content:flex-end':''}">${inner}</span>`;
+  };
+  const rows = matches.map(m => {
+    const home = m.teams.find(t => t.homeAway === 'home') || m.teams[0] || {};
+    const away = m.teams.find(t => t.homeAway === 'away') || m.teams[1] || {};
+    const isLive = m.status === 'in', isDone = m.status === 'post';
+    const d = new Date(m.date);
+    const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+    const timeStr = d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+    const statusCell = isLive
+      ? `<span style="color:#e74c3c;font-weight:700"><span class="live-dot"></span>${m.statusDesc||'進行中'}</span>`
+      : isDone ? `<span style="color:var(--sub)">FT</span>` : `<span style="color:var(--sub)">${timeStr}</span>`;
+    const scoreCell = (isDone||isLive) ? `${home.score} - ${away.score}` : 'vs';
+    return `<tr style="${isLive?'background:rgba(231,76,60,0.06)':''}">
+      <td style="white-space:nowrap;padding:7px 4px;font-size:11px;border-bottom:1px solid var(--border)">${statusCell}</td>
+      <td style="white-space:nowrap;padding:7px 4px;font-size:11px;color:var(--sub);border-bottom:1px solid var(--border)">${dateStr}</td>
+      <td style="padding:7px 4px;font-size:12px;font-weight:600;text-align:right;border-bottom:1px solid var(--border)">${teamCell(home,'right')}</td>
+      <td style="padding:7px 8px;font-size:14px;font-weight:900;text-align:center;white-space:nowrap;color:var(--blue);border-bottom:1px solid var(--border)">${scoreCell}</td>
+      <td style="padding:7px 4px;font-size:12px;font-weight:600;border-bottom:1px solid var(--border)">${teamCell(away,'left')}</td>
+    </tr>`;
+  }).join('');
+  return `<table style="width:100%;border-collapse:collapse">
+    <thead><tr style="border-bottom:2px solid var(--border)">
+      <th style="padding:5px 4px;font-size:10px;color:var(--sub);font-weight:600;text-align:left">狀態</th>
+      <th style="padding:5px 4px;font-size:10px;color:var(--sub);font-weight:600;text-align:left">日期</th>
+      <th style="padding:5px 4px;font-size:10px;color:var(--sub);font-weight:600;text-align:right">主場</th>
+      <th style="padding:5px 4px;font-size:10px;color:var(--sub);font-weight:600;text-align:center">比分</th>
+      <th style="padding:5px 4px;font-size:10px;color:var(--sub);font-weight:600;text-align:left">客場</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
 }
 
 async function loadWorldCup() {
   const el = document.getElementById('wc-rows');
   try {
-    const r = await fetch('/api/worldcup');
-    if (!r.ok) throw new Error('wc');
-    const matches = await r.json();
+    const data = await fetch('/api/worldcup').then(r => r.ok ? r.json() : Promise.reject(r.status));
+    el.innerHTML = wcTableHTML(Array.isArray(data) ? data : []);
     el.dataset.loaded = '1';
-    if (!matches.length) {
-      el.innerHTML = `<div class="error-note">目前無賽程 · <a href="https://www.espn.com/soccer/league/_/name/fifa.world" target="_blank" style="color:var(--blue)">ESPN 查看 →</a></div>`;
-      return;
-    }
-    el.innerHTML = matches.map(m => wcMatchHTML(m)).join('');
   } catch(e) {
     el.dataset.loaded = '1';
     el.innerHTML = `<div class="error-note">賽程載入失敗 · <a href="https://www.espn.com/soccer/league/_/name/fifa.world" target="_blank" style="color:var(--blue)">ESPN 世界盃 →</a></div>`;
   }
 }
 
+async function loadWCStandings() {
+  const box = document.getElementById('wc-stand-rows');
+  try {
+    const groups = await fetch('/api/worldcup?mode=standings').then(r => r.ok ? r.json() : Promise.reject(r.status));
+    if (!Array.isArray(groups) || !groups.length) { box.innerHTML = '<div class="error-note">暫無積分榜資料</div>'; return; }
+    const th = (txt, align='center') => `<th style="padding:5px 3px;font-size:10px;color:var(--sub);font-weight:600;text-align:${align}">${txt}</th>`;
+    const td = (txt, bold) => `<td style="padding:6px 3px;font-size:12px;text-align:center${bold?';font-weight:900;color:var(--blue)':''}">${txt}</td>`;
+    box.innerHTML = groups.map(g => {
+      const rows = g.entries.map((e,i) => `<tr style="border-bottom:1px solid var(--border)${i===0?';background:rgba(212,168,67,0.07)':''}">
+        <td style="padding:6px 3px;font-size:12px"><div style="display:flex;align-items:center;gap:4px">
+          ${e.logo ? `<img src="${e.logo}" style="width:20px;height:14px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">` : ''}
+          <span>${e.team}</span></div></td>
+        ${td(e.P)} ${td(e.W)} ${td(e.D)} ${td(e.L)} ${td(e.GF)} ${td(e.GA)} ${td(e.Pts,true)}
+      </tr>`).join('');
+      return `<div style="margin-bottom:18px">
+        <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px">${g.name}</div>
+        <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:280px">
+          <thead><tr style="border-bottom:2px solid var(--border)">
+            ${th('隊伍','left')} ${th('場')} ${th('勝')} ${th('平')} ${th('負')} ${th('進')} ${th('失')} ${th('積分')}
+          </tr></thead><tbody>${rows}</tbody>
+        </table></div>
+      </div>`;
+    }).join('');
+    box.dataset.loaded = '1';
+  } catch(e) {
+    box.innerHTML = `<div class="error-note">積分榜暫時無法取得</div>`;
+  }
+}
+
+async function fetchUDNNews(cate, count) {
+  try {
+    const items = await fetch(`/api/udnnews?cate=${cate}&count=${count}`).then(r => r.ok ? r.json() : Promise.reject(r.status));
+    return Array.isArray(items) ? items : [];
+  } catch(e) { console.error('fetchUDNNews error:', e); return []; }
+}
+
 async function loadNewsTab() {
-  document.getElementById('wc-rows').dataset.loaded = '1';
   loadWorldCup();
-  // 台股
+  // 台股 (UDN 經濟日報)
   const twEl = document.getElementById('tw-news-tab');
   twEl.innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
-  fetchNews('台積電 台股 加權指數 台灣股市', 5).then(items => {
+  fetchUDNNews('5590', 5).then(items => {
     twEl.innerHTML = items.length ? newsHTML(items) : '<div class="error-note">台股新聞暫無資料</div>';
   });
   // 美股
@@ -1796,10 +1844,10 @@ async function loadNewsTab() {
   fetchNews('US stocks S&P500 NASDAQ earnings Wall Street tech', 5).then(items => {
     usEl.innerHTML = items.length ? newsHTML(items) : '<div class="error-note">美股新聞暫無資料</div>';
   });
-  // 稅法
+  // 稅法 (UDN 經濟日報)
   const taxEl = document.getElementById('tax-news-tab');
   taxEl.innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
-  fetchNews('台灣稅法 遺產稅 所得稅 房地合一稅 財政部', 2).then(items => {
+  fetchUDNNews('5590', 2).then(items => {
     taxEl.innerHTML = items.length ? newsHTML(items) : '<div class="error-note">稅法新聞暫無資料</div>';
   });
 }
