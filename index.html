@@ -1773,8 +1773,7 @@ async function loadWCPreview() {
             <span style="font-size:14px;font-weight:700;color:var(--blue)">${m.home} <span style="color:var(--sub);font-weight:400">vs</span> ${m.away}</span>
             <span style="font-size:11px;color:var(--sub);white-space:nowrap">${m.time}</span>
           </div>
-          <div style="font-size:13px;line-height:1.8;color:var(--text)">${m.analysis.replace(/
-/g,'<br>').replace(/【/g,'<strong>【').replace(/】/g,'】</strong>')}</div>
+          <div style="font-size:13px;line-height:1.8;color:var(--text)">${m.analysis.split('\n').join('<br>').replace(/【/g,'<strong>【').replace(/】/g,'】</strong>')}</div>
         </div>
       `).join('');
     box.dataset.loaded = '1';
