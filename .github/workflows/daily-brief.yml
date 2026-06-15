@@ -2,15 +2,16 @@ name: 每日社群文案生成
 
 on:
   schedule:
-    - cron: '0 23 * * 0-4'   # 週一~五 7:00 AM 台灣時間
+    # 週一~五 7:00 AM 台灣時間 (UTC 前一天 23:00)
+    - cron: '0 23 * * 0-4'
   workflow_dispatch:
     inputs:
-      topic:
-        description: '故事主題（留空自動）'
+      skip_story:
+        description: '跳過故事生成（true/false）'
         required: false
-        default: 'auto'
+        default: 'false'
         type: choice
-        options: [auto, trust, retire, insurance, estate]
+        options: ['false', 'true']
 
 jobs:
   generate:
@@ -30,18 +31,37 @@ jobs:
       - name: Install dependencies
         run: cd scripts && npm install
 
+      # ── 判斷今天是否要發故事（週一/三/五才發）──
+      - name: Check story day
+        id: story_check
+        run: |
+          SKIP_INPUT="${{ github.event.inputs.skip_story }}"
+          TW_DOW=$(TZ=Asia/Taipei date +%u)   # 1=Mon ... 7=Sun
+          echo "Taiwan DOW=$TW_DOW, skip_input=$SKIP_INPUT"
+          # 週一(1)、週三(3)、週五(5) 才發故事
+          if [ "$SKIP_INPUT" = "true" ]; then
+            echo "run_story=false" >> $GITHUB_OUTPUT
+          elif [ "$TW_DOW" = "1" ] || [ "$TW_DOW" = "3" ] || [ "$TW_DOW" = "5" ]; then
+            echo "run_story=true" >> $GITHUB_OUTPUT
+          else
+            echo "run_story=false" >> $GITHUB_OUTPUT
+          fi
+
+      # ── 週一/三/五 生成案例故事 ──
       - name: 生成案例故事
+        if: steps.story_check.outputs.run_story == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          STORY_TOPIC: ${{ github.event.inputs.topic }}
         run: node scripts/generate-story.js
 
+      # ── 每天 生成市場早盤觀點 ──
       - name: 生成市場早盤觀點
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           BRIEF_MODE: morning
         run: node scripts/generate-brief.js
 
+      # ── 每天 生成圖卡 ──
       - name: 生成圖卡
         run: node scripts/generate-images.js
 
@@ -52,4 +72,3 @@ jobs:
           git add data/brief.json data/stories.json data/images/
           git diff --staged --quiet || git commit -m "chore: 自動更新 $(TZ=Asia/Taipei date '+%Y-%m-%d %H:%M')"
           git push
-
