@@ -485,7 +485,30 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 <!-- ===== TAB: 社群文案 ===== -->
 <div id="panel-copy" class="panel">
 
-  <div class="section-label">根據今日行情自動生成，可直接複製發佈</div>
+  <!-- 重點整理生成器 -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">✍️ 重點整理生成器</div>
+      <div style="font-size:11px;color:var(--sub);margin-top:2px">貼上案例故事或新聞，一鍵生成 FB / IG / LINE 文案</div>
+    </div>
+    <div class="card-body">
+      <textarea id="gen-input" placeholder="貼上案例故事、新聞文章、任何內容…" rows="7" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:12px;font-size:13px;line-height:1.6;resize:vertical;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="copy-ptab active" id="gen-plat-fb" onclick="selectGenPlatform(this,'fb')">FB</button>
+        <button class="copy-ptab" id="gen-plat-ig" onclick="selectGenPlatform(this,'ig')">IG</button>
+        <button class="copy-ptab" id="gen-plat-line" onclick="selectGenPlatform(this,'line')">LINE</button>
+      </div>
+      <button onclick="generateSocialPost()" style="width:100%;background:linear-gradient(135deg,var(--blue),#1E6B4F);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px">⚡ 生成文案</button>
+      <div id="gen-loading" style="display:none;margin-top:14px" class="loading-row"><span class="spin">⟳</span> 生成中，請稍候…</div>
+      <div id="gen-error" style="display:none;margin-top:14px" class="error-note"></div>
+      <div id="gen-output" style="display:none;margin-top:16px">
+        <div id="gen-result" style="white-space:pre-wrap;font-size:13px;line-height:1.8;background:#f8f9fb;border-radius:10px;padding:14px;color:var(--text);border:1px solid var(--border)"></div>
+        <div class="copy-action" style="margin-top:10px"><button class="copy-btn" onclick="cpGen(this)">複製文案</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:8px">今日 AI 行情文案</div>
 
   <!-- Weber AI 每日文案 -->
   <div class="card" id="brief-copy-card" style="display:none">
@@ -1628,6 +1651,45 @@ const dropArea = document.getElementById('img-drop-area');
 // Initial preview render
 setTimeout(() => renderCard(false), 500);
 
+// ── 重點整理生成器 ──
+let _genPlatform = 'fb';
+function selectGenPlatform(btn, plat) {
+  ['gen-plat-fb','gen-plat-ig','gen-plat-line'].forEach(id => document.getElementById(id).classList.remove('active'));
+  btn.classList.add('active');
+  _genPlatform = plat;
+}
+async function generateSocialPost() {
+  const content = (document.getElementById('gen-input').value || '').trim();
+  if (!content) { alert('請先貼上要整理的內容'); return; }
+  document.getElementById('gen-output').style.display = 'none';
+  document.getElementById('gen-error').style.display = 'none';
+  document.getElementById('gen-loading').style.display = 'flex';
+  try {
+    const r = await fetch('/api/generate-post', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content, platform: _genPlatform })
+    });
+    const data = await r.json();
+    if (data.error) throw new Error(data.error);
+    document.getElementById('gen-result').textContent = data.result;
+    document.getElementById('gen-output').style.display = 'block';
+  } catch(e) {
+    document.getElementById('gen-error').textContent = '生成失敗：' + e.message;
+    document.getElementById('gen-error').style.display = 'block';
+  } finally {
+    document.getElementById('gen-loading').style.display = 'none';
+  }
+}
+function cpGen(btn) {
+  const text = document.getElementById('gen-result').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ 已複製';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+
 // ── AUTO REFRESH ──
 const REFRESH_SEC = 60;
 let marketSec = REFRESH_SEC, cryptoSec = REFRESH_SEC;
@@ -1709,26 +1771,6 @@ function storyCardHTML(s, idx) {
   <div class="story-mid">
     <div class="story-quote">${quoteHtml}</div>
     ${sol}
-  </div>
-  <div class="story-toggle"><button class="toggle-btn" onclick="toggleCopy(this)">▼ 展開社群文案</button></div>
-  <div class="story-copy" style="display:none">
-    <div class="copy-tabs-s">
-      <div class="copy-ptab active" onclick="switchCopyS(this,'${id}-fb')">FB</div>
-      <div class="copy-ptab" onclick="switchCopyS(this,'${id}-ig')">IG</div>
-      <div class="copy-ptab" onclick="switchCopyS(this,'${id}-line')">LINE</div>
-    </div>
-    <div id="${id}-fb" class="copy-pane-s active">
-      <div class="copy-text" id="${id}-fb-t">${(s.fb||'').replace(/</g,'&lt;')}</div>
-      <div class="copy-action"><button class="copy-btn" onclick="cp('${id}-fb-t',this)">複製</button></div>
-    </div>
-    <div id="${id}-ig" class="copy-pane-s">
-      <div class="copy-text" id="${id}-ig-t">${(s.ig||'').replace(/</g,'&lt;')}</div>
-      <div class="copy-action"><button class="copy-btn" onclick="cp('${id}-ig-t',this)">複製</button></div>
-    </div>
-    <div id="${id}-line" class="copy-pane-s">
-      <div class="copy-text" id="${id}-line-t">${(s.line||'').replace(/</g,'&lt;')}</div>
-      <div class="copy-action"><button class="copy-btn" onclick="cp('${id}-line-t',this)">複製</button></div>
-    </div>
   </div>
 </div>`;
 }
