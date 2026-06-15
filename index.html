@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Weber 理財筆記｜每日行情 × 真實案例</title>
+<title>樂爸Weber金融分享</title>
 <meta name="description" content="每日市場重點、資產配置建議、真實理財案例，Weber 理財顧問為你整理。">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
 <style>
@@ -240,7 +240,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       <div class="brand">
         <div class="brand-icon">📊</div>
         <div>
-          <div class="brand-name">Weber 理財筆記</div>
+          <div class="brand-name">樂爸Weber金融分享</div>
           <div class="brand-sub">每日行情 × 資產配置 × 真實案例</div>
         </div>
       </div>
@@ -750,8 +750,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 <script>
 // ── DATE ──
 const NOW = new Date();
-document.getElementById('datePill').textContent =
-  NOW.toLocaleDateString('zh-TW',{year:'numeric',month:'short',day:'numeric',weekday:'short'});
+(function(){
+  const d = NOW;
+  const y = d.getFullYear();
+  const mo = String(d.getMonth()+1).padStart(2,'0');
+  const dy = String(d.getDate()).padStart(2,'0');
+  const days = ['日','一','二','三','四','五','六'];
+  const wd = days[d.getDay()];
+  document.getElementById('datePill').textContent = `${y}.${mo}.${dy} ${wd}`;
+})();
 
 // ── TABS ──
 function switchTab(name) {
@@ -1369,6 +1376,25 @@ async function loadCryptoNews() {
   document.getElementById('crypto-news').innerHTML = newsHTML(items);
 }
 
+function copyStoryText(idx, btn) {
+  const stories = window._storiesCache || [];
+  const s = stories[idx];
+  if (!s) return;
+  const lines = [];
+  if (s.title) lines.push(s.title);
+  if (s.meta) lines.push(s.meta);
+  if (s.quote) lines.push('', s.quote);
+  if (s.solution) {
+    lines.push('', '【' + s.solution.title + '】');
+    (s.solution.points || []).forEach(p => lines.push('• ' + p));
+  }
+  navigator.clipboard.writeText(lines.join('\n')).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ 已複製';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+
 function copyStoryLink(idx, btn) {
   const url = location.origin + location.pathname + '#story-' + idx;
   navigator.clipboard.writeText(url).then(() => {
@@ -1795,6 +1821,9 @@ function storyCardHTML(s, idx) {
     <div class="story-quote">${quoteHtml}</div>
     ${sol}
   </div>
+  <div style="text-align:right;padding:0 14px 14px">
+    <button onclick="copyStoryText(${idx},this)" style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 13px;font-size:13px;color:var(--sub);cursor:pointer" onmouseover="this.style.color='var(--blue)';this.style.borderColor='var(--blue)'" onmouseout="this.style.color='var(--sub)';this.style.borderColor='var(--border)'">📋 複製全文</button>
+  </div>
 </div>`;
 }
 
@@ -1806,6 +1835,7 @@ async function loadStories() {
     if (!r.ok) throw new Error('failed');
     const stories = await r.json();
     const sorted = [...stories].reverse();
+    window._storiesCache = sorted;
     container.innerHTML = sorted.map((s, i) => storyCardHTML(s, i)).join('');
     const activeTag = document.querySelector('.filter-tag.active');
     if (activeTag && activeTag.dataset.tag !== 'all') filterTag(activeTag);
