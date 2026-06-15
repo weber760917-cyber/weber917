@@ -278,6 +278,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       <div style="display:flex;gap:6px;margin-top:6px">
         <button class="copy-ptab active" onclick="switchWCView(this,'wc-schedule-pane')">📅 賽程</button>
         <button class="copy-ptab" onclick="switchWCView(this,'wc-stand-pane')">📊 積分榜</button>
+        <button class="copy-ptab" onclick="switchWCView(this,'wc-preview-pane')">🔮 分析</button>
       </div>
       <div style="font-size:11px;color:var(--sub);margin-top:4px">點球隊名查陣容 · 資料來源 ESPN</div>
     </div>
@@ -287,6 +288,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       </div>
       <div id="wc-stand-pane" style="display:none;padding:8px 16px 12px">
         <div id="wc-stand-rows"><div class="loading-row"><span class="spin">⟳</span> 載入積分榜…</div></div>
+      </div>
+      <div id="wc-preview-pane" style="display:none;padding:8px 16px 12px">
+        <div id="wc-preview-rows"><div class="loading-row"><span class="spin">⟳</span> 載入賽前分析…</div></div>
       </div>
     </div>
   </div>
@@ -1734,11 +1738,49 @@ async function loadStories() {
 function switchWCView(btn, paneId) {
   document.querySelectorAll('#panel-news .copy-ptab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  ['wc-schedule-pane','wc-stand-pane'].forEach(id => {
+  ['wc-schedule-pane','wc-stand-pane','wc-preview-pane'].forEach(id => {
     document.getElementById(id).style.display = id === paneId ? '' : 'none';
   });
   if (paneId === 'wc-stand-pane' && !document.getElementById('wc-stand-rows').dataset.loaded) {
     loadWCStandings();
+  }
+  if (paneId === 'wc-preview-pane' && !document.getElementById('wc-preview-rows').dataset.loaded) {
+    loadWCPreview();
+  }
+}
+
+async function loadWCPreview() {
+  const box = document.getElementById('wc-preview-rows');
+  try {
+    const data = await fetch('/data/wc-preview.json?_=' + Date.now()).then(r => r.ok ? r.json() : Promise.reject());
+    if (!data.matches || !data.matches.length) {
+      box.innerHTML = '<div class="error-note">今日尚無明日賽程分析，每天 18:00 自動更新</div>';
+      box.dataset.loaded = '1';
+      return;
+    }
+    const mm = data.date ? data.date.slice(4,6) : '';
+    const dd = data.date ? data.date.slice(6,8) : '';
+    const dateLabel = mm && dd ? `${parseInt(mm)}/${parseInt(dd)}` : '明日';
+    const genTime = data.generatedAt ? new Date(data.generatedAt).toLocaleString('zh-TW', {timeZone:'Asia/Taipei', month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
+    box.innerHTML =
+      `<div style="font-size:11px;color:var(--sub);margin-bottom:14px">` +
+      `⚽ ${dateLabel} 賽前分析 · Claude AI × 莊家視角` +
+      (genTime ? ` · 生成於 ${genTime}` : '') +
+      `</div>` +
+      data.matches.map((m, i) => `
+        <div style="margin-bottom:${i < data.matches.length-1 ? '20px;padding-bottom:20px;border-bottom:1px solid var(--border)' : '0'}">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span style="font-size:14px;font-weight:700;color:var(--blue)">${m.home} <span style="color:var(--sub);font-weight:400">vs</span> ${m.away}</span>
+            <span style="font-size:11px;color:var(--sub);white-space:nowrap">${m.time}</span>
+          </div>
+          <div style="font-size:13px;line-height:1.8;color:var(--text)">${m.analysis.replace(/
+/g,'<br>').replace(/【/g,'<strong>【').replace(/】/g,'】</strong>')}</div>
+        </div>
+      `).join('');
+    box.dataset.loaded = '1';
+  } catch(e) {
+    box.innerHTML = '<div class="error-note">賽前分析尚未產生，每天 18:00 自動更新 🔄</div>';
+    box.dataset.loaded = '1';
   }
 }
 
