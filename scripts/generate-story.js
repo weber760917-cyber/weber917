@@ -25,14 +25,24 @@ function getTaiwanDate() {
   };
 }
 
-// ── 今日主題（依星期幾輪替，可被 STORY_TOPIC 環境變數覆蓋）──
-const DAY_TOPIC = {
-  1: 'trust',      // 週一
-  2: 'retire',     // 週二
-  3: 'insurance',  // 週三
-  4: 'estate',     // 週四
-  5: 'trust',      // 週五
-};
+// ── 每週三天（週一/三/五）× 4主題循環排程 ──
+// 每4週完整跑完 trust / retire / insurance / estate，每天都不重複
+const TOPIC_SCHEDULE = [
+  ['trust',     'retire',    'insurance'], // 第1週 週一/三/五
+  ['estate',    'trust',     'retire'],    // 第2週
+  ['insurance', 'estate',    'trust'],     // 第3週
+  ['retire',    'insurance', 'estate'],    // 第4週
+];
+const DAY_SLOT = { 1: 0, 3: 1, 5: 2 }; // 週一=欄0, 週三=欄1, 週五=欄2
+
+function getTodayTopic(dayOfWeek) {
+  const start = new Date('2026-01-05'); // 第一個週一
+  const now   = new Date();
+  const week  = Math.max(0, Math.floor((now - start) / (7 * 24 * 60 * 60 * 1000)));
+  const row   = TOPIC_SCHEDULE[week % 4];
+  const slot  = DAY_SLOT[dayOfWeek] ?? 0;
+  return row[slot];
+}
 
 // ── 故事模板庫（每個主題 3 個模板，依週數輪替）──
 const STORY_POOL = {
@@ -275,38 +285,21 @@ async function generateWithClaude(topic, dateInfo) {
       insurance: '保險規劃、保單健診、保障缺口',
       estate: '以房養老、不動產信託、不動產活化',
     };
-    const prompt = `你是「樂爸 Weber」（也可以叫 Weber），台灣資深理財顧問，IG @weber917，專注保險金信託、退休規劃、不動產活化。
-今天是 ${dateInfo.dateLabel}，請生成一篇「${topicMap[topic]}」主題的理財案例故事。
+    const prompt = `你是 Weber，資深保險理財顧問。今天是 ${dateInfo.dateLabel}。
+請生成一篇關於「${topicMap[topic]}」的理財案例故事，格式為 JSON：
 
-【核心人設】
-- 叫「樂爸」或「Weber」都行，偶爾自然帶入，不要每句都說
-- 說話像懂很多的大學長，在咖啡廳跟你分享剛遇到的真實案例
-- 專業感來自「分析到位、建議具體」，不是靠術語裝腔
-- 術語要解釋（例：「信託，簡單說就是把錢交給第三方幫你管」）
-- 故事要有畫面感、情感，讓人讀了有共鳴，不是教科書案例
-- 幽默自然，不刻意，像說話時順口一句
-- 結尾問句讓人想回應，不要命令式
-
-格式為 JSON：
 {
-  "title": "強吸引力標題（數字＋衝突或意外轉折，讓人想點進來看）",
-  "meta": "2句話說明案例背景（例：根據真實信託諮詢案例改編）",
-  "quote": "4-5段故事：第一句就抓人→情境畫面→衝突痛點→轉折，像Weber在跟你說這個客戶的故事",
+  "title": "一句吸引人的標題（含數字或衝突感）",
+  "meta": "改編說明（例：安養信託真實諮詢案例）",
+  "quote": "以客戶的真實情境開場的故事，3~5段，帶情感，真實感，繁體中文",
   "solution": {
-    "title": "Weber 的建議：（簡短有力，3-6字）",
-    "points": ["具體可執行的建議1，說清楚為什麼", "建議2", "建議3", "建議4"]
+    "title": "Weber 的解法標題",
+    "points": ["解決方案重點1", "解決方案重點2", "解決方案重點3", "重點4"]
   },
-  "fb": "280-380字：故事感開場（1-2句）→案例核心問題→Weber的分析（有觀點有深度）→問句結尾，自然不做作",
-  "ig": "110-140字精華版 + hashtag（必含 #樂爸Weber #workhardplayharder 加3個主題tag）",
-  "line": "60-80字，最口語最直接，像傳訊息給老朋友，1-2個emoji"
+  "fb": "Facebook 貼文，250~350字，有故事感，結尾私訊CTA",
+  "ig": "Instagram 貼文，100~150字 + 5個hashtag，簡潔有力",
+  "line": "LINE 貼文，50~70字，親切直接"
 }
-
-【邏輯自我檢查——生成前必須確認】
-1. 標題與故事人物一致（例：標題說「兒子」故事裡就不能變「女兒」）
-2. 因果關係合理：誰做了什麼→造成什麼問題→為什麼會這樣，要說得通
-3. 衝突方向正確：誰告誰、誰虧到、誰佔便宜，邏輯要前後一致
-4. 金額要合理：前面說的總資產、分配金額、缺口，數字要對得起來
-5. 解法要對症：建議的信託/保險工具，要真的能解決故事裡的那個問題
 
 只回 JSON，不要其他文字。`;
 
@@ -328,8 +321,7 @@ async function generateWithClaude(topic, dateInfo) {
 // ── 主程式 ──
 async function main() {
   const dateInfo = getTaiwanDate();
-  const envTopic = process.env.STORY_TOPIC;
-  const topic = (envTopic && envTopic !== 'auto') ? envTopic : (DAY_TOPIC[dateInfo.dayOfWeek] || 'trust');
+  const topic = getTodayTopic(dateInfo.dayOfWeek);
   console.log(`📅 ${dateInfo.dateLabel}  📌 主題：${topic}`);
 
   // 讀取現有 stories.json
