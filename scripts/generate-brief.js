@@ -270,9 +270,12 @@ ${base.jin10 ? '【jin10_summary 欄位要求】根據金十數據早餐原文�
     const msg = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 2500,
-      messages: [{ role: 'user', content: prompt }]
+      messages: [
+        { role: 'user', content: prompt },
+        { role: 'assistant', content: '{' }   // prefill — 強制從 JSON 開頭回覆
+      ]
     });
-    const text = msg.content[0].text.trim();
+    const text = '{' + msg.content[0].text.trim(); // 補回 prefill 的 {
     console.log('Claude 回應長度:', text.length);
     const match = text.match(/\{[\s\S]+\}/);
     if (!match) { console.warn('⚠️  Claude 回應無法解析為 JSON:', text.slice(0,200)); return null; }
