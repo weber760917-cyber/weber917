@@ -1789,9 +1789,8 @@ async function loadWCPreview() {
     const dateLabel = mm && dd ? `${parseInt(mm)}/${parseInt(dd)}` : '明日';
     const genTime = data.generatedAt ? new Date(data.generatedAt).toLocaleString('zh-TW', {timeZone:'Asia/Taipei', month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
     box.innerHTML =
-      `<div style="font-size:11px;color:var(--sub);margin-bottom:14px">` +
-      `⚽ ${dateLabel} 賽前分析 · Claude AI × 莊家視角` +
-      (genTime ? ` · 生成於 ${genTime}` : '') +
+      `<div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:14px">` +
+      `${dateLabel} 樂爸Weber賽前分析` +
       `</div>` +
       data.matches.map((m, i) => `
         <div style="margin-bottom:${i < data.matches.length-1 ? '20px;padding-bottom:20px;border-bottom:1px solid var(--border)' : '0'}">
