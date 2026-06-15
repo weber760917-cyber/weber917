@@ -37,7 +37,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .brand-icon { width: 42px; height: 42px; background: rgba(255,255,255,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
 .brand-name { font-size: 17px; font-weight: 700; }
 .brand-sub { font-size: 11px; color: #90b4d4; margin-top: 1px; }
-.date-pill { background: rgba(255,255,255,0.12); border-radius: 20px; padding: 5px 12px; font-size: 12px; color: #b0c8e0; }
+.date-pill { background: rgba(255,255,255,0.12); border-radius: 20px; padding: 5px 12px; font-size: 16px; color: #b0c8e0; }
 .header-tags { display: flex; gap: 6px; flex-wrap: wrap; }
 .h-tag { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: #90c4e0; }
 
@@ -45,7 +45,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .tabs-wrap { background: white; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .tabs { display: flex; overflow-x: auto; padding: 0 16px; max-width: 640px; margin: 0 auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
-.tab { flex-shrink: 0; padding: 13px 14px; font-size: 13px; font-weight: 500; color: var(--sub); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+.tab { flex-shrink: 0; padding: 13px 14px; font-size: 15px; font-weight: 500; color: var(--sub); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
 .tab.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 700; }
 
 /* ── PANELS ── */
@@ -63,11 +63,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .mkt-row:last-child { border-bottom: none; }
 .mkt-l { display: flex; align-items: center; gap: 10px; }
 .mkt-flag { font-size: 18px; }
-.mkt-name { font-size: 14px; font-weight: 600; }
+.mkt-name { font-size: 16px; font-weight: 600; }
 .mkt-code { font-size: 11px; color: var(--sub); margin-top: 1px; }
 .mkt-r { text-align: right; }
 .mkt-price { font-size: 15px; font-weight: 700; }
-.mkt-chg { font-size: 12px; margin-top: 2px; font-weight: 600; }
+.mkt-chg { font-size: 16px; margin-top: 2px; font-weight: 600; }
 .up   { color: var(--up); }    /* TW: red=up */
 .down { color: var(--down); }  /* TW: green=down */
 .up-us   { color: #2a9d8f; }   /* US/Crypto: green=up */
@@ -75,15 +75,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .copy-pane-s { display: none; }
 .copy-pane-s.active { display: block; }
 .flat { color: var(--sub); }
-.loading-row { text-align: center; padding: 20px; color: var(--sub); font-size: 13px; }
+.loading-row { text-align: center; padding: 20px; color: var(--sub); font-size: 15px; }
 .spin { display: inline-block; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── CUSTOM SYMBOL INPUT ── */
 .custom-sym-bar { display: flex; gap: 8px; padding: 8px 0 4px; border-top: 1px solid #f0f3f7; margin-top: 0; }
-.custom-sym-bar input { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 13px; outline: none; color: var(--text); background: #fafbfd; min-width: 0; }
+.custom-sym-bar input { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 15px; outline: none; color: var(--text); background: #fafbfd; min-width: 0; }
 .custom-sym-bar input:focus { border-color: var(--blue); background: white; }
-.custom-sym-bar button { background: var(--blue); color: white; border: none; border-radius: 8px; padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.custom-sym-bar button { background: var(--blue); color: white; border: none; border-radius: 8px; padding: 6px 16px; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 .custom-sym-bar button:active { opacity: 0.8; }
 .kline-wrap { height: 180px; margin: 8px 0 4px; position: relative; }
 .kline-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
@@ -92,7 +92,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .chart-wrap { position: relative; height: 160px; margin: 8px 0 4px; }
 
 /* ── SUMMARY ── */
-.summary-body { font-size: 14px; line-height: 1.85; color: #3d4f6e; white-space: pre-wrap; }
+.summary-body { font-size: 16px; line-height: 1.85; color: #3d4f6e; white-space: pre-wrap; }
 .kw-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
 .kw { background: #ebf3ff; color: var(--blue); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
 
@@ -104,13 +104,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .copy-pane.active { display: block; }
 .copy-text { font-size: 15px; line-height: 2; color: #2d3748; background: #fafbfd; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; white-space: pre-wrap; word-break: break-word; margin-bottom: 8px; }
 .copy-action { text-align: right; }
-.copy-btn { background: var(--blue); color: white; border: none; border-radius: 8px; padding: 7px 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.copy-btn { background: var(--blue); color: white; border: none; border-radius: 8px; padding: 7px 16px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
 .copy-btn:hover { opacity: 0.85; }
 .copy-btn.ok { background: var(--green); }
 
 /* ── STORY LIBRARY ── */
 .tag-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-.filter-tag { font-size: 12px; padding: 5px 13px; border-radius: 20px; border: 1.5px solid var(--border); cursor: pointer; color: var(--sub); font-weight: 500; transition: all 0.15s; background: white; }
+.filter-tag { font-size: 16px; padding: 5px 13px; border-radius: 20px; border: 1.5px solid var(--border); cursor: pointer; color: var(--sub); font-weight: 500; transition: all 0.15s; background: white; }
 .filter-tag.active { color: white; border-color: transparent; font-weight: 700; }
 .filter-tag[data-color="trust"].active  { background: #d4720a; }
 .filter-tag[data-color="retire"].active { background: #c0392b; }
@@ -132,15 +132,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .story-meta  { font-size: 11px; color: var(--sub); margin-bottom: 12px; }
 
 .story-mid { padding: 0 16px; }
-.story-quote { font-size: 13px; line-height: 1.9; color: #3d4f6e; border-left: 3px solid var(--border); padding-left: 12px; margin-bottom: 12px; }
+.story-quote { font-size: 15px; line-height: 1.9; color: #3d4f6e; border-left: 3px solid var(--border); padding-left: 12px; margin-bottom: 12px; }
 .sol-box { background: #f0f6ff; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
 .sol-title { font-size: 11px; font-weight: 700; color: var(--blue); margin-bottom: 8px; }
-.sol-list { list-style: none; font-size: 13px; color: #2d4a6e; line-height: 2; }
+.sol-list { list-style: none; font-size: 15px; color: #2d4a6e; line-height: 2; }
 .sol-list li::before { content: '✓ '; color: var(--green); font-weight: 700; }
 
 /* expand/collapse */
 .story-toggle { padding: 0 16px 10px; }
-.toggle-btn { background: none; border: none; color: var(--blue); font-size: 12px; font-weight: 700; cursor: pointer; padding: 4px 0; }
+.toggle-btn { background: none; border: none; color: var(--blue); font-size: 16px; font-weight: 700; cursor: pointer; padding: 4px 0; }
 .story-copy { border-top: 1px solid #f0f3f7; padding: 12px 16px 16px; }
 .copy-tabs-s { display: flex; gap: 5px; margin-bottom: 10px; }
 .copy-tabs-s .copy-ptab { font-size: 11px; padding: 3px 10px; }
@@ -149,15 +149,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .about-profile { background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%); border-radius: 18px; padding: 28px 20px 24px; margin-bottom: 14px; color: white; text-align: center; }
 .about-avatar { width: 76px; height: 76px; border-radius: 50%; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 14px; border: 2px solid rgba(255,255,255,0.2); }
 .about-name { font-size: 22px; font-weight: 800; letter-spacing: 1px; margin-bottom: 4px; }
-.about-title { font-size: 12px; color: #7ec8e3; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
-.about-tagline { font-size: 13px; color: #b0c8e0; line-height: 1.7; margin-bottom: 20px; max-width: 280px; margin-left: auto; margin-right: auto; }
+.about-title { font-size: 16px; color: #7ec8e3; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
+.about-tagline { font-size: 15px; color: #b0c8e0; line-height: 1.7; margin-bottom: 20px; max-width: 280px; margin-left: auto; margin-right: auto; }
 .about-stats { display: flex; justify-content: center; gap: 0; margin-bottom: 22px; background: rgba(255,255,255,0.07); border-radius: 12px; overflow: hidden; }
 .about-stat { flex: 1; padding: 12px 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.1); }
 .about-stat:last-child { border-right: none; }
 .about-stat-num { font-size: 20px; font-weight: 800; color: #7ec8e3; }
 .about-stat-label { font-size: 10px; color: rgba(255,255,255,0.55); margin-top: 2px; letter-spacing: 0.5px; }
 .about-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-.about-btn { display: inline-flex; align-items: center; gap: 6px; padding: 11px 20px; border-radius: 25px; font-size: 13px; font-weight: 700; text-decoration: none; transition: opacity 0.15s; }
+.about-btn { display: inline-flex; align-items: center; gap: 6px; padding: 11px 20px; border-radius: 25px; font-size: 15px; font-weight: 700; text-decoration: none; transition: opacity 0.15s; }
 .about-btn:hover { opacity: 0.85; }
 .about-btn-line { background: #06c755; color: white; }
 .about-btn-ig { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); color: white; }
@@ -170,9 +170,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .service-icon.c2 { background: #fff3e0; }
 .service-icon.c3 { background: #e8f5e9; }
 .service-icon.c4 { background: #fce4ec; }
-.service-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; color: var(--navy); }
-.service-desc { font-size: 12px; color: var(--sub); line-height: 1.6; }
-.about-note { background: #f8faff; border: 1px solid #e0e8f5; border-radius: 12px; padding: 13px 16px; font-size: 12px; color: var(--sub); line-height: 1.8; }
+.service-name { font-size: 16px; font-weight: 700; margin-bottom: 3px; color: var(--navy); }
+.service-desc { font-size: 16px; color: var(--sub); line-height: 1.6; }
+.about-note { background: #f8faff; border: 1px solid #e0e8f5; border-radius: 12px; padding: 13px 16px; font-size: 16px; color: var(--sub); line-height: 1.8; }
 
 /* ── CARD TEMPLATES ── */
 .tpl-btn { cursor:pointer; opacity:0.6; transition:opacity 0.15s; flex-shrink:0; }
@@ -184,7 +184,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .news-item:last-child { border-bottom: none; }
 .news-thumb { width: 64px; height: 48px; object-fit: cover; border-radius: 7px; flex-shrink: 0; background: #f0f3f7; }
 .news-body { flex: 1; min-width: 0; }
-.news-title { font-size: 13px; font-weight: 600; line-height: 1.5; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 3px; }
+.news-title { font-size: 15px; font-weight: 600; line-height: 1.5; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 3px; }
 .news-meta { font-size: 11px; color: var(--sub); }
 
 /* ── CALENDAR ── */
@@ -195,15 +195,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .cal-agm  { background: #fff0e0; color: #d4720a; }
 .cal-ir   { background: #ebf4ff; color: #0f3460; }
 .cal-econ { background: #f0eaff; color: #6d28d9; }
-.cal-name { font-size: 13px; font-weight: 500; }
+.cal-name { font-size: 15px; font-weight: 500; }
 .cal-link { text-decoration: none; color: inherit; border-bottom: 1px dashed #b0bdd4; transition: color 0.15s; }
 .cal-link:hover { color: var(--blue); }
 
 /* ── UTILS ── */
 .section-label { font-size: 11px; font-weight: 700; color: var(--sub); letter-spacing: 1px; padding: 4px 2px 10px; text-transform: uppercase; }
-.error-note { font-size: 12px; color: var(--sub); text-align: center; padding: 12px; }
+.error-note { font-size: 16px; color: var(--sub); text-align: center; padding: 12px; }
 .refresh-area { text-align: center; margin-bottom: 12px; }
-.refresh-mini { background: none; border: 1px solid var(--border); color: var(--sub); border-radius: 20px; padding: 5px 14px; font-size: 12px; cursor: pointer; }
+.refresh-mini { background: none; border: 1px solid var(--border); color: var(--sub); border-radius: 20px; padding: 5px 14px; font-size: 16px; cursor: pointer; }
 .refresh-mini:hover { border-color: var(--blue); color: var(--blue); }
 
   /* Brief section */
@@ -218,13 +218,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .wc-match:last-child { border-bottom:none; }
 .wc-meta { font-size:11px; color:var(--sub); margin-bottom:6px; }
 .wc-teams { display:flex; align-items:center; gap:4px; }
-.wc-team { flex:1; display:flex; align-items:center; gap:6px; text-decoration:none; color:var(--text); font-size:13px; font-weight:600; }
+.wc-team { flex:1; display:flex; align-items:center; gap:6px; text-decoration:none; color:var(--text); font-size:15px; font-weight:600; }
 .wc-home { justify-content:flex-end; text-align:right; }
 .wc-away { justify-content:flex-start; }
 .wc-flag { width:26px; height:18px; object-fit:contain; border-radius:2px; flex-shrink:0; }
 .wc-score { min-width:60px; text-align:center; font-size:22px; font-weight:900; color:var(--navy); }
 .wc-score.live-score { color:#e74c3c; }
-.wc-score.pre-score  { font-size:13px; color:var(--sub); font-weight:500; }
+.wc-score.pre-score  { font-size:15px; color:var(--sub); font-weight:500; }
 .wc-status { font-size:11px; color:var(--sub); margin-top:5px; text-align:center; }
 .wc-status a { color:var(--blue); text-decoration:none; }
 .live-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#e74c3c; animation:wcpulse 1s infinite; margin-right:3px; vertical-align:middle; }
@@ -425,7 +425,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <div class="card-body">
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <div style="flex:1;min-width:120px">
-          <select id="fx-from" onchange="calcFX()" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;margin-bottom:6px">
+          <select id="fx-from" onchange="calcFX()" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:16px;font-family:inherit;margin-bottom:6px">
             <option value="USD">🇺🇸 美元 USD</option>
             <option value="TWD" selected>🇹🇼 台幣 TWD</option>
             <option value="JPY">🇯🇵 日圓 JPY</option>
@@ -443,7 +443,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
         </div>
         <div style="font-size:22px;color:var(--sub)">=</div>
         <div style="flex:1;min-width:120px">
-          <select id="fx-to" onchange="calcFX()" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;margin-bottom:6px">
+          <select id="fx-to" onchange="calcFX()" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:16px;font-family:inherit;margin-bottom:6px">
             <option value="USD" selected>🇺🇸 美元 USD</option>
             <option value="TWD">🇹🇼 台幣 TWD</option>
             <option value="JPY">🇯🇵 日圓 JPY</option>
@@ -474,7 +474,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       <div class="chart-wrap"><canvas id="chartFX"></canvas></div>
     </div>
   </div>
-  <div style="background:white;border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:12px;color:var(--sub);box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+  <div style="background:white;border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:16px;color:var(--sub);box-shadow:0 1px 4px rgba(0,0,0,0.06)">
     💡 數字越大代表台幣越弱（需要更多台幣換外幣）
   </div>
   <div class="refresh-area">
@@ -492,19 +492,29 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       <div style="font-size:11px;color:var(--sub);margin-top:2px">貼上案例故事或新聞，一鍵生成 FB / IG / LINE 文案</div>
     </div>
     <div class="card-body">
-      <textarea id="gen-input" placeholder="貼上案例故事、新聞文章、任何內容…" rows="7" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:12px;font-size:13px;line-height:1.6;resize:vertical;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <div id="gen-lock" style="margin-bottom:14px">
+        <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px">🔒 請輸入密碼才能使用生成器</div>
+        <div style="display:flex;gap:8px">
+          <input type="password" id="gen-pwd" placeholder="輸入密碼" style="flex:1;border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:15px;background:var(--card);color:var(--text);outline:none" onkeydown="if(event.key==='Enter')unlockGen()" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+          <button onclick="unlockGen()" style="background:var(--blue);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:15px;font-weight:700;cursor:pointer">解鎖</button>
+        </div>
+        <div id="gen-pwd-err" style="display:none;color:#e53;font-size:13px;margin-top:6px">密碼錯誤，請再試一次</div>
+      </div>
+      <div id="gen-body" style="display:none">
+      <textarea id="gen-input" placeholder="貼上案例故事、新聞文章、任何內容…" rows="7" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:12px;font-size:15px;line-height:1.6;resize:vertical;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       <div style="display:flex;gap:8px;margin-top:12px">
         <button class="copy-ptab active" id="gen-plat-fb" onclick="selectGenPlatform(this,'fb')">FB</button>
         <button class="copy-ptab" id="gen-plat-ig" onclick="selectGenPlatform(this,'ig')">IG</button>
         <button class="copy-ptab" id="gen-plat-line" onclick="selectGenPlatform(this,'line')">LINE</button>
       </div>
-      <button onclick="generateSocialPost()" style="width:100%;background:linear-gradient(135deg,var(--blue),#1E6B4F);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px">⚡ 生成文案</button>
+      <button onclick="generateSocialPost()" style="width:100%;background:linear-gradient(135deg,var(--blue),#1E6B4F);color:#fff;border:none;border-radius:10px;padding:13px;font-size:16px;font-weight:700;cursor:pointer;margin-top:12px">⚡ 生成文案</button>
       <div id="gen-loading" style="display:none;margin-top:14px" class="loading-row"><span class="spin">⟳</span> 生成中，請稍候…</div>
       <div id="gen-error" style="display:none;margin-top:14px" class="error-note"></div>
       <div id="gen-output" style="display:none;margin-top:16px">
-        <div id="gen-result" style="white-space:pre-wrap;font-size:13px;line-height:1.8;background:#f8f9fb;border-radius:10px;padding:14px;color:var(--text);border:1px solid var(--border)"></div>
+        <div id="gen-result" style="white-space:pre-wrap;font-size:15px;line-height:1.8;background:#f8f9fb;border-radius:10px;padding:14px;color:var(--text);border:1px solid var(--border)"></div>
         <div class="copy-action" style="margin-top:10px"><button class="copy-btn" onclick="cpGen(this)">複製文案</button></div>
       </div>
+      </div><!-- /gen-body -->
     </div>
   </div>
 
@@ -555,17 +565,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       <!-- 文字輸入 -->
       <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px;letter-spacing:0.5px">卡片主標題</div>
       <input id="card-headline" type="text" placeholder="例：退休1000萬，73歲就見底了" maxlength="24"
-        style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;margin-bottom:10px;outline:none">
+        style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:16px;font-family:inherit;margin-bottom:10px;outline:none">
 
       <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px;letter-spacing:0.5px">副文案（可留空，從左側文案複製貼上）</div>
       <textarea id="card-body-text" rows="3" placeholder="例：長照費用每月5～8萬，很多人根本沒算到…"
-        style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;resize:none;outline:none;margin-bottom:12px"></textarea>
+        style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:15px;font-family:inherit;resize:none;outline:none;margin-bottom:12px"></textarea>
 
       <!-- 上傳照片（可選） -->
       <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px;letter-spacing:0.5px">背景照片（可不上傳，自動用設計背景）</div>
       <div id="img-drop-area" onclick="document.getElementById('imgInput').click()"
         style="border:2px dashed var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fafbfd;margin-bottom:10px">
-        <div id="img-placeholder" style="color:var(--sub);font-size:13px">
+        <div id="img-placeholder" style="color:var(--sub);font-size:15px">
           <div style="font-size:22px;margin-bottom:4px">📷</div>
           點此上傳照片，或拖曳進來
         </div>
@@ -591,9 +601,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       <canvas id="cardCanvas" style="width:100%;border-radius:10px;margin-bottom:10px;display:block"></canvas>
 
       <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button onclick="clearImg()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;color:var(--sub);cursor:pointer">重置</button>
-        <button onclick="renderCard(true)" style="background:#e8f0fe;border:none;border-radius:8px;padding:8px 14px;font-size:12px;color:var(--blue);font-weight:700;cursor:pointer">👁 預覽</button>
-        <button onclick="downloadCard()" style="background:var(--blue);border:none;border-radius:8px;padding:8px 16px;font-size:12px;color:white;font-weight:700;cursor:pointer">⬇ 下載 1080px</button>
+        <button onclick="clearImg()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:16px;color:var(--sub);cursor:pointer">重置</button>
+        <button onclick="renderCard(true)" style="background:#e8f0fe;border:none;border-radius:8px;padding:8px 14px;font-size:16px;color:var(--blue);font-weight:700;cursor:pointer">👁 預覽</button>
+        <button onclick="downloadCard()" style="background:var(--blue);border:none;border-radius:8px;padding:8px 16px;font-size:16px;color:white;font-weight:700;cursor:pointer">⬇ 下載 1080px</button>
       </div>
     </div>
   </div>
@@ -644,7 +654,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 14px">💼</div>
   <div style="font-size:24px;font-weight:800;letter-spacing:1px;margin-bottom:4px">Weber</div>
   <div style="font-size:11px;color:#7ec8e3;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px">Insurance & Financial Advisor</div>
-  <div style="font-size:13px;color:#b8d4ea;line-height:1.8;margin-bottom:22px;max-width:300px;margin-left:auto;margin-right:auto">
+  <div style="font-size:15px;color:#b8d4ea;line-height:1.8;margin-bottom:22px;max-width:300px;margin-left:auto;margin-right:auto">
     做這行超過十年，幫超過三百位客戶<br>把複雜的金融產品說清楚、算明白。<br>不是要賣你東西，是幫你做對的決定。
   </div>
   <!-- Stats -->
@@ -665,11 +675,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   <!-- Buttons -->
   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
     <a href="https://line.me/ti/p/~weber917" target="_blank"
-       style="display:inline-flex;align-items:center;gap:7px;background:#06c755;color:white;padding:12px 22px;border-radius:25px;font-size:13px;font-weight:700;text-decoration:none">
+       style="display:inline-flex;align-items:center;gap:7px;background:#06c755;color:white;padding:12px 22px;border-radius:25px;font-size:15px;font-weight:700;text-decoration:none">
       💬 LINE 我
     </a>
     <a href="https://instagram.com/weber917" target="_blank"
-       style="display:inline-flex;align-items:center;gap:7px;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:white;padding:12px 22px;border-radius:25px;font-size:13px;font-weight:700;text-decoration:none">
+       style="display:inline-flex;align-items:center;gap:7px;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:white;padding:12px 22px;border-radius:25px;font-size:15px;font-weight:700;text-decoration:none">
       📸 IG 追蹤
     </a>
   </div>
@@ -682,32 +692,32 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #f0f3f7">
     <div style="width:42px;height:42px;border-radius:12px;background:#ebf4ff;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🔒</div>
     <div>
-      <div style="font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:4px">信託與資產保全</div>
-      <div style="font-size:12px;color:#8a9ab5;line-height:1.7">安養信託、不動產信託、遺囑規劃<br>讓你的財產只為你自己服務，不被外力侵佔</div>
+      <div style="font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:4px">信託與資產保全</div>
+      <div style="font-size:16px;color:#8a9ab5;line-height:1.7">安養信託、不動產信託、遺囑規劃<br>讓你的財產只為你自己服務，不被外力侵佔</div>
     </div>
   </div>
 
   <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #f0f3f7">
     <div style="width:42px;height:42px;border-radius:12px;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">💸</div>
     <div>
-      <div style="font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:4px">退休規劃</div>
-      <div style="font-size:12px;color:#8a9ab5;line-height:1.7">長照準備、退休缺口試算、通膨對策<br>把每一個變數都算進去，睡得著才算規劃</div>
+      <div style="font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:4px">退休規劃</div>
+      <div style="font-size:16px;color:#8a9ab5;line-height:1.7">長照準備、退休缺口試算、通膨對策<br>把每一個變數都算進去，睡得著才算規劃</div>
     </div>
   </div>
 
   <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #f0f3f7">
     <div style="width:42px;height:42px;border-radius:12px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🏠</div>
     <div>
-      <div style="font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:4px">不動產活化</div>
-      <div style="font-size:12px;color:#8a9ab5;line-height:1.7">以房養老、不動產信託<br>讓房子從沉睡資產，變成每月穩定的現金流</div>
+      <div style="font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:4px">不動產活化</div>
+      <div style="font-size:16px;color:#8a9ab5;line-height:1.7">以房養老、不動產信託<br>讓房子從沉睡資產，變成每月穩定的現金流</div>
     </div>
   </div>
 
   <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0">
     <div style="width:42px;height:42px;border-radius:12px;background:#fce4ec;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🛡️</div>
     <div>
-      <div style="font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:4px">保險規劃</div>
-      <div style="font-size:12px;color:#8a9ab5;line-height:1.7">壽險、醫療險、長照險<br>精準評估需求，只買你真正需要的保障</div>
+      <div style="font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:4px">保險規劃</div>
+      <div style="font-size:16px;color:#8a9ab5;line-height:1.7">壽險、醫療險、長照險<br>精準評估需求，只買你真正需要的保障</div>
     </div>
   </div>
 </div>
@@ -717,16 +727,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   <div style="font-size:11px;font-weight:700;color:#8a9ab5;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px">我的工作方式</div>
   <div style="display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;align-items:center;gap:12px">
-      <div style="width:32px;height:32px;border-radius:50%;background:#ebf4ff;color:#0f3460;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
-      <div style="font-size:13px;color:#3d4f6e;line-height:1.6">先了解你的狀況和目標，不急著推產品</div>
+      <div style="width:32px;height:32px;border-radius:50%;background:#ebf4ff;color:#0f3460;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+      <div style="font-size:15px;color:#3d4f6e;line-height:1.6">先了解你的狀況和目標，不急著推產品</div>
     </div>
     <div style="display:flex;align-items:center;gap:12px">
-      <div style="width:32px;height:32px;border-radius:50%;background:#ebf4ff;color:#0f3460;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
-      <div style="font-size:13px;color:#3d4f6e;line-height:1.6">把每個選項的優缺點說清楚，讓你自己判斷</div>
+      <div style="width:32px;height:32px;border-radius:50%;background:#ebf4ff;color:#0f3460;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+      <div style="font-size:15px;color:#3d4f6e;line-height:1.6">把每個選項的優缺點說清楚，讓你自己判斷</div>
     </div>
     <div style="display:flex;align-items:center;gap:12px">
-      <div style="width:32px;height:32px;border-radius:50%;background:#ebf4ff;color:#0f3460;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
-      <div style="font-size:13px;color:#3d4f6e;line-height:1.6">簽約後持續追蹤，有變化隨時調整</div>
+      <div style="width:32px;height:32px;border-radius:50%;background:#ebf4ff;color:#0f3460;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+      <div style="font-size:15px;color:#3d4f6e;line-height:1.6">簽約後持續追蹤，有變化隨時調整</div>
     </div>
   </div>
 </div>
@@ -990,7 +1000,7 @@ async function renderCustomSym(market, sym, displayCode, usStyle) {
   }
 
   if (!result) {
-    dataEl.innerHTML = '<div class="mkt-row"><span style="color:var(--sub);font-size:13px">查無資料，請確認代號（台股直接輸入數字如 5347）</span></div>';
+    dataEl.innerHTML = '<div class="mkt-row"><span style="color:var(--sub);font-size:15px">查無資料，請確認代號（台股直接輸入數字如 5347）</span></div>';
     return;
   }
 
@@ -1010,7 +1020,7 @@ async function renderCustomSym(market, sym, displayCode, usStyle) {
     const canvas = document.getElementById(`${market}-kline`);
     drawKLine(canvas, result.timestamp, q.open, q.high, q.low, q.close, usStyle);
   } catch(e) {
-    dataEl.innerHTML = '<div class="mkt-row"><span style="color:var(--sub);font-size:13px">資料解析錯誤，請重試</span></div>';
+    dataEl.innerHTML = '<div class="mkt-row"><span style="color:var(--sub);font-size:15px">資料解析錯誤，請重試</span></div>';
   }
 }
 
@@ -1652,6 +1662,19 @@ const dropArea = document.getElementById('img-drop-area');
 setTimeout(() => renderCard(false), 500);
 
 // ── 重點整理生成器 ──
+function unlockGen() {
+  const pwd = (document.getElementById('gen-pwd').value || '').trim().toLowerCase();
+  if (pwd === 'weber') {
+    document.getElementById('gen-lock').style.display = 'none';
+    document.getElementById('gen-body').style.display = 'block';
+    sessionStorage.setItem('genUnlocked', '1');
+  } else {
+    document.getElementById('gen-pwd-err').style.display = 'block';
+    document.getElementById('gen-pwd').value = '';
+  }
+}
+// 同一session已解鎖則自動跳過
+(function(){ if(sessionStorage.getItem('genUnlocked')==='1'){ document.addEventListener('DOMContentLoaded',function(){ var l=document.getElementById('gen-lock'),b=document.getElementById('gen-body'); if(l)l.style.display='none'; if(b)b.style.display='block'; }); } })();
 let _genPlatform = 'fb';
 function selectGenPlatform(btn, plat) {
   ['gen-plat-fb','gen-plat-ig','gen-plat-line'].forEach(id => document.getElementById(id).classList.remove('active'));
@@ -1831,16 +1854,16 @@ async function loadWCPreview() {
     const dateLabel = mm && dd ? `${parseInt(mm)}/${parseInt(dd)}` : '明日';
     const genTime = data.generatedAt ? new Date(data.generatedAt).toLocaleString('zh-TW', {timeZone:'Asia/Taipei', month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
     box.innerHTML =
-      `<div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:14px">` +
+      `<div style="font-size:16px;font-weight:700;color:var(--blue);margin-bottom:14px">` +
       `${dateLabel} 樂爸Weber賽前分析` +
       `</div>` +
       data.matches.map((m, i) => `
         <div style="margin-bottom:${i < data.matches.length-1 ? '20px;padding-bottom:20px;border-bottom:1px solid var(--border)' : '0'}">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-            <span style="font-size:14px;font-weight:700;color:var(--blue)">${m.home} <span style="color:var(--sub);font-weight:400">vs</span> ${m.away}</span>
+            <span style="font-size:16px;font-weight:700;color:var(--blue)">${m.home} <span style="color:var(--sub);font-weight:400">vs</span> ${m.away}</span>
             <span style="font-size:11px;color:var(--sub);white-space:nowrap">${m.time}</span>
           </div>
-          <div style="font-size:13px;line-height:1.8;color:var(--text)">${m.analysis.split('\n').join('<br>').replace(/【/g,'<strong>【').replace(/】/g,'】</strong>')}</div>
+          <div style="font-size:15px;line-height:1.8;color:var(--text)">${m.analysis.split('\n').join('<br>').replace(/【/g,'<strong>【').replace(/】/g,'】</strong>')}</div>
         </div>
       `).join('');
     box.dataset.loaded = '1';
@@ -1873,9 +1896,9 @@ function wcTableHTML(matches) {
     return `<tr style="${isLive?'background:rgba(231,76,60,0.06)':''}">
       <td style="white-space:nowrap;padding:7px 4px;font-size:11px;border-bottom:1px solid var(--border)">${statusCell}</td>
       <td style="white-space:nowrap;padding:7px 4px;font-size:11px;color:var(--sub);border-bottom:1px solid var(--border)">${dateStr}</td>
-      <td style="padding:7px 4px;font-size:12px;font-weight:600;text-align:right;border-bottom:1px solid var(--border)">${teamCell(home,'right')}</td>
-      <td style="padding:7px 8px;font-size:14px;font-weight:900;text-align:center;white-space:nowrap;color:var(--blue);border-bottom:1px solid var(--border)">${scoreCell}</td>
-      <td style="padding:7px 4px;font-size:12px;font-weight:600;border-bottom:1px solid var(--border)">${teamCell(away,'left')}</td>
+      <td style="padding:7px 4px;font-size:16px;font-weight:600;text-align:right;border-bottom:1px solid var(--border)">${teamCell(home,'right')}</td>
+      <td style="padding:7px 8px;font-size:16px;font-weight:900;text-align:center;white-space:nowrap;color:var(--blue);border-bottom:1px solid var(--border)">${scoreCell}</td>
+      <td style="padding:7px 4px;font-size:16px;font-weight:600;border-bottom:1px solid var(--border)">${teamCell(away,'left')}</td>
     </tr>`;
   }).join('');
   return `<table style="width:100%;border-collapse:collapse">
@@ -1908,16 +1931,16 @@ async function loadWCStandings() {
     const groups = await fetch('/api/worldcup?mode=standings').then(r => r.ok ? r.json() : Promise.reject(r.status));
     if (!Array.isArray(groups) || !groups.length) { box.innerHTML = '<div class="error-note">暫無積分榜資料</div>'; return; }
     const th = (txt, align='center') => `<th style="padding:5px 3px;font-size:10px;color:var(--sub);font-weight:600;text-align:${align}">${txt}</th>`;
-    const td = (txt, bold) => `<td style="padding:6px 3px;font-size:12px;text-align:center${bold?';font-weight:900;color:var(--blue)':''}">${txt}</td>`;
+    const td = (txt, bold) => `<td style="padding:6px 3px;font-size:16px;text-align:center${bold?';font-weight:900;color:var(--blue)':''}">${txt}</td>`;
     box.innerHTML = groups.map(g => {
       const rows = g.entries.map((e,i) => `<tr style="border-bottom:1px solid var(--border)${i===0?';background:rgba(212,168,67,0.07)':''}">
-        <td style="padding:6px 3px;font-size:12px"><div style="display:flex;align-items:center;gap:4px">
+        <td style="padding:6px 3px;font-size:16px"><div style="display:flex;align-items:center;gap:4px">
           ${e.logo ? `<img src="${e.logo}" style="width:20px;height:14px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">` : ''}
           <span>${e.team}</span></div></td>
         ${td(e.P)} ${td(e.W)} ${td(e.D)} ${td(e.L)} ${td(e.GF)} ${td(e.GA)} ${td(e.Pts,true)}
       </tr>`).join('');
       return `<div style="margin-bottom:18px">
-        <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px">${g.name}</div>
+        <div style="font-size:16px;font-weight:700;color:var(--blue);margin-bottom:6px">${g.name}</div>
         <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:280px">
           <thead><tr style="border-bottom:2px solid var(--border)">
             ${th('隊伍','left')} ${th('場')} ${th('勝')} ${th('平')} ${th('負')} ${th('進')} ${th('失')} ${th('積分')}
