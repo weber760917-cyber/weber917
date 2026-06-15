@@ -212,6 +212,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   .brief-date-note { font-size:11px; color:var(--sub); margin-bottom:10px; }
   .ai-badge { display:inline-block; background:linear-gradient(135deg,#667eea,#764ba2); color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:8px; margin-left:6px; vertical-align:middle; }
   .story-new-badge { display:inline-block; background:#e94560; color:white; font-size:9px; font-weight:700; padding:1px 6px; border-radius:6px; margin-left:5px; vertical-align:middle; }
+
+/* ── WORLD CUP ── */
+.wc-match { padding:12px 0; border-bottom:1px solid var(--border); }
+.wc-match:last-child { border-bottom:none; }
+.wc-meta { font-size:11px; color:var(--sub); margin-bottom:6px; }
+.wc-teams { display:flex; align-items:center; gap:4px; }
+.wc-team { flex:1; display:flex; align-items:center; gap:6px; text-decoration:none; color:var(--text); font-size:13px; font-weight:600; }
+.wc-home { justify-content:flex-end; text-align:right; }
+.wc-away { justify-content:flex-start; }
+.wc-flag { width:26px; height:18px; object-fit:contain; border-radius:2px; flex-shrink:0; }
+.wc-score { min-width:60px; text-align:center; font-size:22px; font-weight:900; color:var(--navy); }
+.wc-score.live-score { color:#e74c3c; }
+.wc-score.pre-score  { font-size:13px; color:var(--sub); font-weight:500; }
+.wc-status { font-size:11px; color:var(--sub); margin-top:5px; text-align:center; }
+.wc-status a { color:var(--blue); text-decoration:none; }
+.live-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#e74c3c; animation:wcpulse 1s infinite; margin-right:3px; vertical-align:middle; }
+@keyframes wcpulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
 </style>
 </head>
 <body>
@@ -243,10 +260,46 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 <div class="tabs-wrap">
   <div class="tabs">
     <div class="tab active"  onclick="switchTab('stories')">📖 案例故事</div>
+    <div class="tab" onclick="switchTab('news')">📰 新聞</div>
     <div class="tab" onclick="switchTab('about')">👤 關於我</div>
     <div class="tab" onclick="switchTab('market')">📈 今日行情</div>
     <div class="tab" onclick="switchTab('fx')">💱 匯率</div>
     <div class="tab" onclick="switchTab('copy')">✍️ 社群文案</div>
+  </div>
+</div>
+
+<!-- ===== TAB: 新聞 ===== -->
+<div id="panel-news" class="panel">
+
+  <!-- 世界盃 -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">⚽ 2026 FIFA 世界盃</div>
+      <div style="font-size:11px;color:var(--sub);margin-top:2px">點球隊名查陣容 · 數據來源 ESPN</div>
+    </div>
+    <div class="card-body" id="wc-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+  </div>
+
+  <!-- 台股新聞 -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">🇹🇼 台股新聞</div></div>
+    <div class="card-body" id="tw-news-tab"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+  </div>
+
+  <!-- 美股新聞 -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">🇺🇸 美股新聞</div></div>
+    <div class="card-body" id="us-news-tab"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+  </div>
+
+  <!-- 稅法新聞 -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">📑 稅法財政新聞</div></div>
+    <div class="card-body" id="tax-news-tab"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+  </div>
+
+  <div class="refresh-area">
+    <button class="refresh-mini" onclick="loadNewsTab()">↺ 重新整理新聞</button>
   </div>
 </div>
 
@@ -654,11 +707,12 @@ document.getElementById('datePill').textContent =
 
 // ── TABS ──
 function switchTab(name) {
-  const names = ['stories','about','market','fx','copy'];
+  const names = ['stories','news','about','market','fx','copy'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
   if (name === 'fx' && !document.getElementById('fx-rows').querySelector('.mkt-row')) loadFX();
+  if (name === 'news' && !document.getElementById('wc-rows').dataset.loaded) loadNewsTab();
   try { localStorage.setItem('activeTab', name); } catch(e) {}
 }
 
@@ -1664,11 +1718,97 @@ async function loadStories() {
   }
 }
 
+
+// ── NEWS TAB ──
+function wcMatchHTML(m) {
+  const home = m.teams.find(t => t.homeAway === 'home') || m.teams[0];
+  const away = m.teams.find(t => t.homeAway === 'away') || m.teams[1];
+  if (!home || !away) return '';
+  const dt    = new Date(m.date);
+  const dtStr = dt.toLocaleDateString('zh-TW', {month:'numeric',day:'numeric',weekday:'short'});
+  const tStr  = dt.toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit'});
+  const isLive = m.status === 'in';
+  const isDone = m.status === 'post';
+  const isPre  = m.status === 'pre';
+  const scoreEl = isPre
+    ? `<div class="wc-score pre-score">${tStr}</div>`
+    : `<div class="wc-score${isLive ? ' live-score' : ''}">${home.score} - ${away.score}</div>`;
+  const statusEl = isLive
+    ? `<span class="live-dot"></span>進行中 ${m.statusDesc||''}`
+    : isDone
+      ? `完賽 · <a href="${m.matchUrl}" target="_blank">詳情 →</a>`
+      : `${dtStr} 開賽`;
+  const teamA = home.espnUrl
+    ? `<a href="${home.espnUrl}" target="_blank" class="wc-team wc-home">`
+    : `<div class="wc-team wc-home">`;
+  const teamB = away.espnUrl
+    ? `<a href="${away.espnUrl}" target="_blank" class="wc-team wc-away">`
+    : `<div class="wc-team wc-away">`;
+  const closeA = home.espnUrl ? `</a>` : `</div>`;
+  const closeB = away.espnUrl ? `</a>` : `</div>`;
+  return `<div class="wc-match">
+    <div class="wc-meta">${dtStr}${m.venue ? ` &middot; ${m.venue}` : ''}</div>
+    <div class="wc-teams">
+      ${teamA}
+        ${home.logo ? `<img src="${home.logo}" class="wc-flag" onerror="this.style.display='none'">` : ''}
+        <span>${home.name}</span>
+      ${closeA}
+      ${scoreEl}
+      ${teamB}
+        <span>${away.name}</span>
+        ${away.logo ? `<img src="${away.logo}" class="wc-flag" onerror="this.style.display='none'">` : ''}
+      ${closeB}
+    </div>
+    <div class="wc-status">${statusEl}</div>
+  </div>`;
+}
+
+async function loadWorldCup() {
+  const el = document.getElementById('wc-rows');
+  try {
+    const r = await fetch('/api/worldcup');
+    if (!r.ok) throw new Error('wc');
+    const matches = await r.json();
+    el.dataset.loaded = '1';
+    if (!matches.length) {
+      el.innerHTML = `<div class="error-note">目前無賽程 · <a href="https://www.espn.com/soccer/league/_/name/fifa.world" target="_blank" style="color:var(--blue)">ESPN 查看 →</a></div>`;
+      return;
+    }
+    el.innerHTML = matches.map(m => wcMatchHTML(m)).join('');
+  } catch(e) {
+    el.dataset.loaded = '1';
+    el.innerHTML = `<div class="error-note">賽程載入失敗 · <a href="https://www.espn.com/soccer/league/_/name/fifa.world" target="_blank" style="color:var(--blue)">ESPN 世界盃 →</a></div>`;
+  }
+}
+
+async function loadNewsTab() {
+  document.getElementById('wc-rows').dataset.loaded = '1';
+  loadWorldCup();
+  // 台股
+  const twEl = document.getElementById('tw-news-tab');
+  twEl.innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
+  fetchNews('台積電 台股 加權指數 台灣股市', 5).then(items => {
+    twEl.innerHTML = items.length ? newsHTML(items) : '<div class="error-note">台股新聞暫無資料</div>';
+  });
+  // 美股
+  const usEl = document.getElementById('us-news-tab');
+  usEl.innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
+  fetchNews('US stocks S&P500 NASDAQ earnings Wall Street tech', 5).then(items => {
+    usEl.innerHTML = items.length ? newsHTML(items) : '<div class="error-note">美股新聞暫無資料</div>';
+  });
+  // 稅法
+  const taxEl = document.getElementById('tax-news-tab');
+  taxEl.innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
+  fetchNews('台灣稅法 遺產稅 所得稅 房地合一稅 財政部', 2).then(items => {
+    taxEl.innerHTML = items.length ? newsHTML(items) : '<div class="error-note">稅法新聞暫無資料</div>';
+  });
+}
+
 // ── INIT ──
 (function() {
   try {
     const saved = localStorage.getItem('activeTab');
-    if (saved && ['stories','about','market','fx','copy'].includes(saved)) {
+    if (saved && ['stories','news','about','market','fx','copy'].includes(saved)) {
       switchTab(saved);
     }
   } catch(e) {}
