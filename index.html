@@ -729,6 +729,7 @@ function switchTab(name) {
   if (name === 'fx' && !document.getElementById('fx-rows').querySelector('.mkt-row')) loadFX();
   if (name === 'news' && !document.getElementById('wc-rows').dataset.loaded) loadNewsTab();
   try { localStorage.setItem('activeTab', name); } catch(e) {}
+  history.replaceState(null, '', '#' + name);
 }
 
 // ── COPY UTILS ──
@@ -1335,6 +1336,18 @@ async function loadCryptoNews() {
   document.getElementById('crypto-news').innerHTML = newsHTML(items);
 }
 
+function copyStoryLink(idx, btn) {
+  const url = location.origin + location.pathname + '#story-' + idx;
+  navigator.clipboard.writeText(url).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓';
+    btn.style.opacity = '1';
+    setTimeout(() => { btn.textContent = orig; btn.style.opacity = '0.4'; }, 1500);
+  }).catch(() => {
+    prompt('複製這個連結：', url);
+  });
+}
+
 // ── CALENDAR ──
 function loadCalendar() {
   const el = document.getElementById('cal-rows');
@@ -1684,9 +1697,12 @@ function storyCardHTML(s, idx) {
   const quoteHtml = (s.quote || '').replace(/\n/g, '<br>');
   const id = s.id || ('s' + idx);
   return `
-<div class="story-card" data-tags="${(s.tags||[]).join(' ')}">
+<div class="story-card" id="story-${idx}" data-tags="${(s.tags||[]).join(' ')}">
   <div class="story-top">
-    ${tags}${isNew ? '<span class="story-new-badge">NEW</span>' : ''}
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+      <div>${tags}${isNew ? '<span class="story-new-badge">NEW</span>' : ''}</div>
+      <button onclick="copyStoryLink(${idx},this)" title="複製分享連結" style="background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;opacity:0.4;flex-shrink:0;line-height:1" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.4">🔗</button>
+    </div>
     <div class="story-title">${s.title || ''}</div>
     <div class="story-meta">${s.meta || ''}</div>
   </div>
@@ -1728,6 +1744,16 @@ async function loadStories() {
     container.innerHTML = sorted.map((s, i) => storyCardHTML(s, i)).join('');
     const activeTag = document.querySelector('.filter-tag.active');
     if (activeTag && activeTag.dataset.tag !== 'all') filterTag(activeTag);
+    // Deep link scroll
+    const storyHash = window.location.hash.slice(1);
+    if (storyHash.startsWith('story-')) {
+      const el = document.getElementById(storyHash);
+      if (el) setTimeout(() => {
+        el.scrollIntoView({ behavior:'smooth', block:'start' });
+        el.style.outline = '2px solid var(--blue)';
+        setTimeout(() => el.style.outline = '', 2000);
+      }, 200);
+    }
   } catch(e) {
     container.innerHTML = '<div class="error-note">案例載入失敗，請重新整理</div>';
   }
@@ -1895,12 +1921,16 @@ async function loadNewsTab() {
 
 // ── INIT ──
 (function() {
-  try {
-    const saved = localStorage.getItem('activeTab');
-    if (saved && ['stories','news','about','market','fx','copy'].includes(saved)) {
-      switchTab(saved);
-    }
-  } catch(e) {}
+  const TABS = ['stories','news','about','market','fx','copy'];
+  const hash = window.location.hash.slice(1);
+  if (hash && (TABS.includes(hash) || hash.startsWith('story-'))) {
+    switchTab(hash.startsWith('story-') ? 'stories' : hash);
+  } else {
+    try {
+      const saved = localStorage.getItem('activeTab');
+      if (saved && TABS.includes(saved)) switchTab(saved);
+    } catch(e) {}
+  }
 })();
 loadStories();
 loadBrief();
