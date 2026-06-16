@@ -662,6 +662,80 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 <!-- ===== TAB: 關於我 ===== -->
 <div id="panel-about" class="panel">
 
+<!-- 退休缺口試算器 -->
+<div class="card" style="margin-bottom:14px">
+  <div class="card-head">
+    <div class="card-title">🧮 退休缺口試算器</div>
+    <div style="font-size:13px;color:var(--sub);margin-top:3px">30 秒算出你的退休缺口</div>
+  </div>
+  <div class="card-body" id="retCalcBody">
+
+    <div style="display:flex;flex-direction:column;gap:18px" id="ret-inputs">
+
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:15px;font-weight:600;color:var(--text)">現在年齡</span>
+          <span style="font-size:15px;font-weight:700;color:var(--blue)" id="lbl-age">35 歲</span>
+        </div>
+        <input type="range" id="sl-age" min="25" max="60" value="35" oninput="retCalc()"
+          style="width:100%;accent-color:var(--blue)">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-top:2px"><span>25歲</span><span>60歲</span></div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:15px;font-weight:600;color:var(--text)">預計退休年齡</span>
+          <span style="font-size:15px;font-weight:700;color:var(--blue)" id="lbl-ret">65 歲</span>
+        </div>
+        <input type="range" id="sl-ret" min="55" max="70" value="65" oninput="retCalc()"
+          style="width:100%;accent-color:var(--blue)">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-top:2px"><span>55歲</span><span>70歲</span></div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:15px;font-weight:600;color:var(--text)">退休後每月生活費</span>
+          <span style="font-size:15px;font-weight:700;color:var(--blue)" id="lbl-exp">5 萬元</span>
+        </div>
+        <input type="range" id="sl-exp" min="2" max="15" value="5" oninput="retCalc()"
+          style="width:100%;accent-color:var(--blue)">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-top:2px"><span>2萬</span><span>15萬</span></div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:15px;font-weight:600;color:var(--text)">目前每月儲蓄</span>
+          <span style="font-size:15px;font-weight:700;color:var(--blue)" id="lbl-save">1 萬元</span>
+        </div>
+        <input type="range" id="sl-save" min="0" max="5" value="1" step="0.5" oninput="retCalc()"
+          style="width:100%;accent-color:var(--blue)">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-top:2px"><span>0元</span><span>5萬</span></div>
+      </div>
+
+    </div>
+
+    <!-- 結果 -->
+    <div id="ret-result" style="margin-top:22px;background:linear-gradient(135deg,#0f3460,#1a1a2e);border-radius:16px;padding:20px 18px;color:white;text-align:center">
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:8px">你的退休缺口估算</div>
+      <div id="ret-gap" style="font-size:36px;font-weight:800;color:#f97316;letter-spacing:-1px;margin-bottom:4px">—</div>
+      <div id="ret-gap-sub" style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:16px"></div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:16px">
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:6px">每月還需要多存</div>
+        <div id="ret-monthly" style="font-size:22px;font-weight:700;color:#7ec8e3">—</div>
+      </div>
+      <a href="https://line.me/ti/p/weber917" target="_blank"
+        style="display:inline-flex;align-items:center;gap:8px;background:#06C755;color:#fff;padding:12px 24px;border-radius:25px;font-size:15px;font-weight:700;text-decoration:none">
+        💬 讓 Weber 幫你填補缺口
+      </a>
+    </div>
+
+    <div style="font-size:12px;color:var(--sub);margin-top:10px;line-height:1.6;text-align:center">
+      ※ 試算結果為概估，假設壽命85歲、勞保月領1.7萬、勞退每月入帳1.5萬<br>實際規劃請依個人狀況洽詢
+    </div>
+
+  </div>
+</div>
+
 <!-- Hero Card -->
 <div style="background:linear-gradient(135deg,#0f3460 0%,#1a1a2e 100%);border-radius:20px;padding:28px 20px 24px;margin-bottom:14px;color:white;text-align:center">
   <img src="https://raw.githubusercontent.com/weber760917-cyber/weber917/main/images/weber-profile-v6.jpg" alt="Weber" style="width:110px;height:110px;border-radius:50%;object-fit:cover;object-position:center center;border:3px solid rgba(255,255,255,0.4);margin:0 auto 14px;display:block;box-shadow:0 4px 20px rgba(0,0,0,0.3)">
@@ -1877,6 +1951,38 @@ function cpGen(btn) {
     setTimeout(() => btn.textContent = orig, 1500);
   });
 }
+
+// ── 退休缺口試算器 ──
+function retCalc() {
+  const age   = +document.getElementById('sl-age').value;
+  const ret   = Math.max(+document.getElementById('sl-ret').value, age + 1);
+  const exp   = +document.getElementById('sl-exp').value * 10000;
+  const save  = +document.getElementById('sl-save').value * 10000;
+
+  document.getElementById('lbl-age').textContent  = age + ' 歲';
+  document.getElementById('lbl-ret').textContent  = ret + ' 歲';
+  document.getElementById('lbl-exp').textContent  = (+document.getElementById('sl-exp').value) + ' 萬元';
+  document.getElementById('lbl-save').textContent = (+document.getElementById('sl-save').value) + ' 萬元';
+
+  const yrsToRet  = ret - age;               // 距退休年數
+  const yrsInRet  = Math.max(85 - ret, 5);   // 退休後年數
+  const totalNeed = exp * 12 * yrsInRet;     // 退休總需求
+  const insurance = (17000 + 15000) * 12 * yrsInRet; // 勞保+勞退月領估算
+  const selfSave  = save * 12 * yrsToRet;    // 自行準備（保守不計利息）
+  const gap       = Math.max(totalNeed - insurance - selfSave, 0);
+  const monthly   = yrsToRet > 0 ? Math.ceil(gap / (yrsToRet * 12)) : 0;
+
+  const fmt = n => n >= 100000000
+    ? (n/100000000).toFixed(1) + ' 億'
+    : n >= 10000
+    ? Math.round(n/10000) + ' 萬'
+    : n.toLocaleString();
+
+  document.getElementById('ret-gap').textContent     = gap > 0 ? fmt(gap) : '已足夠 🎉';
+  document.getElementById('ret-gap-sub').textContent = gap > 0 ? '（尚未準備的退休金）' : '恭喜！你的退休準備很充足';
+  document.getElementById('ret-monthly').textContent  = gap > 0 ? '+ ' + fmt(monthly) + ' / 月' : '持續維持即可';
+}
+retCalc();
 
 // ── FAQ ──
 function toggleFaq(header) {
