@@ -229,6 +229,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 .wc-status a { color:var(--blue); text-decoration:none; }
 .live-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#e74c3c; animation:wcpulse 1s infinite; margin-right:3px; vertical-align:middle; }
 @keyframes wcpulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+@media (max-width: 480px) {
+  body { font-size: 17px; }
+  .brand-name { font-size: 19px !important; }
+  .tab { font-size: 14px !important; padding: 9px 10px !important; }
+  .card-title { font-size: 17px !important; }
+  .story-title { font-size: 18px !important; }
+  .story-meta { font-size: 16px !important; }
+  .story-quote { font-size: 16px !important; }
+  .news-title { font-size: 16px !important; }
+  .mkt-name, .mkt-val { font-size: 16px !important; }
+  .section-label { font-size: 13px !important; }
+  table { font-size: 14px !important; }
+}
 </style>
 <!-- Google Analytics GA4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-2W1BKM3XFY"></script>
@@ -650,7 +664,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 
 <!-- Hero Card -->
 <div style="background:linear-gradient(135deg,#0f3460 0%,#1a1a2e 100%);border-radius:20px;padding:28px 20px 24px;margin-bottom:14px;color:white;text-align:center">
-  <img src="/images/weber-profile.jpg" alt="Weber" style="width:110px;height:110px;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid rgba(255,255,255,0.4);margin:0 auto 14px;display:block;box-shadow:0 4px 20px rgba(0,0,0,0.3)">
+  <img src="/images/weber-profile.jpg" alt="Weber" style="width:110px;height:110px;border-radius:50%;object-fit:cover;object-position:center center;border:3px solid rgba(255,255,255,0.4);margin:0 auto 14px;display:block;box-shadow:0 4px 20px rgba(0,0,0,0.3)">
   <div style="font-size:24px;font-weight:800;letter-spacing:1px;margin-bottom:4px">Weber</div>
   <div style="font-size:11px;color:#7ec8e3;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px">Insurance & Financial Advisor</div>
   <div style="font-size:15px;color:#b8d4ea;line-height:1.8;margin-bottom:22px;max-width:300px;margin-left:auto;margin-right:auto">
