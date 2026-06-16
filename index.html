@@ -302,7 +302,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <button id="ntab-wc"     class="market-sub active" onclick="switchNSub('nview-wc','ntab-wc')">⚽ 世界盃</button>
     <button id="ntab-tw"     class="market-sub"        onclick="switchNSub('nview-tw','ntab-tw')">🇹🇼 台股新聞</button>
     <button id="ntab-us"     class="market-sub"        onclick="switchNSub('nview-us','ntab-us')">🇺🇸 美股新聞</button>
-    <button id="ntab-policy" class="market-sub"        onclick="switchNSub('nview-policy','ntab-policy')">📋 政策新聞</button>
   </div>
 
   <!-- ── 世界盃 ── -->
@@ -319,7 +318,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       </div>
       <div class="card-body" style="padding:0">
         <div id="wc-schedule-pane" style="padding:8px 16px 12px">
-          <div id="wc-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+          <div id="wc-rows" style="font-size:15px"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
         </div>
         <div id="wc-stand-pane" style="display:none;padding:8px 16px 12px">
           <div id="wc-stand-rows"><div class="loading-row"><span class="spin">⟳</span> 載入積分榜…</div></div>
@@ -347,13 +346,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     </div>
   </div><!-- /nview-us -->
 
-  <!-- ── 政策新聞 ── -->
-  <div id="nview-policy" style="display:none">
-    <div class="card">
-      <div class="card-head"><div class="card-title">📋 政策財政新聞</div></div>
-      <div class="card-body" id="tax-news-tab"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
-    </div>
-  </div><!-- /nview-policy -->
 
   <div class="refresh-area">
     <button class="refresh-mini" onclick="loadNewsTab()">↺ 重新整理新聞</button>
@@ -1071,7 +1063,7 @@ const NOW = new Date();
 
 
 function switchNSub(view, btnId) {
-  ['nview-wc','nview-tw','nview-us','nview-policy'].forEach(id => {
+  ['nview-wc','nview-tw','nview-us'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = id === view ? '' : 'none';
   });
@@ -1096,7 +1088,6 @@ function switchTab(name) {
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
-  if (name === 'fx' && !document.getElementById('fx-rows').querySelector('.mkt-row')) loadFX();
   if (name === 'news' && !document.getElementById('wc-rows').dataset.loaded) loadNewsTab();
   try { localStorage.setItem('activeTab', name); } catch(e) {}
   history.replaceState(null, '', '#' + name);
@@ -2431,31 +2422,40 @@ async function fetchUDNNews(cate, count) {
   } catch(e) { console.error('fetchUDNNews error:', e); return []; }
 }
 
+async function fetchCapNews(n) {
+  try {
+    const r = await fetch('/api/news?q=台股+投資&src=capital&n=' + n);
+    if (!r.ok) return [];
+    const data = await r.json();
+    return (data.items||[]).slice(0,n).map(item => ({
+      title: item.title,
+      link:  item.link || 'https://www.capitalfutures.com.tw/zh-tw/financial/global',
+      date:  item.date||'',
+      src:   '資本期貨',
+      ts:    item.ts||0
+    }));
+  } catch(e) { return []; }
+}
 async function loadNewsTab() {
   loadWorldCup();
-  // 台股 (UDN 經濟日報)
+  // 台股：UDN + 資本期貨，共8篇
   const twEl = document.getElementById('tw-news-tab');
   twEl.innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
-  fetchUDNNews('5590', 5).then(items => {
+  Promise.all([fetchUDNNews('5590', 5), fetchCapNews(3)]).then(([a, b]) => {
+    const items = [...a, ...b].sort((x,y)=>(y.ts||0)-(x.ts||0)).slice(0,8);
     twEl.innerHTML = items.length ? newsHTML(items) : '<div class="error-note">台股新聞暫無資料</div>';
   });
-  // 美股
+  // 美股 8篇
   const usEl = document.getElementById('us-news-tab');
   usEl.innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
-  fetchNews('US stocks S&P500 NASDAQ earnings Wall Street tech', 5).then(items => {
+  fetchNews('US stocks S&P500 NASDAQ earnings Wall Street tech', 8).then(items => {
     usEl.innerHTML = items.length ? newsHTML(items) : '<div class="error-note">美股新聞暫無資料</div>';
-  });
-  // 稅法 (UDN 經濟日報)
-  const taxEl = document.getElementById('tax-news-tab');
-  taxEl.innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
-  fetchUDNNews('5590', 2).then(items => {
-    taxEl.innerHTML = items.length ? newsHTML(items) : '<div class="error-note">稅法新聞暫無資料</div>';
   });
 }
 
 // ── INIT ──
 (function() {
-  const TABS = ['stories','news','about','market','fx','copy'];
+  const TABS = ['stories','news','retire','about','market','copy'];
   const hash = window.location.hash.slice(1);
   if (hash && (TABS.includes(hash) || hash.startsWith('story-'))) {
     switchTab(hash.startsWith('story-') ? 'stories' : hash);
@@ -2473,7 +2473,6 @@ loadCalendar();
 loadUSNews();
 loadCrypto();
 loadCryptoNews();
-loadFX();
 startCountdown();
 </script>
 </body>
