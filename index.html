@@ -1089,6 +1089,8 @@ function switchTab(name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
   if (name === 'news' && !document.getElementById('wc-rows').dataset.loaded) loadNewsTab();
+  if (name === 'about') { try { retCalc(); } catch(e){} }
+  if (name === 'retire') { try { retPlan(); } catch(e){} }
   try { localStorage.setItem('activeTab', name); } catch(e) {}
   history.replaceState(null, '', '#' + name);
 }
@@ -2159,7 +2161,6 @@ function retCalc() {
   document.getElementById('ret-gap-sub').textContent = gap > 0 ? '（尚未準備的退休金）' : '恭喜！你的退休準備很充足';
   document.getElementById('ret-monthly').textContent  = gap > 0 ? '+ ' + fmt(monthly) + ' / 月' : '持續維持即可';
 }
-retCalc();
 
 // ── FAQ ──
 function toggleFaq(header) {
