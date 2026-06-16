@@ -297,47 +297,63 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 <!-- ===== TAB: 新聞 ===== -->
 <div id="panel-news" class="panel">
 
-  <!-- 世界盃 -->
-  <div class="card">
-    <div class="card-head">
-      <div class="card-title">⚽ 2026 FIFA 世界盃</div>
-      <div style="display:flex;gap:6px;margin-top:6px">
-        <button class="copy-ptab active" onclick="switchWCView(this,'wc-schedule-pane')">📅 賽程</button>
-        <button class="copy-ptab" onclick="switchWCView(this,'wc-stand-pane')">📊 積分榜</button>
-        <button class="copy-ptab" onclick="switchWCView(this,'wc-preview-pane')">🔮 分析</button>
+  <!-- ── 新聞子分頁 ── -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+    <button id="ntab-wc"     class="market-sub active" onclick="switchNSub('nview-wc','ntab-wc')">⚽ 世界盃</button>
+    <button id="ntab-tw"     class="market-sub"        onclick="switchNSub('nview-tw','ntab-tw')">🇹🇼 台股新聞</button>
+    <button id="ntab-us"     class="market-sub"        onclick="switchNSub('nview-us','ntab-us')">🇺🇸 美股新聞</button>
+    <button id="ntab-policy" class="market-sub"        onclick="switchNSub('nview-policy','ntab-policy')">📋 政策新聞</button>
+  </div>
+
+  <!-- ── 世界盃 ── -->
+  <div id="nview-wc">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">⚽ 2026 FIFA 世界盃</div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="copy-ptab active" onclick="switchWCView(this,'wc-schedule-pane')">📅 賽程</button>
+          <button class="copy-ptab" onclick="switchWCView(this,'wc-stand-pane')">📊 積分榜</button>
+          <button class="copy-ptab" onclick="switchWCView(this,'wc-preview-pane')">🔮 分析</button>
+        </div>
+        <div style="font-size:11px;color:var(--sub);margin-top:4px">點球隊名查陣容 · 資料來源 ESPN</div>
       </div>
-      <div style="font-size:11px;color:var(--sub);margin-top:4px">點球隊名查陣容 · 資料來源 ESPN</div>
+      <div class="card-body" style="padding:0">
+        <div id="wc-schedule-pane" style="padding:8px 16px 12px">
+          <div id="wc-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+        </div>
+        <div id="wc-stand-pane" style="display:none;padding:8px 16px 12px">
+          <div id="wc-stand-rows"><div class="loading-row"><span class="spin">⟳</span> 載入積分榜…</div></div>
+        </div>
+        <div id="wc-preview-pane" style="display:none;padding:8px 16px 12px">
+          <div id="wc-preview-rows"><div class="loading-row"><span class="spin">⟳</span> 載入賽前分析…</div></div>
+        </div>
+      </div>
     </div>
-    <div class="card-body" style="padding:0">
-      <div id="wc-schedule-pane" style="padding:8px 16px 12px">
-        <div id="wc-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
-      </div>
-      <div id="wc-stand-pane" style="display:none;padding:8px 16px 12px">
-        <div id="wc-stand-rows"><div class="loading-row"><span class="spin">⟳</span> 載入積分榜…</div></div>
-      </div>
-      <div id="wc-preview-pane" style="display:none;padding:8px 16px 12px">
-        <div id="wc-preview-rows"><div class="loading-row"><span class="spin">⟳</span> 載入賽前分析…</div></div>
-      </div>
+  </div><!-- /nview-wc -->
+
+  <!-- ── 台股新聞 ── -->
+  <div id="nview-tw" style="display:none">
+    <div class="card">
+      <div class="card-head"><div class="card-title">🇹🇼 台股新聞</div></div>
+      <div class="card-body" id="tw-news-tab"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
     </div>
-  </div>
+  </div><!-- /nview-tw -->
 
-  <!-- 台股新聞 -->
-  <div class="card">
-    <div class="card-head"><div class="card-title">🇹🇼 台股新聞</div></div>
-    <div class="card-body" id="tw-news-tab"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
-  </div>
+  <!-- ── 美股新聞 ── -->
+  <div id="nview-us" style="display:none">
+    <div class="card">
+      <div class="card-head"><div class="card-title">🇺🇸 美股新聞</div></div>
+      <div class="card-body" id="us-news-tab"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+    </div>
+  </div><!-- /nview-us -->
 
-  <!-- 美股新聞 -->
-  <div class="card">
-    <div class="card-head"><div class="card-title">🇺🇸 美股新聞</div></div>
-    <div class="card-body" id="us-news-tab"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
-  </div>
-
-  <!-- 稅法新聞 -->
-  <div class="card">
-    <div class="card-head"><div class="card-title">📑 稅法財政新聞</div></div>
-    <div class="card-body" id="tax-news-tab"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
-  </div>
+  <!-- ── 政策新聞 ── -->
+  <div id="nview-policy" style="display:none">
+    <div class="card">
+      <div class="card-head"><div class="card-title">📋 政策財政新聞</div></div>
+      <div class="card-body" id="tax-news-tab"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+    </div>
+  </div><!-- /nview-policy -->
 
   <div class="refresh-area">
     <button class="refresh-mini" onclick="loadNewsTab()">↺ 重新整理新聞</button>
@@ -1123,6 +1139,17 @@ const NOW = new Date();
 })();
 
 // ── TABS ──
+
+
+function switchNSub(view, btnId) {
+  ['nview-wc','nview-tw','nview-us','nview-policy'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = id === view ? '' : 'none';
+  });
+  document.querySelectorAll('[id^="ntab-"]').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById(btnId);
+  if (btn) btn.classList.add('active');
+}
 
 function switchMSub(view, btnId) {
   ['mview-stock','mview-fx'].forEach(id => {
