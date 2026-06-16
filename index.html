@@ -284,6 +284,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   <div class="tabs">
     <div class="tab active"  onclick="switchTab('stories')">📖 案例故事</div>
     <div class="tab" onclick="switchTab('news')">📰 新聞</div>
+    <div class="tab" onclick="switchTab('retire')">🏖️ 退休規劃</div>
     <div class="tab" onclick="switchTab('about')">👤 關於我</div>
     <div class="tab" onclick="switchTab('market')">📈 今日行情</div>
     <div class="tab" onclick="switchTab('fx')">💱 匯率</div>
@@ -660,6 +661,139 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 </div>
 
 <!-- ===== TAB: 關於我 ===== -->
+<div id="panel-retire" class="panel">
+
+<div class="card" style="margin-bottom:14px">
+  <div class="card-head">
+    <div class="card-title">🏖️ 退休規劃試算</div>
+    <div style="font-size:13px;color:var(--sub);margin-top:3px">含通膨 × 複利回測 × 多種投資工具比較</div>
+  </div>
+  <div class="card-body">
+
+    <!-- 基本設定 -->
+    <div style="font-size:12px;font-weight:700;color:var(--sub);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px">基本設定</div>
+    <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:22px">
+
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:15px;font-weight:600;color:var(--text)">現在年齡</span>
+          <span style="font-size:15px;font-weight:700;color:var(--blue)" id="r-lbl-age">35 歲</span>
+        </div>
+        <input type="range" id="r-age" min="25" max="60" value="35" oninput="retPlan()" style="width:100%;accent-color:var(--blue)">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub)"><span>25歲</span><span>60歲</span></div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:15px;font-weight:600;color:var(--text)">預計退休年齡</span>
+          <span style="font-size:15px;font-weight:700;color:var(--blue)" id="r-lbl-ret">65 歲</span>
+        </div>
+        <input type="range" id="r-ret" min="50" max="70" value="65" oninput="retPlan()" style="width:100%;accent-color:var(--blue)">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub)"><span>50歲</span><span>70歲</span></div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:15px;font-weight:600;color:var(--text)">退休後每月生活費</span>
+          <span style="font-size:15px;font-weight:700;color:var(--blue)" id="r-lbl-exp">5 萬元</span>
+        </div>
+        <input type="range" id="r-exp" min="2" max="20" value="5" oninput="retPlan()" style="width:100%;accent-color:var(--blue)">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub)"><span>2萬</span><span>20萬</span></div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:15px;font-weight:600;color:var(--text)">目前已有積蓄</span>
+          <span style="font-size:15px;font-weight:700;color:var(--blue)" id="r-lbl-pv">50 萬元</span>
+        </div>
+        <input type="range" id="r-pv" min="0" max="500" step="10" value="50" oninput="retPlan()" style="width:100%;accent-color:var(--blue)">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub)"><span>0元</span><span>500萬</span></div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:15px;font-weight:600;color:var(--text)">每月投入金額</span>
+          <span style="font-size:15px;font-weight:700;color:var(--blue)" id="r-lbl-pmt">1 萬元</span>
+        </div>
+        <input type="range" id="r-pmt" min="0" max="10" step="0.5" value="1" oninput="retPlan()" style="width:100%;accent-color:var(--blue)">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub)"><span>0元</span><span>10萬</span></div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:15px;font-weight:600;color:var(--text)">通膨率假設</span>
+          <span style="font-size:15px;font-weight:700;color:#e53" id="r-lbl-inf">2.0 %</span>
+        </div>
+        <input type="range" id="r-inf" min="1" max="4" step="0.5" value="2" oninput="retPlan()" style="width:100%;accent-color:#e53">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub)"><span>1%</span><span>4%</span></div>
+      </div>
+    </div>
+
+    <!-- 投資工具選擇 -->
+    <div style="font-size:12px;font-weight:700;color:var(--sub);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">投資工具（年化報酬率回測）</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:22px" id="fund-list">
+      <label id="fund-sp500"  class="fund-opt active"   onclick="selectFund('sp500')" style="display:flex;justify-content:space-between;align-items:center;background:#f0f5ff;border:2px solid var(--blue);border-radius:12px;padding:12px 14px;cursor:pointer">
+        <div><div style="font-size:15px;font-weight:700;color:var(--text)">📈 S&P 500</div><div style="font-size:12px;color:var(--sub);margin-top:2px">近30年年化 ≈ 10.5%</div></div>
+        <div style="font-size:18px;font-weight:800;color:var(--blue)">10.5%</div>
+      </label>
+      <label id="fund-t0050" class="fund-opt" onclick="selectFund('t0050')" style="display:flex;justify-content:space-between;align-items:center;background:#f8f9fb;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer">
+        <div><div style="font-size:15px;font-weight:700;color:var(--text)">🇹🇼 台灣 0050</div><div style="font-size:12px;color:var(--sub);margin-top:2px">成立至今年化 ≈ 9.2%</div></div>
+        <div style="font-size:18px;font-weight:800;color:var(--sub)">9.2%</div>
+      </label>
+      <label id="fund-vt" class="fund-opt" onclick="selectFund('vt')" style="display:flex;justify-content:space-between;align-items:center;background:#f8f9fb;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer">
+        <div><div style="font-size:15px;font-weight:700;color:var(--text)">🌍 VT 全球股票</div><div style="font-size:12px;color:var(--sub);margin-top:2px">成立至今年化 ≈ 8.1%</div></div>
+        <div style="font-size:18px;font-weight:800;color:var(--sub)">8.1%</div>
+      </label>
+      <label id="fund-altech" class="fund-opt" onclick="selectFund('altech')" style="display:flex;justify-content:space-between;align-items:center;background:#f8f9fb;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer">
+        <div><div style="font-size:15px;font-weight:700;color:var(--text)">⚡ 安聯科技大壩</div><div style="font-size:12px;color:var(--sub);margin-top:2px">近10年年化 ≈ 15.2%（高波動）</div></div>
+        <div style="font-size:18px;font-weight:800;color:var(--sub)">15.2%</div>
+      </label>
+      <label id="fund-aling" class="fund-opt" onclick="selectFund('aling')" style="display:flex;justify-content:space-between;align-items:center;background:#f8f9fb;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer">
+        <div><div style="font-size:15px;font-weight:700;color:var(--text)">💼 安聯收益成長</div><div style="font-size:12px;color:var(--sub);margin-top:2px">近10年年化 ≈ 8.8%</div></div>
+        <div style="font-size:18px;font-weight:800;color:var(--sub)">8.8%</div>
+      </label>
+      <label id="fund-custom" class="fund-opt" onclick="selectFund('custom')" style="display:flex;justify-content:space-between;align-items:center;background:#f8f9fb;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer">
+        <div style="flex:1"><div style="font-size:15px;font-weight:700;color:var(--text)">✏️ 自訂報酬率</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+            <input type="range" id="r-custom" min="1" max="20" step="0.5" value="5" oninput="retPlan();document.getElementById('r-lbl-custom').textContent=this.value+'%'" onclick="event.stopPropagation()" style="flex:1;accent-color:var(--blue)">
+            <span id="r-lbl-custom" style="font-size:14px;font-weight:700;color:var(--blue);width:36px">5%</span>
+          </div>
+        </div>
+      </label>
+    </div>
+
+    <!-- 結果 -->
+    <div style="background:linear-gradient(135deg,#0f3460,#1a1a2e);border-radius:16px;padding:20px 18px;color:white">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div style="background:rgba(255,255,255,0.08);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:6px">退休時資產</div>
+          <div id="r-asset" style="font-size:22px;font-weight:800;color:#7ec8e3">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.08);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:6px">退休總需求（含通膨）</div>
+          <div id="r-need" style="font-size:22px;font-weight:800;color:#fbbf24">—</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:6px">缺口 / 盈餘</div>
+        <div id="r-gap" style="font-size:32px;font-weight:800;letter-spacing:-1px">—</div>
+        <div id="r-gap-note" style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:4px"></div>
+      </div>
+      <a href="https://line.me/ti/p/weber917" target="_blank"
+        style="display:flex;align-items:center;justify-content:center;gap:8px;background:#06C755;color:#fff;padding:13px;border-radius:25px;font-size:15px;font-weight:700;text-decoration:none">
+        💬 讓 Weber 幫你優化退休計畫
+      </a>
+    </div>
+
+    <div style="font-size:12px;color:var(--sub);margin-top:10px;line-height:1.6;text-align:center">
+      ※ 回測報酬率為歷史數據，不代表未來績效。勞保月領估算 NT$17,000、勞退 NT$15,000。<br>
+      實際規劃請依個人狀況洽詢 Weber。
+    </div>
+  </div>
+</div>
+
+</div>
+
 <div id="panel-about" class="panel">
 
 <!-- 退休缺口試算器 -->
@@ -975,7 +1109,7 @@ const NOW = new Date();
 
 // ── TABS ──
 function switchTab(name) {
-  const names = ['stories','news','about','market','fx','copy'];
+  const names = ['stories','news','retire','about','market','fx','copy'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
@@ -1950,6 +2084,75 @@ function cpGen(btn) {
     btn.textContent = '✓ 已複製';
     setTimeout(() => btn.textContent = orig, 1500);
   });
+}
+
+// ── 退休規劃試算器 ──
+const FUNDS = {
+  sp500:  10.5,
+  t0050:  9.2,
+  vt:     8.1,
+  altech: 15.2,
+  aling:  8.8,
+  custom: 5.0
+};
+let _retFund = 'sp500';
+function selectFund(id) {
+  _retFund = id;
+  document.querySelectorAll('.fund-opt').forEach(el => {
+    const active = el.id === 'fund-' + id;
+    el.style.background = active ? '#f0f5ff' : '#f8f9fb';
+    el.style.borderColor = active ? 'var(--blue)' : 'var(--border)';
+    const pct = el.querySelector('div > div:last-child, div:last-child');
+    if (pct) pct.style.color = active ? 'var(--blue)' : 'var(--sub)';
+  });
+  retPlan();
+}
+function retPlan() {
+  const age  = +document.getElementById('r-age').value;
+  const ret  = Math.max(+document.getElementById('r-ret').value, age+1);
+  const exp  = +document.getElementById('r-exp').value * 10000;
+  const pv   = +document.getElementById('r-pv').value * 10000;
+  const pmt  = +document.getElementById('r-pmt').value * 10000;
+  const inf  = +document.getElementById('r-inf').value / 100;
+  const rate = (_retFund === 'custom'
+    ? +document.getElementById('r-custom').value
+    : FUNDS[_retFund]) / 100;
+
+  document.getElementById('r-lbl-age').textContent = age + ' 歲';
+  document.getElementById('r-lbl-ret').textContent = ret + ' 歲';
+  document.getElementById('r-lbl-exp').textContent = +document.getElementById('r-exp').value + ' 萬元';
+  document.getElementById('r-lbl-pv').textContent  = +document.getElementById('r-pv').value + ' 萬元';
+  document.getElementById('r-lbl-pmt').textContent = +document.getElementById('r-pmt').value + ' 萬元';
+  document.getElementById('r-lbl-inf').textContent = (+document.getElementById('r-inf').value).toFixed(1) + ' %';
+
+  const n = (ret - age) * 12;          // months to retirement
+  const r = rate / 12;                  // monthly rate
+  // FV of lump sum + annuity
+  const fv = pv * Math.pow(1+r, n) + (r > 0 ? pmt * (Math.pow(1+r,n)-1)/r : pmt*n);
+
+  const yrsInRet = Math.max(85 - ret, 5);
+  // retirement monthly need adjusted for inflation at retirement
+  const adjExp = exp * Math.pow(1+inf, ret-age);
+  // total need = sum of PV of monthly withdrawals (simple: adj × 12 × years, no further inflation for simplicity)
+  const totalNeed = adjExp * 12 * yrsInRet;
+  // add insurance offset
+  const insurance = (17000 + 15000) * 12 * yrsInRet;
+  const netNeed = Math.max(totalNeed - insurance, 0);
+  const gap = fv - netNeed;
+
+  const fmt = v => {
+    const abs = Math.abs(v);
+    if (abs >= 1e8) return (v/1e8).toFixed(1) + ' 億';
+    if (abs >= 1e4) return Math.round(v/1e4) + ' 萬';
+    return Math.round(v).toLocaleString();
+  };
+  document.getElementById('r-asset').textContent = fmt(fv);
+  document.getElementById('r-need').textContent  = fmt(netNeed);
+  document.getElementById('r-gap').textContent   = (gap >= 0 ? '+' : '') + fmt(gap);
+  document.getElementById('r-gap').style.color   = gap >= 0 ? '#4ade80' : '#f97316';
+  document.getElementById('r-gap-note').textContent = gap >= 0
+    ? '🎉 計畫超標！你的退休金很充裕'
+    : '⚠️ 缺口需要提早規劃補足';
 }
 
 // ── 退休缺口試算器 ──
