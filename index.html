@@ -243,6 +243,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   .section-label { font-size: 13px !important; }
   table { font-size: 14px !important; }
 }
+
+  .market-sub { background:none; border:none; padding:8px 18px; border-radius:20px; font-size:14px; font-weight:600; cursor:pointer; color:var(--sub); transition:.2s; }
+  .market-sub.active { background:var(--blue); color:#fff; }
 </style>
 <!-- Google Analytics GA4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-2W1BKM3XFY"></script>
@@ -287,7 +290,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <div class="tab" onclick="switchTab('retire')">🏖️ 退休規劃</div>
     <div class="tab" onclick="switchTab('about')">👤 關於我</div>
     <div class="tab" onclick="switchTab('market')">📈 今日行情</div>
-    <div class="tab" onclick="switchTab('fx')">💱 匯率</div>
     <div class="tab" onclick="switchTab('copy')">✍️ 社群文案</div>
   </div>
 </div>
@@ -345,6 +347,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 <!-- ===== TAB: 今日行情 ===== -->
 <div id="panel-market" class="panel">
 
+
+  <!-- ── 子分頁 ── -->
+  <div style="display:flex;gap:8px;margin-bottom:14px">
+    <button id="mtab-stock" class="market-sub active" onclick="switchMSub('mview-stock','mtab-stock')">📈 台美股</button>
+    <button id="mtab-fx"    class="market-sub"        onclick="switchMSub('mview-fx','mtab-fx')">💱 匯率</button>
+  </div>
+  <div id="mview-stock">
   <!-- Daily Brief Card -->
   <div class="card" id="brief-card" style="display:none">
     <div class="card-head">
@@ -438,10 +447,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <button class="refresh-mini" onclick="loadMarket();loadCrypto();">↺ 重新整理行情</button>
     <span id="market-countdown" style="font-size:11px;color:var(--sub);margin-left:8px"></span>
   </div>
-</div>
 
-<!-- ===== TAB: 匯率 ===== -->
-<div id="panel-fx" class="panel">
+  </div><!-- /mview-stock -->
+
+  <div id="mview-fx" style="display:none">
+
 
   <!-- 匯率換算器 -->
   <div class="card">
@@ -505,6 +515,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <button class="refresh-mini" onclick="loadFX()">↺ 重新整理匯率</button>
   </div>
 </div>
+  </div><!-- /mview-fx -->
+
+</div>
+
+<!-- ===== TAB: 匯率 ===== -->
 
 <!-- ===== TAB: 社群文案 ===== -->
 <div id="panel-copy" class="panel">
@@ -1108,8 +1123,20 @@ const NOW = new Date();
 })();
 
 // ── TABS ──
+
+function switchMSub(view, btnId) {
+  ['mview-stock','mview-fx'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = id === view ? '' : 'none';
+  });
+  document.querySelectorAll('.market-sub').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById(btnId);
+  if (btn) btn.classList.add('active');
+  if (view === 'mview-fx') loadFX();
+}
+
 function switchTab(name) {
-  const names = ['stories','news','retire','about','market','fx','copy'];
+  const names = ['stories','news','retire','about','market','copy'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
