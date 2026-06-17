@@ -2,8 +2,8 @@ name: LINE Daily Push
 
 on:
   schedule:
-    - cron: '0 0 * * *'   # 每天台灣時間 08:00 (UTC+8)
-  workflow_dispatch:        # 可手動觸發
+    - cron: '0 0 * * *'   # 每天台灣時間 08:00 (UTC 0:00 = TST 8:00)
+  workflow_dispatch:        # 可手動觸發測試
 
 jobs:
   push:
@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Run LINE push script
+      - name: Send LINE Flex Message
         env:
           LINE_CHANNEL_TOKEN: ${{ secrets.LINE_CHANNEL_TOKEN }}
-        run: node --experimental-vm-modules scripts/line-push.js
+        run: node scripts/line-push.js
