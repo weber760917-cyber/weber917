@@ -2389,12 +2389,16 @@ async function loadWorldCup() {
     };
     const todayStr = toTWDate(twNow);
 
-    // 篩選今日場次，按開賽時間正序
-    let display = all
-      .filter(m => toTWDate(m.date) === todayStr)
-      .sort((a, b) => new Date(a.date) - new Date(b.date));
+    // 篩選今日場次
+    const todayAll = all.filter(m => toTWDate(m.date) === todayStr);
 
-    // 今日無場次 → 顯示最近3場已完賽 + 最近3場即將開賽
+    // 排序：進行中 → 即將開賽 → 已完賽（依時間正序，最早踢的排最下）
+    const live_m     = todayAll.filter(m => m.status === 'in').sort((a,b) => new Date(a.date)-new Date(b.date));
+    const upcoming_m = todayAll.filter(m => m.status === 'pre').sort((a,b) => new Date(a.date)-new Date(b.date));
+    const done_m     = todayAll.filter(m => m.status === 'post').sort((a,b) => new Date(a.date)-new Date(b.date));
+    let display = [...live_m, ...upcoming_m, ...done_m];
+
+    // 今日無場次 → 最近3場已完賽 + 最近3場即將開賽
     if (!display.length) {
       const done = all.filter(m => m.status === 'post').sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,3);
       const upcoming = all.filter(m => m.status === 'pre').sort((a,b) => new Date(a.date)-new Date(b.date)).slice(0,3);
