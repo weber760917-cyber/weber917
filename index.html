@@ -2445,25 +2445,50 @@ async function loadWorldCup() {
 
 async function loadWCStandings() {
   const box = document.getElementById('wc-stand-rows');
+  if (!box) return;
   try {
     const groups = await fetch('/api/worldcup?mode=standings').then(r => r.ok ? r.json() : Promise.reject(r.status));
     if (!Array.isArray(groups) || !groups.length) { box.innerHTML = '<div class="error-note">暫無積分榜資料</div>'; return; }
-    const th = (txt, align='center') => `<th style="padding:5px 3px;font-size:10px;color:var(--sub);font-weight:600;text-align:${align}">${txt}</th>`;
-    const td = (txt, bold) => `<td style="padding:6px 3px;font-size:16px;text-align:center${bold?';font-weight:900;color:var(--blue)':''}">${txt}</td>`;
+
+    const thS = (align) => `style="padding:4px 2px;font-size:11px;color:var(--sub);font-weight:700;text-align:${align};white-space:nowrap"`;
+    const tdS = (align, bold) => `style="padding:5px 2px;font-size:12px;text-align:${align};white-space:nowrap${bold?';font-weight:900;color:var(--blue)':''}"`;
+
     box.innerHTML = groups.map(g => {
       const rows = g.entries.map((e,i) => `<tr style="border-bottom:1px solid var(--border)${i===0?';background:rgba(212,168,67,0.07)':''}">
-        <td style="padding:6px 3px;font-size:16px"><div style="display:flex;align-items:center;gap:4px">
-          ${e.logo ? `<img src="${e.logo}" style="width:20px;height:14px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">` : ''}
-          <span>${e.team}</span></div></td>
-        ${td(e.P)} ${td(e.W)} ${td(e.D)} ${td(e.L)} ${td(e.GF)} ${td(e.GA)} ${td(e.Pts,true)}
+        <td ${tdS('left')} style="padding:5px 2px;font-size:12px;white-space:nowrap">
+          <div style="display:flex;align-items:center;gap:4px">
+            ${e.logo ? `<img src="${e.logo}" style="width:18px;height:13px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">` : ''}
+            <span>${e.team}</span>
+          </div>
+        </td>
+        <td ${tdS('center')}>${e.P}</td>
+        <td ${tdS('center')}>${e.W}</td>
+        <td ${tdS('center')}>${e.D}</td>
+        <td ${tdS('center')}>${e.L}</td>
+        <td ${tdS('center')}>${e.GF}</td>
+        <td ${tdS('center')}>${e.GA}</td>
+        <td ${tdS('center',true)}>${e.Pts}</td>
       </tr>`).join('');
-      return `<div style="margin-bottom:18px">
-        <div style="font-size:16px;font-weight:700;color:var(--blue);margin-bottom:6px">${g.name}</div>
-        <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:280px">
-          <thead><tr style="border-bottom:2px solid var(--border)">
-            ${th('隊伍','left')} ${th('場')} ${th('勝')} ${th('平')} ${th('負')} ${th('進')} ${th('失')} ${th('積分')}
-          </tr></thead><tbody>${rows}</tbody>
-        </table></div>
+
+      return `<div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">${g.name}</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;table-layout:fixed">
+            <colgroup>
+              <col style="width:auto">
+              <col style="width:28px"><col style="width:28px"><col style="width:28px"><col style="width:28px">
+              <col style="width:28px"><col style="width:28px"><col style="width:34px">
+            </colgroup>
+            <thead><tr style="border-bottom:2px solid var(--border)">
+              <th ${thS('left')}>隊伍</th>
+              <th ${thS('center')}>場</th><th ${thS('center')}>勝</th>
+              <th ${thS('center')}>平</th><th ${thS('center')}>負</th>
+              <th ${thS('center')}>進</th><th ${thS('center')}>失</th>
+              <th ${thS('center')}>積分</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
       </div>`;
     }).join('');
     box.dataset.loaded = '1';
@@ -2471,7 +2496,6 @@ async function loadWCStandings() {
     box.innerHTML = `<div class="error-note">積分榜暫時無法取得</div>`;
   }
 }
-
 async function fetchUDNNews(cate, count) {
   try {
     const items = await fetch(`/api/udnnews?cate=${cate}&count=${count}`).then(r => r.ok ? r.json() : Promise.reject(r.status));
