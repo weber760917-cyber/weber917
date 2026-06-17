@@ -2361,6 +2361,38 @@ async function loadWCPreview() {
       box.dataset.loaded = '1';
     });
 }
+function wcTableHTML(matches) {
+  if (!matches || !matches.length) return '';
+  return matches.map(m => {
+    const home = m.teams.find(t => t.homeAway === 'home') || m.teams[0] || {};
+    const away = m.teams.find(t => t.homeAway === 'away') || m.teams[1] || {};
+    const isLive = m.status === 'in';
+    const isDone = m.status === 'post';
+    const isPre  = m.status === 'pre';
+    // 台灣時間
+    const twTime = new Date(new Date(m.date).toLocaleString('en-US', {timeZone:'Asia/Taipei'}));
+    const timeStr = `${String(twTime.getHours()).padStart(2,'0')}:${String(twTime.getMinutes()).padStart(2,'0')}`;
+    // 比分 or 時間
+    const scoreOrTime = isDone
+      ? `<span style="font-size:18px;font-weight:900;color:var(--text)">${home.score ?? 0} - ${away.score ?? 0}</span>`
+      : isLive
+      ? `<span style="font-size:14px;font-weight:700;color:#e53935">${home.score ?? 0} - ${away.score ?? 0}</span><br><span style="font-size:10px;color:#e53935;animation:blink 1s infinite">● LIVE</span>`
+      : `<span style="font-size:13px;font-weight:600;color:var(--sub)">${timeStr}</span>`;
+    const rowBg = isLive ? 'background:rgba(229,57,53,0.05);' : '';
+    return `<div style="display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);${rowBg}gap:6px">
+      <div style="flex:1;text-align:right;font-size:13px;font-weight:600;line-height:1.3">
+        ${home.logo ? `<img src="${home.logo}" style="width:20px;height:15px;object-fit:contain;vertical-align:middle;margin-right:4px" onerror="this.style.display='none'">` : ''}
+        ${home.name}
+      </div>
+      <div style="flex:0 0 70px;text-align:center;line-height:1.4">${scoreOrTime}</div>
+      <div style="flex:1;text-align:left;font-size:13px;font-weight:600;line-height:1.3">
+        ${away.logo ? `<img src="${away.logo}" style="width:20px;height:15px;object-fit:contain;vertical-align:middle;margin-right:4px" onerror="this.style.display='none'">` : ''}
+        ${away.name}
+      </div>
+    </div>`;
+  }).join('');
+}
+
 async function loadWorldCup() {
   const el = document.getElementById('wc-rows');
   try {
