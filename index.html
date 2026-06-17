@@ -2310,77 +2310,57 @@ function switchWCSub(btn, paneId) {
 
 async function loadWCPreview() {
   const box = document.getElementById('wc-preview-rows');
-  try {
-    const data = await fetch('/data/wc-preview.json?_=' + Date.now()).then(r => r.ok ? r.json() : Promise.reject());
-    if (!data.matches || !data.matches.length) {
-      box.innerHTML = '<div class="error-note">今日尚無明日賽程分析，每天 18:00 自動更新</div>';
-      box.dataset.loaded = '1';
-      return;
-    }
-    const mm = data.date ? data.date.slice(4,6) : '';
-    const dd = data.date ? data.date.slice(6,8) : '';
-    const dateLabel = mm && dd ? `${parseInt(mm)}/${parseInt(dd)}` : '明日';
-    const genTime = data.generatedAt ? new Date(data.generatedAt).toLocaleString('zh-TW', {timeZone:'Asia/Taipei', month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
-    box.innerHTML =
-      `<div style="font-size:16px;font-weight:700;color:var(--blue);margin-bottom:14px">` +
-      `${dateLabel} 樂爸Weber賽前分析` +
-      `</div>` +
-      data.matches.map((m, i) => `
-        <div style="margin-bottom:${i < data.matches.length-1 ? '20px;padding-bottom:20px;border-bottom:1px solid var(--border)' : '0'}">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-            <span style="font-size:16px;font-weight:700;color:var(--blue)">${m.home} <span style="color:var(--sub);font-weight:400">vs</span> ${m.away}</span>
-            <span style="font-size:11px;color:var(--sub);white-space:nowrap">${m.time}</span>
+  if (!box) return;
+  fetch('/data/wc-preview.json?_=' + Date.now())
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(data => {
+      if (!data.matches || !data.matches.length) {
+        box.innerHTML = '<div class="error-note">今日尚無賽事分析</div>';
+        box.dataset.loaded = '1'; return;
+      }
+      const mm = data.date ? data.date.slice(4,6) : '';
+      const dd = data.date ? data.date.slice(6,8) : '';
+      const dateLabel = mm && dd ? `${parseInt(mm)}月${parseInt(dd)}日` : '';
+
+      box.innerHTML = data.matches.map(m => `
+        <div style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px">
+          <!-- 對戰標題 -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-size:15px;font-weight:700">${m.home} vs ${m.away}</div>
+            <div style="font-size:12px;color:var(--sub)">${dateLabel} ${m.time}</div>
           </div>
-          <div style="font-size:15px;line-height:1.8;color:var(--text)">${m.analysis.split('\n').join('<br>').replace(/【/g,'<strong>【').replace(/】/g,'】</strong>')}</div>
+          <!-- 預測比分 -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+            <div style="background:var(--blue);color:#fff;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700">
+              🎯 ${m.predict || ''}
+            </div>
+            ${m.upset ? `<div style="background:#f5f0e8;color:#8B6914;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600">${m.upset}</div>` : ''}
+          </div>
+          <!-- 觀賽重點 -->
+          <div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:10px">${m.analysis || ''}</div>
+          <!-- 焦點球星 -->
+          ${m.stars && m.stars.length ? `
+          <div style="background:var(--card);border-radius:8px;padding:8px 10px;margin-bottom:10px">
+            <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px">⭐ 焦點球星</div>
+            ${m.stars.map(s => `<div style="font-size:12px;color:var(--text);margin-bottom:3px">
+              <span style="font-weight:700">${s.team}</span>：${s.name}　<span style="color:var(--sub)">${s.role}</span>
+            </div>`).join('')}
+          </div>` : ''}
+          <!-- Weber 分析 -->
+          ${m.weber ? `
+          <div style="border-left:3px solid var(--blue);padding:8px 12px;background:#f0f4ff;border-radius:0 8px 8px 0">
+            <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:4px">📊 Weber 盤口分析</div>
+            <div style="font-size:12px;color:#333;line-height:1.7">${m.weber}</div>
+          </div>` : ''}
         </div>
       `).join('');
-    box.dataset.loaded = '1';
-  } catch(e) {
-    box.innerHTML = '<div class="error-note">賽前分析尚未產生，每天 18:00 自動更新 🔄</div>';
-    box.dataset.loaded = '1';
-  }
+      box.dataset.loaded = '1';
+    })
+    .catch(() => {
+      box.innerHTML = '<div class="error-note">分析資料載入失敗</div>';
+      box.dataset.loaded = '1';
+    });
 }
-
-function wcTableHTML(matches) {
-  if (!matches || !matches.length) return '<div class="error-note">目前無賽程 · <a href="https://www.espn.com/soccer/league/_/name/fifa.world" target="_blank" style="color:var(--blue)">ESPN 查看 →</a></div>';
-  const logo = t => t.logo ? `<img src="${t.logo}" style="width:22px;height:16px;object-fit:contain;vertical-align:middle;flex-shrink:0" onerror="this.style.display='none'">` : '';
-  const teamCell = (t, align) => {
-    const inner = align === 'right' ? `<span>${t.name}</span>${logo(t)}` : `${logo(t)}<span>${t.name}</span>`;
-    return t.espnUrl
-      ? `<a href="${t.espnUrl}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:4px;${align==='right'?'justify-content:flex-end':''}">${inner}</a>`
-      : `<span style="display:flex;align-items:center;gap:4px;${align==='right'?'justify-content:flex-end':''}">${inner}</span>`;
-  };
-  const rows = matches.map(m => {
-    const home = m.teams.find(t => t.homeAway === 'home') || m.teams[0] || {};
-    const away = m.teams.find(t => t.homeAway === 'away') || m.teams[1] || {};
-    const isLive = m.status === 'in', isDone = m.status === 'post';
-    const d = new Date(m.date);
-    const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
-    const timeStr = d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
-    const statusCell = isLive
-      ? `<span style="color:#e74c3c;font-weight:700"><span class="live-dot"></span>${m.statusDesc||'進行中'}</span>`
-      : isDone ? `<span style="color:var(--sub)">FT</span>` : `<span style="color:var(--sub)">${timeStr}</span>`;
-    const scoreCell = (isDone||isLive) ? `${home.score} - ${away.score}` : 'vs';
-    return `<tr style="${isLive?'background:rgba(231,76,60,0.06)':''}">
-      <td style="white-space:nowrap;padding:7px 4px;font-size:11px;border-bottom:1px solid var(--border)">${statusCell}</td>
-      <td style="white-space:nowrap;padding:7px 4px;font-size:11px;color:var(--sub);border-bottom:1px solid var(--border)">${dateStr}</td>
-      <td style="padding:7px 4px;font-size:16px;font-weight:600;text-align:right;border-bottom:1px solid var(--border)">${teamCell(home,'right')}</td>
-      <td style="padding:7px 8px;font-size:16px;font-weight:900;text-align:center;white-space:nowrap;color:var(--blue);border-bottom:1px solid var(--border)">${scoreCell}</td>
-      <td style="padding:7px 4px;font-size:16px;font-weight:600;border-bottom:1px solid var(--border)">${teamCell(away,'left')}</td>
-    </tr>`;
-  }).join('');
-  return `<table style="width:100%;border-collapse:collapse">
-    <thead><tr style="border-bottom:2px solid var(--border)">
-      <th style="padding:5px 4px;font-size:10px;color:var(--sub);font-weight:600;text-align:left">狀態</th>
-      <th style="padding:5px 4px;font-size:10px;color:var(--sub);font-weight:600;text-align:left">日期</th>
-      <th style="padding:5px 4px;font-size:10px;color:var(--sub);font-weight:600;text-align:right">主場</th>
-      <th style="padding:5px 4px;font-size:10px;color:var(--sub);font-weight:600;text-align:center">比分</th>
-      <th style="padding:5px 4px;font-size:10px;color:var(--sub);font-weight:600;text-align:left">客場</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table>`;
-}
-
 async function loadWorldCup() {
   const el = document.getElementById('wc-rows');
   try {
