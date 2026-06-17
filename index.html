@@ -308,22 +308,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   <div id="nview-wc">
     <div class="card">
       <div class="card-head">
-        <div class="card-title">⚽ 2026 FIFA 世界盃</div>
-        <div style="display:flex;gap:6px;margin-top:6px">
-          <button class="copy-ptab active" onclick="switchWCView(this,'wc-schedule-pane')">📅 賽程</button>
-          <button class="copy-ptab" onclick="switchWCView(this,'wc-stand-pane')">📊 積分榜</button>
-          <button class="copy-ptab" onclick="switchWCView(this,'wc-preview-pane')">🔮 分析</button>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="card-title">⚽ 2026 FIFA 世界盃</div>
+          <button class="copy-ptab" id="wc-analysis-btn" onclick="toggleWCAnalysis(this)">🔮 分析</button>
         </div>
-        <div style="font-size:11px;color:var(--sub);margin-top:4px">點球隊名查陣容 · 資料來源 ESPN</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:4px">昨天・今天・明天賽程 · 資料來源 ESPN</div>
       </div>
       <div class="card-body" style="padding:0">
-        <div id="wc-schedule-pane" style="padding:8px 16px 12px">
+        <!-- 賽程 + 積分榜 永遠顯示 -->
+        <div style="padding:8px 16px 4px">
           <div id="wc-rows" style="font-size:15px"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
         </div>
-        <div id="wc-stand-pane" style="display:none;padding:8px 16px 12px">
-          <div id="wc-stand-rows"><div class="loading-row"><span class="spin">⟳</span> 載入積分榜…</div></div>
+        <div style="border-top:1px solid var(--border);padding:12px 16px 12px">
+          <div style="font-size:13px;font-weight:700;color:var(--sub);margin-bottom:8px">📊 積分榜</div>
+          <div id="wc-stand-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
         </div>
-        <div id="wc-preview-pane" style="display:none;padding:8px 16px 12px">
+        <!-- 分析：點按鈕才展開 -->
+        <div id="wc-preview-pane" style="display:none;padding:8px 16px 12px;border-top:1px solid var(--border)">
           <div id="wc-preview-rows"><div class="loading-row"><span class="spin">⟳</span> 載入賽前分析…</div></div>
         </div>
       </div>
@@ -2288,6 +2289,13 @@ async function loadStories() {
 
 
 // ── NEWS TAB ──
+function toggleWCAnalysis(btn) {
+  const pane = document.getElementById('wc-preview-pane');
+  const isOpen = pane.style.display !== 'none';
+  pane.style.display = isOpen ? 'none' : '';
+  btn.classList.toggle('active', !isOpen);
+  if (!isOpen && !document.getElementById('wc-preview-rows').dataset.loaded) loadWCPreview();
+}
 function switchWCView(btn, paneId) {
   document.querySelectorAll('#panel-news .copy-ptab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -2381,36 +2389,58 @@ async function loadWorldCup() {
     const data = await fetch('/api/worldcup').then(r => r.ok ? r.json() : Promise.reject(r.status));
     const all = Array.isArray(data) ? data : [];
 
-    // 台灣時間今日日期
-    const twNow = new Date(new Date().toLocaleString('en-US', {timeZone:'Asia/Taipei'}));
     const toTWDate = d => {
       const tw = new Date(new Date(d).toLocaleString('en-US', {timeZone:'Asia/Taipei'}));
       return `${tw.getFullYear()}-${String(tw.getMonth()+1).padStart(2,'0')}-${String(tw.getDate()).padStart(2,'0')}`;
     };
-    const todayStr = toTWDate(twNow);
+    const twNow  = new Date(new Date().toLocaleString('en-US', {timeZone:'Asia/Taipei'}));
+    const todayStr    = toTWDate(twNow);
+    const yesterStr   = toTWDate(new Date(twNow - 86400000));
+    const tomorrowStr = toTWDate(new Date(+twNow + 86400000));
 
-    // 篩選今日場次
+    // 昨、今、明 台灣時間場次
+    const yester   = all.filter(m => toTWDate(m.date) === yesterStr);
     const todayAll = all.filter(m => toTWDate(m.date) === todayStr);
+    const tomorrow = all.filter(m => toTWDate(m.date) === tomorrowStr);
 
-    // 排序：進行中 → 即將開賽 → 已完賽（依時間正序，最早踢的排最下）
-    const live_m     = todayAll.filter(m => m.status === 'in').sort((a,b) => new Date(a.date)-new Date(b.date));
-    const upcoming_m = todayAll.filter(m => m.status === 'pre').sort((a,b) => new Date(a.date)-new Date(b.date));
-    const done_m     = todayAll.filter(m => m.status === 'post').sort((a,b) => new Date(a.date)-new Date(b.date));
-    let display = [...live_m, ...upcoming_m, ...done_m];
+    // 今日排序：進行中 → 即將開賽 → 已完賽
+    const todaySorted = [
+      ...todayAll.filter(m=>m.status==='in').sort((a,b)=>new Date(a.date)-new Date(b.date)),
+      ...todayAll.filter(m=>m.status==='pre').sort((a,b)=>new Date(a.date)-new Date(b.date)),
+      ...todayAll.filter(m=>m.status==='post').sort((a,b)=>new Date(a.date)-new Date(b.date))
+    ];
 
-    // 今日無場次 → 最近3場已完賽 + 最近3場即將開賽
-    if (!display.length) {
-      const done = all.filter(m => m.status === 'post').sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,3);
-      const upcoming = all.filter(m => m.status === 'pre').sort((a,b) => new Date(a.date)-new Date(b.date)).slice(0,3);
-      display = [...done.reverse(), ...upcoming];
+    const fmt = dateStr => {
+      const [y,mo,dy] = dateStr.split('-');
+      const days = ['日','一','二','三','四','五','六'];
+      const d = new Date(`${dateStr}T00:00:00+08:00`);
+      return `${mo}/${dy} (${days[d.getDay()]})`;
+    };
+
+    // 組合 HTML
+    let html = '';
+    if (yester.length) {
+      html += `<div style="font-size:11px;font-weight:700;color:var(--sub);padding:6px 0 4px;letter-spacing:.5px">▸ ${fmt(yesterStr)} 昨日賽果</div>`;
+      html += wcTableHTML(yester.sort((a,b)=>new Date(a.date)-new Date(b.date)));
     }
+    if (todaySorted.length) {
+      html += `<div style="font-size:11px;font-weight:700;color:var(--blue);padding:10px 0 4px;letter-spacing:.5px">▸ ${fmt(todayStr)} 今日賽事</div>`;
+      html += wcTableHTML(todaySorted);
+    }
+    if (tomorrow.length) {
+      html += `<div style="font-size:11px;font-weight:700;color:var(--sub);padding:10px 0 4px;letter-spacing:.5px">▸ ${fmt(tomorrowStr)} 明日賽程</div>`;
+      html += wcTableHTML(tomorrow.sort((a,b)=>new Date(a.date)-new Date(b.date)));
+    }
+    if (!html) html = '<div class="error-note">目前無賽程資料</div>';
 
-    el.innerHTML = wcTableHTML(display);
+    el.innerHTML = html;
     el.dataset.loaded = '1';
   } catch(e) {
     el.dataset.loaded = '1';
-    el.innerHTML = `<div class="error-note">賽程載入失敗 · <a href="https://www.espn.com/soccer/league/_/name/fifa.world" target="_blank" style="color:var(--blue)">ESPN 世界盃 →</a></div>`;
+    el.innerHTML = `<div class="error-note">賽程載入失敗 · <a href="https://www.espn.com/soccer/league/_/name/fifa.world" target="_blank" style="color:var(--blue)">ESPN →</a></div>`;
   }
+  // 自動載積分榜
+  loadWCStandings();
 }
 
 async function loadWCStandings() {
