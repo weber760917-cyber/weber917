@@ -308,25 +308,30 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   <div id="nview-wc">
     <div class="card">
       <div class="card-head">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div class="card-title">⚽ 2026 FIFA 世界盃</div>
-          <button class="copy-ptab" id="wc-analysis-btn" onclick="toggleWCAnalysis(this)">🔮 分析</button>
+        <div class="card-title">⚽ 2026 FIFA 世界盃</div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button class="copy-ptab active" id="wc-tab-schedule" onclick="switchWCSub(this,'wc-pane-schedule')">📅 賽程</button>
+          <button class="copy-ptab" id="wc-tab-analysis" onclick="switchWCSub(this,'wc-pane-analysis')">🔮 分析</button>
         </div>
-        <div style="font-size:11px;color:var(--sub);margin-top:4px">昨天・今天・明天賽程 · 資料來源 ESPN</div>
       </div>
       <div class="card-body" style="padding:0">
-        <!-- 賽程 + 積分榜 永遠顯示 -->
-        <div style="padding:8px 16px 4px">
-          <div id="wc-rows" style="font-size:15px"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+
+        <!-- 賽程 + 積分榜 -->
+        <div id="wc-pane-schedule">
+          <div style="padding:8px 16px 4px">
+            <div id="wc-rows" style="font-size:15px"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding:12px 16px 12px">
+            <div style="font-size:13px;font-weight:700;color:var(--sub);margin-bottom:8px">📊 積分榜</div>
+            <div id="wc-stand-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+          </div>
         </div>
-        <div style="border-top:1px solid var(--border);padding:12px 16px 12px">
-          <div style="font-size:13px;font-weight:700;color:var(--sub);margin-bottom:8px">📊 積分榜</div>
-          <div id="wc-stand-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
-        </div>
-        <!-- 分析：點按鈕才展開 -->
-        <div id="wc-preview-pane" style="display:none;padding:8px 16px 12px;border-top:1px solid var(--border)">
+
+        <!-- 分析子頁面 -->
+        <div id="wc-pane-analysis" style="display:none;padding:16px">
           <div id="wc-preview-rows"><div class="loading-row"><span class="spin">⟳</span> 載入賽前分析…</div></div>
         </div>
+
       </div>
     </div>
   </div><!-- /nview-wc -->
@@ -2289,26 +2294,19 @@ async function loadStories() {
 
 
 // ── NEWS TAB ──
-function toggleWCAnalysis(btn) {
-  const pane = document.getElementById('wc-preview-pane');
-  const isOpen = pane.style.display !== 'none';
-  pane.style.display = isOpen ? 'none' : '';
-  btn.classList.toggle('active', !isOpen);
-  if (!isOpen && !document.getElementById('wc-preview-rows').dataset.loaded) loadWCPreview();
-}
-function switchWCView(btn, paneId) {
-  document.querySelectorAll('#panel-news .copy-ptab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  ['wc-schedule-pane','wc-stand-pane','wc-preview-pane'].forEach(id => {
+function switchWCSub(btn, paneId) {
+  ['wc-pane-schedule','wc-pane-analysis'].forEach(id => {
     document.getElementById(id).style.display = id === paneId ? '' : 'none';
   });
-  if (paneId === 'wc-stand-pane' && !document.getElementById('wc-stand-rows').dataset.loaded) {
-    loadWCStandings();
-  }
-  if (paneId === 'wc-preview-pane' && !document.getElementById('wc-preview-rows').dataset.loaded) {
+  ['wc-tab-schedule','wc-tab-analysis'].forEach(id => {
+    document.getElementById(id).classList.remove('active');
+  });
+  btn.classList.add('active');
+  if (paneId === 'wc-pane-analysis' && !document.getElementById('wc-preview-rows').dataset.loaded) {
     loadWCPreview();
   }
 }
+
 
 async function loadWCPreview() {
   const box = document.getElementById('wc-preview-rows');
