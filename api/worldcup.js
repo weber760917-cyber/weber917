@@ -22,11 +22,14 @@ export default async function handler(req, res) {
       return res.json(groups);
     }
 
-    // ── 台灣時間當日可能橫跨兩個 UTC 日期，同時查兩天 ──
-    const twNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+    // ── 同時查 UTC 昨天、今天、明天（涵蓋台灣時間前後各一天）──
     const fmt = d => `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-    const todayUTC  = fmt(new Date());
-    const prevUTC   = fmt(new Date(Date.now() - 86400000));
+    const now = new Date();
+    const dates = [
+      fmt(new Date(now - 86400000)),
+      fmt(now),
+      fmt(new Date(now + 86400000))
+    ];
 
     const fetchDay = async (dateStr) => {
       const r = await fetch(
@@ -38,15 +41,14 @@ export default async function handler(req, res) {
       return data.events || [];
     };
 
-    const [eventsToday, eventsPrev] = await Promise.all([fetchDay(todayUTC), fetchDay(prevUTC)]);
-    // 合併去重
+    const allEventsRaw = (await Promise.all(dates.map(fetchDay))).flat();
     const seen = new Set();
-    const allEvents = [...eventsToday, ...eventsPrev].filter(ev => {
+    const allEvents = allEventsRaw.filter(ev => {
       if (seen.has(ev.id)) return false;
       seen.add(ev.id); return true;
     });
 
-    const parseMatch = ev => {
+    const matches = allEvents.map(ev => {
       const comp = ev.competitions?.[0];
       const teams = (comp?.competitors || []).map(c => ({
         homeAway: c.homeAway, name: c.team?.displayName||'', logo: c.team?.logo||'',
@@ -57,15 +59,10 @@ export default async function handler(req, res) {
       return { id:ev.id, date:ev.date, status:st?.state||'pre', statusDesc:st?.shortDetail||'',
                venue:comp?.venue?.fullName||'', teams,
                matchUrl:`https://www.espn.com/soccer/match/_/gameId/${ev.id}` };
-    };
-
-    const matches = allEvents.map(parseMatch);
-    const live     = matches.filter(m=>m.status==='in');
-    const done     = matches.filter(m=>m.status==='post').sort((a,b)=>new Date(b.date)-new Date(a.date));
-    const upcoming = matches.filter(m=>m.status==='pre').sort((a,b)=>new Date(a.date)-new Date(b.date));
+    }).sort((a, b) => new Date(a.date) - new Date(b.date));
 
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=120');
-    return res.json([...live,...done,...upcoming]);
+    return res.json(matches);
   } catch (e) {
     return res.status(502).json({ error: e.message });
   }
