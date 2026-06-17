@@ -2379,7 +2379,29 @@ async function loadWorldCup() {
   const el = document.getElementById('wc-rows');
   try {
     const data = await fetch('/api/worldcup').then(r => r.ok ? r.json() : Promise.reject(r.status));
-    el.innerHTML = wcTableHTML(Array.isArray(data) ? data : []);
+    const all = Array.isArray(data) ? data : [];
+
+    // 台灣時間今日日期
+    const twNow = new Date(new Date().toLocaleString('en-US', {timeZone:'Asia/Taipei'}));
+    const toTWDate = d => {
+      const tw = new Date(new Date(d).toLocaleString('en-US', {timeZone:'Asia/Taipei'}));
+      return `${tw.getFullYear()}-${String(tw.getMonth()+1).padStart(2,'0')}-${String(tw.getDate()).padStart(2,'0')}`;
+    };
+    const todayStr = toTWDate(twNow);
+
+    // 篩選今日場次，按開賽時間正序
+    let display = all
+      .filter(m => toTWDate(m.date) === todayStr)
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // 今日無場次 → 顯示最近3場已完賽 + 最近3場即將開賽
+    if (!display.length) {
+      const done = all.filter(m => m.status === 'post').sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,3);
+      const upcoming = all.filter(m => m.status === 'pre').sort((a,b) => new Date(a.date)-new Date(b.date)).slice(0,3);
+      display = [...done.reverse(), ...upcoming];
+    }
+
+    el.innerHTML = wcTableHTML(display);
     el.dataset.loaded = '1';
   } catch(e) {
     el.dataset.loaded = '1';
