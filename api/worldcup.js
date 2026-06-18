@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     if (mode === 'standings') {
       const r = await fetch('https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings',
         { headers: { 'User-Agent': 'Mozilla/5.0' } });
-      if (!r.ok) throw new Error(`ESPN standings ${r.status}`);
+      if (!r.ok) throw new Error('ESPN standings ' + r.status);
       const data = await r.json();
       const val = (stats, name) => { const s=(stats||[]).find(s=>s.name===name); return s?parseInt(s.displayValue,10)||0:0; };
       const groups = (data.children || []).map(g => ({
@@ -22,10 +22,11 @@ export default async function handler(req, res) {
       return res.json(groups);
     }
 
-    // ── 同時查 UTC 昨天、今天、明天（涵蓋台灣時間前後各一天）──
-    const fmt = d => `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    // 查 4 個 UTC 日期（涵蓋台灣時間昨今明 + 18:00 換頁所需）
+    const fmt = d => d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2);
     const now = new Date();
     const dates = [
+      fmt(new Date(now - 2*86400000)),
       fmt(new Date(now - 86400000)),
       fmt(now),
       fmt(new Date(now + 86400000))
@@ -33,7 +34,7 @@ export default async function handler(req, res) {
 
     const fetchDay = async (dateStr) => {
       const r = await fetch(
-        `https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=${dateStr}`,
+        'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=' + dateStr,
         { headers: { 'User-Agent': 'Mozilla/5.0' } }
       );
       if (!r.ok) return [];
@@ -41,9 +42,9 @@ export default async function handler(req, res) {
       return data.events || [];
     };
 
-    const allEventsRaw = (await Promise.all(dates.map(fetchDay))).flat();
+    const allRaw = (await Promise.all(dates.map(fetchDay))).flat();
     const seen = new Set();
-    const allEvents = allEventsRaw.filter(ev => {
+    const allEvents = allRaw.filter(ev => {
       if (seen.has(ev.id)) return false;
       seen.add(ev.id); return true;
     });
@@ -52,18 +53,16 @@ export default async function handler(req, res) {
       const comp = ev.competitions?.[0];
       const teams = (comp?.competitors || []).map(c => ({
         homeAway: c.homeAway, name: c.team?.displayName||'', logo: c.team?.logo||'',
-        score: c.score||'0',
-        espnUrl: (c.team?.links?.find(l=>l.rel?.includes('clubhouse'))||c.team?.links?.[0])?.href||''
+        score: c.score||'0'
       }));
       const st = comp?.status?.type;
       return { id:ev.id, date:ev.date, status:st?.state||'pre', statusDesc:st?.shortDetail||'',
-               venue:comp?.venue?.fullName||'', teams,
-               matchUrl:`https://www.espn.com/soccer/match/_/gameId/${ev.id}` };
-    }).sort((a, b) => new Date(a.date) - new Date(b.date));
+               venue:comp?.venue?.fullName||'', teams };
+    }).sort((a,b) => new Date(a.date)-new Date(b.date));
 
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=120');
     return res.json(matches);
-  } catch (e) {
+  } catch(e) {
     return res.status(502).json({ error: e.message });
   }
 }
