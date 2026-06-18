@@ -2430,19 +2430,19 @@ async function loadWorldCup() {
       return `${mo}/${dy} (${days[d.getDay()]})`;
     };
 
-    // 組合 HTML
+    // 組合 HTML：今日 → 明日 → 昨日
     let html = '';
-    if (yester.length) {
-      html += `<div style="font-size:11px;font-weight:700;color:var(--sub);padding:6px 0 4px;letter-spacing:.5px">▸ ${fmt(yesterStr)} 昨日賽果</div>`;
-      html += wcTableHTML(yester.sort((a,b)=>new Date(a.date)-new Date(b.date)));
-    }
     if (todaySorted.length) {
-      html += `<div style="font-size:11px;font-weight:700;color:var(--blue);padding:10px 0 4px;letter-spacing:.5px">▸ ${fmt(todayStr)} 今日賽事</div>`;
+      html += `<div style="font-size:11px;font-weight:700;color:var(--blue);padding:6px 0 4px;letter-spacing:.5px">▸ ${fmt(todayStr)} 今日賽事</div>`;
       html += wcTableHTML(todaySorted);
     }
     if (tomorrow.length) {
       html += `<div style="font-size:11px;font-weight:700;color:var(--sub);padding:10px 0 4px;letter-spacing:.5px">▸ ${fmt(tomorrowStr)} 明日賽程</div>`;
       html += wcTableHTML(tomorrow.sort((a,b)=>new Date(a.date)-new Date(b.date)));
+    }
+    if (yester.length) {
+      html += `<div style="font-size:11px;font-weight:700;color:var(--sub);padding:10px 0 4px;letter-spacing:.5px">▸ ${fmt(yesterStr)} 昨日賽果</div>`;
+      html += wcTableHTML(yester.sort((a,b)=>new Date(a.date)-new Date(b.date)));
     }
     if (!html) html = '<div class="error-note">目前無賽程資料</div>';
 
