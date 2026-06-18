@@ -22,14 +22,15 @@ export default async function handler(req, res) {
       return res.json(groups);
     }
 
-    // 查 4 個 UTC 日期（涵蓋台灣時間昨今明 + 18:00 換頁所需）
+    // 查 5 個 UTC 日期（涵蓋台灣時間昨今明 + 18:00 換頁後明日所需）
     const fmt = d => d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2);
     const now = new Date();
     const dates = [
       fmt(new Date(now - 2*86400000)),
       fmt(new Date(now - 86400000)),
       fmt(now),
-      fmt(new Date(now + 86400000))
+      fmt(new Date(now + 86400000)),
+      fmt(new Date(now + 2*86400000))
     ];
 
     const fetchDay = async (dateStr) => {
