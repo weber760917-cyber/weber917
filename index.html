@@ -2405,9 +2405,11 @@ async function loadWorldCup() {
       return `${tw.getFullYear()}-${String(tw.getMonth()+1).padStart(2,'0')}-${String(tw.getDate()).padStart(2,'0')}`;
     };
     const twNow  = new Date(new Date().toLocaleString('en-US', {timeZone:'Asia/Taipei'}));
-    const todayStr    = toTWDate(twNow);
-    const yesterStr   = toTWDate(new Date(twNow - 86400000));
-    const tomorrowStr = toTWDate(new Date(+twNow + 86400000));
+    // 18:00 後今日賽程已結束，提前切換到「明日視角」
+    const shifted     = twNow.getHours() >= 18 ? new Date(+twNow + 86400000) : twNow;
+    const todayStr    = toTWDate(shifted);
+    const yesterStr   = toTWDate(new Date(+shifted - 86400000));
+    const tomorrowStr = toTWDate(new Date(+shifted + 86400000));
 
     // 昨、今、明 台灣時間場次
     const yester   = all.filter(m => toTWDate(m.date) === yesterStr);
