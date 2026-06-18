@@ -2253,7 +2253,7 @@ function storyCardHTML(s, idx) {
       <button onclick="copyStoryLink(${idx},this)" title="複製分享連結" style="background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;opacity:0.4;flex-shrink:0;line-height:1" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.4">🔗</button>
     </div>
     <div class="story-title">${s.title || ''}</div>
-    <div class="story-meta">${s.meta || ''}</div>
+    <div class="story-meta" style="display:flex;justify-content:space-between;align-items:center"><span>${s.meta || ''}</span>${s.date ? '<span style="color:var(--sub);font-size:11px">' + s.date + '</span>' : ''}</div>
   </div>
   <div class="story-mid">
     <div class="story-quote">${quoteHtml}</div>
