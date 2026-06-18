@@ -377,7 +377,7 @@ async function main() {
   // 建立新故事物件
   const newStory = {
     id: `auto_${dateInfo.date}`,
-    date: dateInfo.date.replace(/-/g, '.'),
+    date: dateInfo.date.slice(0,7).replace(/-/g, '.'),
     tags: [topic === 'estate' ? 'realestate' : topic],
     tagLabels: [{ trust: '信託保全', retire: '退休警示', insurance: '保險陷阱', estate: '不動產' }[topic]],
     title: tpl.title,
