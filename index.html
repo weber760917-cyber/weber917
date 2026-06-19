@@ -322,7 +322,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
             <div id="wc-rows" style="font-size:15px"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
           </div>
           <div style="border-top:1px solid var(--border);padding:12px 16px 12px">
-            <div style="font-size:13px;font-weight:700;color:var(--sub);margin-bottom:8px">📊 積分榜</div>
+            <div style="font-size:14px;font-weight:700;color:var(--sub);margin-bottom:8px">📊 積分榜</div>
             <div id="wc-stand-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
           </div>
         </div>
@@ -2328,28 +2328,28 @@ async function loadWCPreview() {
           <!-- 對戰 header -->
           <div style="background:var(--navyDk,#111E35);padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
             <div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.3px">⚽ ${m.home} vs ${m.away}</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);white-space:nowrap;margin-left:8px">${dateLabel} ${m.time}</div>
+            <div style="font-size:13px;color:rgba(255,255,255,0.6);white-space:nowrap;margin-left:8px">${dateLabel} ${m.time}</div>
           </div>
 
           <!-- 預測比分 -->
           <div style="background:#1B2A4A;padding:10px 16px;display:flex;align-items:center;gap:8px">
-            <span style="font-size:12px;color:rgba(255,255,255,0.55);font-weight:600">🎯 預測</span>
-            <span style="font-size:16px;font-weight:900;color:#D4A843;letter-spacing:0.5px">${m.predict || ''}</span>
+            <span style="font-size:13px;color:rgba(255,255,255,0.55);font-weight:600">🎯 預測</span>
+            <span style="font-size:18px;font-weight:900;color:#D4A843;letter-spacing:0.5px">${m.predict || ''}</span>
           </div>
 
           <div style="background:var(--card,#fff);padding:14px 16px">
 
             <!-- 觀賽重點 -->
-            <div style="font-size:13px;font-weight:700;color:var(--sub);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">📋 觀賽重點</div>
-            <div style="font-size:14px;color:var(--text);line-height:1.85;margin-bottom:14px;white-space:pre-line">${m.analysis || ''}</div>
+            <div style="font-size:14px;font-weight:700;color:var(--sub);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">📋 觀賽重點</div>
+            <div style="font-size:16px;color:var(--text);line-height:1.85;margin-bottom:14px;white-space:pre-line">${m.analysis || ''}</div>
 
             <!-- 焦點球星 -->
             ${m.stars && m.stars.length ? `
-            <div style="font-size:13px;font-weight:700;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">⭐ 焦點球星</div>
+            <div style="font-size:14px;font-weight:700;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">⭐ 焦點球星</div>
             ${m.stars.map(s => `
             <div style="display:flex;gap:6px;margin-bottom:10px;padding:10px 12px;background:var(--bg,#f8f9fb);border-radius:10px;border-left:3px solid var(--blue)">
-              <div style="min-width:36px;font-size:11px;font-weight:800;color:var(--blue);padding-top:2px">${s.team}</div>
-              <div style="font-size:13px;color:var(--text);line-height:1.7">${s.name.replace('｜','<br><span style="color:var(--sub);font-size:12px">').replace(/^/, '').replace(/$/, s.name.includes('｜') ? '</span>' : '')}</div>
+              <div style="min-width:36px;font-size:13px;font-weight:800;color:var(--blue);padding-top:2px">${s.team}</div>
+              <div style="font-size:15px;color:var(--text);line-height:1.75">${s.name.replace('｜','<br><span style="color:var(--sub);font-size:13px">').replace(/^/, '').replace(/$/, s.name.includes('｜') ? '</span>' : '')}</div>
             </div>`).join('')}` : ''}
 
           </div>
