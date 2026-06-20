@@ -2314,47 +2314,73 @@ async function loadWCPreview() {
   fetch('/data/wc-preview.json?_=' + Date.now())
     .then(r => r.ok ? r.json() : Promise.reject())
     .then(data => {
-      if (!data.matches || !data.matches.length) {
+      // 18:00 TW 切換邏輯
+      const twNow = new Date(new Date().toLocaleString('en-US', {timeZone:'Asia/Taipei'}));
+      const isAfter18 = twNow.getHours() >= 18;
+
+      const todayMatches    = isAfter18 ? (data.tomorrow_matches || []) : (data.matches || []);
+      const tomorrowMatches = isAfter18 ? [] : (data.tomorrow_matches || []);
+      const todayDate       = isAfter18 ? (data.tomorrow_date || '') : (data.date || '');
+      const tomorrowDate    = isAfter18 ? '' : (data.tomorrow_date || '');
+
+      if (!todayMatches.length && !tomorrowMatches.length) {
         box.innerHTML = '<div class="error-note">今日尚無賽事分析</div>';
         box.dataset.loaded = '1'; return;
       }
-      const mm = data.date ? data.date.slice(4,6) : '';
-      const dd = data.date ? data.date.slice(6,8) : '';
-      const dateLabel = mm && dd ? `${parseInt(mm)}月${parseInt(dd)}日` : '';
 
-      box.innerHTML = data.matches.map(m => `
-        <div style="border-radius:14px;overflow:hidden;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.07)">
+      const fmtDate = (ds) => {
+        if (!ds || ds.length < 8) return '';
+        return parseInt(ds.slice(4,6)) + '月' + parseInt(ds.slice(6,8)) + '日';
+      };
 
-          <!-- 對戰 header -->
-          <div style="background:var(--navyDk,#111E35);padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
-            <div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.3px">⚽ ${m.home} vs ${m.away}</div>
-            <div style="font-size:13px;color:rgba(255,255,255,0.6);white-space:nowrap;margin-left:8px">${dateLabel} ${m.time}</div>
-          </div>
+      const renderMatches = (matches, dateStr) => {
+        const dateLabel = fmtDate(dateStr);
+        return matches.map(function(m) {
+          const starHTML = (m.stars && m.stars.length) ? (
+            '<div style="font-size:14px;font-weight:700;color:var(--sub);margin-bottom:8px;letter-spacing:0.5px">⭐ 焦點球星</div>' +
+            m.stars.map(function(s) {
+              const parts = s.name.split('｜');
+              const nameStr = parts[0];
+              const descStr = parts[1] ? '<br><span style="color:var(--sub);font-size:13px">' + parts[1] + '</span>' : '';
+              return '<div style="display:flex;gap:6px;margin-bottom:10px;padding:10px 12px;background:var(--bg,#f8f9fb);border-radius:10px;border-left:3px solid var(--blue)">'
+                + '<div style="min-width:36px;font-size:13px;font-weight:800;color:var(--blue);padding-top:2px">' + s.team + '</div>'
+                + '<div style="font-size:15px;color:var(--text);line-height:1.75">' + nameStr + descStr + '</div>'
+                + '</div>';
+            }).join('')
+          ) : '';
+          return '<div style="border-radius:14px;overflow:hidden;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.07)">'
+            + '<div style="background:var(--navyDk,#111E35);padding:14px 16px;display:flex;justify-content:space-between;align-items:center">'
+            + '<div style="font-size:18px;font-weight:800;color:#fff;letter-spacing:0.3px">⚽ ' + m.home + ' vs ' + m.away + '</div>'
+            + '<div style="font-size:13px;color:rgba(255,255,255,0.6);white-space:nowrap;margin-left:8px">' + dateLabel + ' ' + m.time + '</div>'
+            + '</div>'
+            + '<div style="background:#1B2A4A;padding:10px 16px;display:flex;align-items:center;gap:8px">'
+            + '<span style="font-size:13px;color:rgba(255,255,255,0.55);font-weight:600">🎯 預測</span>'
+            + '<span style="font-size:18px;font-weight:900;color:#D4A843;letter-spacing:0.5px">' + (m.predict || '') + '</span>'
+            + '</div>'
+            + '<div style="background:var(--card,#fff);padding:14px 16px">'
+            + '<div style="font-size:14px;font-weight:700;color:var(--sub);margin-bottom:6px;letter-spacing:0.5px">📋 觀賽重點</div>'
+            + '<div style="font-size:16px;color:var(--text);line-height:1.85;margin-bottom:14px;white-space:pre-line">' + (m.analysis || '') + '</div>'
+            + starHTML
+            + '</div></div>';
+        }).join('');
+      };
 
-          <!-- 預測比分 -->
-          <div style="background:#1B2A4A;padding:10px 16px;display:flex;align-items:center;gap:8px">
-            <span style="font-size:13px;color:rgba(255,255,255,0.55);font-weight:600">🎯 預測</span>
-            <span style="font-size:18px;font-weight:900;color:#D4A843;letter-spacing:0.5px">${m.predict || ''}</span>
-          </div>
+      const sectionHeader = function(label, dateStr) {
+        return '<div style="font-size:14px;font-weight:800;color:var(--sub);letter-spacing:1px;margin:4px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--border)">'
+          + label + ' ' + fmtDate(dateStr) + '</div>';
+      };
 
-          <div style="background:var(--card,#fff);padding:14px 16px">
+      var html = '';
+      if (todayMatches.length) {
+        html += sectionHeader('📅 今日賽事分析', todayDate);
+        html += renderMatches(todayMatches, todayDate);
+      }
+      if (tomorrowMatches.length) {
+        html += sectionHeader('📅 明日賽事預告', tomorrowDate);
+        html += renderMatches(tomorrowMatches, tomorrowDate);
+      }
 
-            <!-- 觀賽重點 -->
-            <div style="font-size:14px;font-weight:700;color:var(--sub);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">📋 觀賽重點</div>
-            <div style="font-size:16px;color:var(--text);line-height:1.85;margin-bottom:14px;white-space:pre-line">${m.analysis || ''}</div>
-
-            <!-- 焦點球星 -->
-            ${m.stars && m.stars.length ? `
-            <div style="font-size:14px;font-weight:700;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">⭐ 焦點球星</div>
-            ${m.stars.map(s => `
-            <div style="display:flex;gap:6px;margin-bottom:10px;padding:10px 12px;background:var(--bg,#f8f9fb);border-radius:10px;border-left:3px solid var(--blue)">
-              <div style="min-width:36px;font-size:13px;font-weight:800;color:var(--blue);padding-top:2px">${s.team}</div>
-              <div style="font-size:15px;color:var(--text);line-height:1.75">${s.name.replace('｜','<br><span style="color:var(--sub);font-size:13px">').replace(/^/, '').replace(/$/, s.name.includes('｜') ? '</span>' : '')}</div>
-            </div>`).join('')}` : ''}
-
-          </div>
-        </div>
-      `).join('');
+      box.innerHTML = html;
       box.dataset.loaded = '1';
     })
     .catch(() => {
