@@ -2314,26 +2314,29 @@ async function loadWCPreview() {
   fetch('/data/wc-preview.json?_=' + Date.now())
     .then(r => r.ok ? r.json() : Promise.reject())
     .then(data => {
-      // 18:00 TW 切換邏輯
       const twNow = new Date(new Date().toLocaleString('en-US', {timeZone:'Asia/Taipei'}));
       const isAfter18 = twNow.getHours() >= 18;
 
-      const todayMatches    = isAfter18 ? (data.tomorrow_matches || []) : (data.matches || []);
-      const tomorrowMatches = isAfter18 ? [] : (data.tomorrow_matches || []);
-      const todayDate       = isAfter18 ? (data.tomorrow_date || '') : (data.date || '');
-      const tomorrowDate    = isAfter18 ? '' : (data.tomorrow_date || '');
+      // 18:00 前：今日=date / 明日=tomorrow_date
+      // 18:00 後：今日=tomorrow_date / 昨日=date
+      const mainMatches  = isAfter18 ? (data.tomorrow_matches || []) : (data.matches || []);
+      const mainDate     = isAfter18 ? (data.tomorrow_date || '') : (data.date || '');
+      const subMatches   = isAfter18 ? (data.matches || []) : (data.tomorrow_matches || []);
+      const subDate      = isAfter18 ? (data.date || '') : (data.tomorrow_date || '');
+      const mainLabel    = '📅 今日賽事分析';
+      const subLabel     = isAfter18 ? '📋 昨日賽果' : '📅 明日賽事預告';
 
-      if (!todayMatches.length && !tomorrowMatches.length) {
+      if (!mainMatches.length && !subMatches.length) {
         box.innerHTML = '<div class="error-note">今日尚無賽事分析</div>';
         box.dataset.loaded = '1'; return;
       }
 
-      const fmtDate = (ds) => {
+      const fmtDate = function(ds) {
         if (!ds || ds.length < 8) return '';
         return parseInt(ds.slice(4,6)) + '月' + parseInt(ds.slice(6,8)) + '日';
       };
 
-      const renderMatches = (matches, dateStr) => {
+      const renderMatches = function(matches, dateStr) {
         const dateLabel = fmtDate(dateStr);
         return matches.map(function(m) {
           const starHTML = (m.stars && m.stars.length) ? (
@@ -2370,17 +2373,17 @@ async function loadWCPreview() {
           + label + ' ' + fmtDate(dateStr) + '</div>';
       };
 
-      var html = '';
-      if (todayMatches.length) {
-        html += sectionHeader('📅 今日賽事分析', todayDate);
-        html += renderMatches(todayMatches, todayDate);
+      var out = '';
+      if (mainMatches.length) {
+        out += sectionHeader(mainLabel, mainDate);
+        out += renderMatches(mainMatches, mainDate);
       }
-      if (tomorrowMatches.length) {
-        html += sectionHeader('📅 明日賽事預告', tomorrowDate);
-        html += renderMatches(tomorrowMatches, tomorrowDate);
+      if (subMatches.length) {
+        out += sectionHeader(subLabel, subDate);
+        out += renderMatches(subMatches, subDate);
       }
 
-      box.innerHTML = html;
+      box.innerHTML = out;
       box.dataset.loaded = '1';
     })
     .catch(() => {
