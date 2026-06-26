@@ -3128,16 +3128,16 @@ function calcFund() {
 
   document.getElementById('fund-result').style.display = '';
   document.getElementById('fund-result-name').textContent = '📌 ' + f.name;
-  document.getElementById('f-monthly-twd').textContent = fmtTWD(monthlyTWD);
+  document.getElementById('f-monthly-twd').textContent = fmtExact(monthlyTWD);
   document.getElementById('f-annual-rate').textContent  = (monthlyRate * 12).toFixed(2) + '%';
-  document.getElementById('f-vs-income').textContent    = fmtTWD(monthlyTWD) + ' 元';
-  document.getElementById('f-vs-grace').textContent     = fmtTWD(gracePay) + ' 元';
-  document.getElementById('f-vs-amort').textContent     = fmtTWD(amortPay) + ' 元';
+  document.getElementById('f-vs-income').textContent    = fmtExact(monthlyTWD) + ' 元';
+  document.getElementById('f-vs-grace').textContent     = fmtExact(gracePay) + ' 元';
+  document.getElementById('f-vs-amort').textContent     = fmtExact(amortPay) + ' 元';
   var gapEl = document.getElementById('f-vs-gap');
-  gapEl.textContent = (gap >= 0 ? '+' : '') + fmtTWD(gap) + ' 元';
+  gapEl.textContent = (gap >= 0 ? '+' : '') + fmtExact(gap) + ' 元';
   gapEl.style.color = gap >= 0 ? '#4ade80' : '#f87171';
-  document.getElementById('f-principal-twd').textContent = fmtTWD(amt);
-  document.getElementById('f-end-twd').textContent       = fmtTWD(endTWD);
+  document.getElementById('f-principal-twd').textContent = fmtExact(amt);
+  document.getElementById('f-end-twd').textContent       = fmtExact(endTWD);
   document.getElementById('f-end-note').textContent      = '※ 依年化報酬 ' + f.annRate + '%、扣除配息後 NAV 年增 '
     + (navGrowth*100).toFixed(1) + '% 估算，匯率視當時而定，僅供參考';
 }
