@@ -291,7 +291,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <div class="tab" onclick="switchTab('about')">👤 關於我</div>
     <div class="tab" onclick="switchTab('market')">📈 今日行情</div>
     <div class="tab" onclick="switchTab('copy')">✍️ 社群文案</div>
-    <div class="tab" onclick="switchTab('loan')">🏦 貸款試算</div>
   </div>
 </div>
 
@@ -692,6 +691,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 
 <!-- ===== TAB: 關於我 ===== -->
 <div id="panel-retire" class="panel">
+  <!-- 子分頁 -->
+  <div style="display:flex;gap:8px;margin-bottom:16px">
+    <button id="rtab-retire" class="market-sub active" onclick="switchRetireSub('rview-retire','rtab-retire')">🏖️ 退休試算</button>
+    <button id="rtab-loan"   class="market-sub"        onclick="switchRetireSub('rview-loan','rtab-loan')">🏦 貸款試算</button>
+  </div>
+
+  <div id="rview-retire">
 
 <div class="card" style="margin-bottom:14px">
   <div class="card-head">
@@ -1151,6 +1157,18 @@ const NOW = new Date();
 
 // ── TABS ──
 
+
+
+function switchRetireSub(view, btnId) {
+  ['rview-retire','rview-loan'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = id === view ? '' : 'none';
+  });
+  document.querySelectorAll('#panel-retire .market-sub').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById(btnId);
+  if (btn) btn.classList.add('active');
+  if (view === 'rview-loan') { calcLoan(); }
+}
 
 function switchNSub(view, btnId) {
   ['nview-wc','nview-tw','nview-us'].forEach(id => {
@@ -2836,8 +2854,9 @@ startCountdown();
 renderPort();
 </script>
 
-<!-- ===== TAB: 貸款試算 ===== -->
-<div id="panel-loan" class="panel">
+  </div>
+
+  <div id="rview-loan" style="display:none">
 
   <!-- 貸款基本設定 -->
   <div class="card">
@@ -2983,6 +3002,10 @@ renderPort();
 
       </div>
     </div>
+  </div>
+
+</div>
+
   </div>
 
 </div>
