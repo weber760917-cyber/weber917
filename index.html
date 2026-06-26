@@ -829,10 +829,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
         <div style="padding:8px 12px 10px">
           <select onchange="addToPort('fund',this.value);this.value=''" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:var(--card);appearance:none">
             <option value="">＋ 新增基金標的</option>
-            <option value="jpm">摩根多重收益（近3年年化 ≈ 10.6%）</option>
-            <option value="aling">安聯收益成長AMg7（近3年年化 ≈ 11.9%）</option>
-            <option value="mg">M&G入息基金（近3年年化 ≈ 7.3%）</option>
-            <option value="ab">聯博美國成長AP（近3年年化 ≈ 3.0%）</option>
+            <option value="jpm">摩根多重收益（成立以來年化 ≈ 6.2%）</option>
+            <option value="aling">安聯收益成長AMg7（成立以來年化 ≈ 3.9%）</option>
+            <option value="mg">M&G入息基金（成立以來年化 ≈ 3.5%）</option>
+            <option value="ab">聯博美國成長AP（成立以來年化 ≈ 3.6%）</option>
           </select>
         </div>
       </div>
@@ -2129,11 +2129,11 @@ const FUND_DB = {
   spy:    { name:'SPY',            cat:'etf',    rate:10.5, color:'#16a34a' },
   e00878: { name:'00878 高股息',   cat:'etf',    rate:7.0,  color:'#16a34a' },
   e00919: { name:'00919 成長高息', cat:'etf',    rate:9.0,  color:'#16a34a' },
-  // 基金
-  jpm:    { name:'摩根多重收益',   cat:'fund',   rate:10.6, color:'#d97706' },
-  aling:  { name:'安聯收益成長AMg7', cat:'fund', rate:11.9, color:'#d97706' },
-  mg:     { name:'M&G入息基金',    cat:'fund',   rate:7.3,  color:'#d97706' },
-  ab:     { name:'聯博美國成長AP', cat:'fund',   rate:3.0,  color:'#d97706' },
+  // 基金（成立以來年化報酬）
+  jpm:    { name:'摩根多重收益',   cat:'fund',   rate:6.2,  color:'#d97706' },
+  aling:  { name:'安聯收益成長AMg7', cat:'fund', rate:3.9,  color:'#d97706' },
+  mg:     { name:'M&G入息基金',    cat:'fund',   rate:3.5,  color:'#d97706' },
+  ab:     { name:'聯博美國成長AP', cat:'fund',   rate:3.6,  color:'#d97706' },
 };
 // portfolio: [{id, alloc}]
 let _port = [];
