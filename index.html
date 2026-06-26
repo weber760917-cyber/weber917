@@ -3140,6 +3140,20 @@ function calcFund() {
   document.getElementById('f-end-twd').textContent       = fmtExact(endTWD);
   document.getElementById('f-end-note').textContent      = '※ 依年化報酬 ' + f.annRate + '%、扣除配息後 NAV 年增 '
     + (navGrowth*100).toFixed(1) + '% 估算，匯率視當時而定，僅供參考';
+
+  // 總結
+  const totalDist  = monthlyTWD * lYr * 12;
+  const totalLoan  = gracePay * lGr * 12 + amortPay * (lYr - lGr) * 12;
+  const cashflow   = totalDist - totalLoan;
+  const finalTotal = endTWD + cashflow;
+  document.getElementById('f-sum-label').textContent = '依貸款 ' + lYr + ' 年期試算';
+  document.getElementById('f-sum-dist').textContent  = fmtExact(totalDist) + ' 元';
+  document.getElementById('f-sum-loan').textContent  = fmtExact(totalLoan) + ' 元';
+  var cfEl = document.getElementById('f-sum-cashflow');
+  cfEl.textContent = (cashflow >= 0 ? '+' : '') + fmtExact(cashflow) + ' 元';
+  cfEl.style.color = cashflow >= 0 ? '#4ade80' : '#f87171';
+  document.getElementById('f-sum-nav').textContent   = fmtExact(endTWD) + ' 元';
+  document.getElementById('f-sum-total').textContent = fmtExact(finalTotal) + ' 元';
 }
 
 // Init on load
