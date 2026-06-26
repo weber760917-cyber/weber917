@@ -1174,7 +1174,7 @@ function switchMSub(view, btnId) {
 }
 
 function switchTab(name) {
-  const names = ['stories','news','retire','about','market','copy'];
+  const names = ['stories','news','retire','about','market','copy','loan'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
@@ -2837,7 +2837,7 @@ renderPort();
 </script>
 
 <!-- ===== TAB: 貸款試算 ===== -->
-<div id="panel-loan" class="panel" style="display:none">
+<div id="panel-loan" class="panel">
 
   <!-- 貸款基本設定 -->
   <div class="card">
