@@ -2941,9 +2941,28 @@ renderPort();
           </div>
         </div>
 
-        <!-- 四檔基金選擇 -->
-        <div style="font-size:13px;font-weight:600;color:var(--sub);margin-bottom:-8px">選擇基金</div>
-        <div style="display:flex;flex-direction:column;gap:8px" id="fund-cards">
+        <!-- 基金選擇 -->
+        <div style="font-size:13px;font-weight:600;color:var(--sub);margin-bottom:6px">選擇基金</div>
+        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none" id="fund-cards"></div>
+        <!-- 選中基金資訊條 -->
+        <div id="fund-info-strip" style="display:none;background:var(--card);border-radius:10px;padding:10px 14px;border-left:3px solid #888;margin-top:2px">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+            <div>
+              <span id="fis-name" style="font-size:13px;font-weight:700;color:var(--text)"></span>
+              <span id="fis-week" style="font-size:10px;padding:2px 6px;border-radius:6px;font-weight:700;margin-left:6px"></span>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center">
+              <div style="text-align:center">
+                <div style="font-size:10px;color:var(--sub)">年化配息率</div>
+                <div id="fis-rate" style="font-size:15px;font-weight:900"></div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:10px;color:var(--sub)">NAV</div>
+                <div id="fis-nav" style="font-size:13px;font-weight:700;color:var(--text)"></div>
+              </div>
+              <a id="fis-link" href="#" target="_blank" rel="noopener" style="font-size:11px;color:var(--sub);text-decoration:none;padding:3px 8px;border:1px solid var(--border);border-radius:6px;white-space:nowrap">MoneyDJ ↗</a>
+            </div>
+          </div>
         </div>
 
         <!-- 配息結果 -->
@@ -3103,27 +3122,35 @@ function initFundCards() {
   box.innerHTML = '';
   Object.entries(FUND_DIST).forEach(function([id, f]) {
     var monthlyRate = f.dist / f.nav * 100;
-    var card = document.createElement('div');
-    card.id = 'fc-' + id;
-    card.style.cssText = 'border:2px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all 0.2s';
-    var weekBadge = f.week ? '<span style="font-size:10px;padding:2px 6px;border-radius:6px;background:' + f.color + '22;color:' + f.color + ';font-weight:700;margin-left:6px">' + f.week + '配息</span>' : '';
-    var djLink = f.url ? '<a href="' + f.url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:10px;color:var(--sub);text-decoration:none;margin-left:6px;padding:1px 5px;border:1px solid var(--border);border-radius:4px">MoneyDJ ↗</a>' : '';
-    card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">'
-      + '<div><div style="font-size:14px;font-weight:700;color:var(--text)">' + f.name + weekBadge + djLink + '</div>'
-      + '<div style="font-size:12px;color:var(--sub);margin-top:2px">每單位月配 ' + f.dist + ' USD｜NAV ' + f.nav + '</div></div>'
-      + '<div style="text-align:right"><div style="font-size:18px;font-weight:900;color:' + f.color + '">' + (monthlyRate*12).toFixed(2) + '%</div>'
-      + '<div style="font-size:11px;color:var(--sub)">年化配息率</div></div></div>';
-    card.addEventListener('click', function() {
+    var btn = document.createElement('button');
+    btn.id = 'fc-' + id;
+    btn.style.cssText = 'flex-shrink:0;padding:8px 14px;border-radius:20px;border:2px solid var(--border);background:var(--card);color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap';
+    btn.textContent = f.name;
+    btn.addEventListener('click', function() {
       _selFund = id;
       Object.keys(FUND_DIST).forEach(function(k) {
-        var c = document.getElementById('fc-' + k);
-        if (c) { c.style.border = '2px solid var(--border)'; c.style.background = 'var(--card)'; }
+        var b = document.getElementById('fc-' + k);
+        if (b) { b.style.border = '2px solid var(--border)'; b.style.background = 'var(--card)'; b.style.color = 'var(--sub)'; }
       });
-      card.style.border = '2px solid ' + f.color;
-      card.style.background = f.color + '15';
+      btn.style.border = '2px solid ' + f.color;
+      btn.style.background = f.color + '20';
+      btn.style.color = f.color;
+      // Update info strip
+      var strip = document.getElementById('fund-info-strip');
+      strip.style.display = '';
+      strip.style.borderColor = f.color;
+      document.getElementById('fis-name').textContent = f.name;
+      var wk = document.getElementById('fis-week');
+      wk.textContent = f.week ? f.week + '配息' : '';
+      wk.style.cssText = 'font-size:10px;padding:2px 6px;border-radius:6px;font-weight:700;margin-left:6px;background:' + f.color + '22;color:' + f.color;
+      document.getElementById('fis-rate').textContent = (monthlyRate*12).toFixed(2) + '%';
+      document.getElementById('fis-rate').style.color = f.color;
+      document.getElementById('fis-nav').textContent = f.nav + ' USD';
+      var link = document.getElementById('fis-link');
+      link.href = f.url || '#';
       calcFund();
     });
-    box.appendChild(card);
+    box.appendChild(btn);
   });
 }
 
