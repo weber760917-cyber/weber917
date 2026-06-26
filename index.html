@@ -2158,41 +2158,64 @@ function getBlendedRate() {
   if (total === 0) return 0;
   return _port.reduce((s,p) => s + (FUND_DB[p.id]?.rate || 0) * p.alloc, 0) / total;
 }
-function renderPort(doFocus) {
-  const cats = ['stocks','etf','fund'];
-  cats.forEach(cat => {
-    const box = document.getElementById('port-' + cat);
+function renderPort() {
+  ['stocks','etf','fund'].forEach(function(cat) {
+    var box = document.getElementById('port-' + cat);
     if (!box) return;
-    const items = _port.filter(p => FUND_DB[p.id]?.cat === cat);
-    const catTotal = items.reduce((s,p) => s + p.alloc, 0);
-    document.getElementById('cat-total-' + cat).textContent = catTotal + '%';
-    box.innerHTML = items.map(p => {
-      const f = FUND_DB[p.id];
-      return '<div style="display:flex;align-items:center;gap:8px;padding:10px 2px;border-bottom:1px solid var(--border)">'
-        + '<div style="flex:0 0 auto;min-width:0">'
-        + '<div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;max-width:90px">' + f.name + '</div>'
-        + '<div style="font-size:11px;color:' + f.color + ';font-weight:600">' + f.rate + '% / yr</div>'
-        + '</div>'
-        + '<div style="flex:1;display:flex;flex-direction:column;gap:2px">'
-        + '<input type="range" min="0" max="100" step="5" value="' + p.alloc + '" '
-        + 'oninput="updateAlloc('' + p.id + '',this.value);document.getElementById('alloc-lbl-' + p.id + '').textContent=this.value+'%'" '
-        + 'style="width:100%;accent-color:' + f.color + '">'
-        + '</div>'
-        + '<div id="alloc-lbl-' + p.id + '" style="flex:0 0 36px;text-align:right;font-size:14px;font-weight:800;color:' + f.color + '">' + p.alloc + '%</div>'
-        + '<button onclick="removeFromPort('' + p.id + '')" style="flex:0 0 auto;background:none;border:none;font-size:16px;color:var(--sub);cursor:pointer;padding:0 2px">✕</button>'
-        + '</div>';
-    }).join('');
+    var items = _port.filter(function(p){ return FUND_DB[p.id] && FUND_DB[p.id].cat === cat; });
+    var catTotal = items.reduce(function(s,p){ return s + p.alloc; }, 0);
+    var lbl = document.getElementById('cat-total-' + cat);
+    if (lbl) lbl.textContent = catTotal + '%';
+    box.innerHTML = '';
+    items.forEach(function(p) {
+      var f = FUND_DB[p.id];
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px 2px;border-bottom:1px solid var(--border)';
+      // name + rate
+      var info = document.createElement('div');
+      info.style.cssText = 'flex:0 0 auto;min-width:0';
+      info.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;max-width:90px;overflow:hidden">' + f.name + '</div>'
+        + '<div style="font-size:11px;color:' + f.color + ';font-weight:600">' + f.rate + '% / yr</div>';
+      // slider
+      var sliderWrap = document.createElement('div');
+      sliderWrap.style.cssText = 'flex:1';
+      var slider = document.createElement('input');
+      slider.type = 'range'; slider.min = 0; slider.max = 100; slider.step = 5;
+      slider.value = p.alloc; slider.style.cssText = 'width:100%;accent-color:' + f.color;
+      slider.dataset.id = p.id;
+      slider.addEventListener('input', function() {
+        updateAlloc(this.dataset.id, +this.value);
+        var lbl = document.getElementById('alloc-lbl-' + this.dataset.id);
+        if (lbl) lbl.textContent = this.value + '%';
+      });
+      sliderWrap.appendChild(slider);
+      // alloc label
+      var allocLbl = document.createElement('div');
+      allocLbl.id = 'alloc-lbl-' + p.id;
+      allocLbl.style.cssText = 'flex:0 0 36px;text-align:right;font-size:14px;font-weight:800;color:' + f.color;
+      allocLbl.textContent = p.alloc + '%';
+      // remove btn
+      var btn = document.createElement('button');
+      btn.textContent = '✕'; btn.dataset.id = p.id;
+      btn.style.cssText = 'background:none;border:none;font-size:16px;color:var(--sub);cursor:pointer;padding:0 2px';
+      btn.addEventListener('click', function(){ removeFromPort(this.dataset.id); });
+      row.appendChild(info); row.appendChild(sliderWrap); row.appendChild(allocLbl); row.appendChild(btn);
+      box.appendChild(row);
+    });
   });
-  const totalAlloc = _port.reduce((s,p) => s + p.alloc, 0);
-  const blended = getBlendedRate();
-  document.getElementById('r-total-pct').textContent = totalAlloc + '%';
-  document.getElementById('r-total-pct').style.color = totalAlloc === 100 ? '#fff' : '#f87171';
-  document.getElementById('r-alloc-warn').textContent = totalAlloc === 100 ? '' : (totalAlloc < 100 ? '尚差 '+(100-totalAlloc)+'%' : '超過 '+(totalAlloc-100)+'%');
-  document.getElementById('r-alloc-bar').style.width = Math.min(totalAlloc, 100) + '%';
-  document.getElementById('r-alloc-bar').style.background = totalAlloc === 100 ? '#22c55e' : totalAlloc > 100 ? '#ef4444' : 'var(--blue)';
-  document.getElementById('r-blend-rate').textContent = blended > 0 ? blended.toFixed(1) + '%' : '—';
+  var totalAlloc = _port.reduce(function(s,p){ return s + p.alloc; }, 0);
+  var blended = getBlendedRate();
+  var tEl = document.getElementById('r-total-pct');
+  var wEl = document.getElementById('r-alloc-warn');
+  var bar = document.getElementById('r-alloc-bar');
+  var bEl = document.getElementById('r-blend-rate');
+  if (tEl) { tEl.textContent = totalAlloc + '%'; tEl.style.color = totalAlloc === 100 ? '#fff' : '#f87171'; }
+  if (wEl) wEl.textContent = totalAlloc === 100 ? '' : (totalAlloc < 100 ? '尚差 '+(100-totalAlloc)+'%' : '超過 '+(totalAlloc-100)+'%');
+  if (bar) { bar.style.width = Math.min(totalAlloc,100) + '%'; bar.style.background = totalAlloc===100?'#22c55e':totalAlloc>100?'#ef4444':'var(--blue)'; }
+  if (bEl) bEl.textContent = blended > 0 ? blended.toFixed(1) + '%' : '—';
   retPlan();
 }
+
 
 function retPlan() {
   const age  = +document.getElementById('r-age').value;
