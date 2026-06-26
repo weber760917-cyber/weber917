@@ -2192,6 +2192,8 @@ const FUND_DB = {
   aling:  { name:'安聯收益成長AMg7', cat:'fund', rate:8.1,  color:'#d97706' },
   mg:     { name:'M&G入息基金',    cat:'fund',   rate:4.9,  color:'#d97706' },
   ab:     { name:'聯博美國成長AP', cat:'fund',   rate:10.9, color:'#d97706' },
+  aiai:   { name:'安聯AI收益成長', cat:'fund',   rate:15.4, color:'#d97706' },
+  brwt:   { name:'貝萊德世界科技A10', cat:'fund', rate:35.2, color:'#d97706' },
 };
 // portfolio: [{id, alloc}]
 let _port = [];
@@ -3073,8 +3075,9 @@ function initFundCards() {
     var card = document.createElement('div');
     card.id = 'fc-' + id;
     card.style.cssText = 'border:2px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all 0.2s';
+    var weekBadge = f.week ? '<span style="font-size:10px;padding:2px 6px;border-radius:6px;background:' + f.color + '22;color:' + f.color + ';font-weight:700;margin-left:6px">' + f.week + '配息</span>' : '';
     card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">'
-      + '<div><div style="font-size:14px;font-weight:700;color:var(--text)">' + f.name + '</div>'
+      + '<div><div style="font-size:14px;font-weight:700;color:var(--text)">' + f.name + weekBadge + '</div>'
       + '<div style="font-size:12px;color:var(--sub);margin-top:2px">每單位月配 ' + f.dist + ' USD｜NAV ' + f.nav + '</div></div>'
       + '<div style="text-align:right"><div style="font-size:18px;font-weight:900;color:' + f.color + '">' + (monthlyRate*12).toFixed(2) + '%</div>'
       + '<div style="font-size:11px;color:var(--sub)">年化配息率</div></div></div>';
