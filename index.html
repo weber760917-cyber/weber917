@@ -2197,53 +2197,17 @@ function getBlendedRate() {
   if (total === 0) return 0;
   return _port.reduce((s,p) => s + (FUND_DB[p.id]?.rate || 0) * p.alloc, 0) / total;
 }
-function renderPort() {
+// ── 輕量更新：僅更新數字，不重建 DOM ──
+var _rafId = null;
+function updateTotals() {
+  var totalAlloc = _port.reduce(function(s,p){ return s + p.alloc; }, 0);
+  var blended = getBlendedRate();
   ['stocks','etf','fund'].forEach(function(cat) {
-    var box = document.getElementById('port-' + cat);
-    if (!box) return;
     var items = _port.filter(function(p){ return FUND_DB[p.id] && FUND_DB[p.id].cat === cat; });
     var catTotal = items.reduce(function(s,p){ return s + p.alloc; }, 0);
     var lbl = document.getElementById('cat-total-' + cat);
     if (lbl) lbl.textContent = catTotal + '%';
-    box.innerHTML = '';
-    items.forEach(function(p) {
-      var f = FUND_DB[p.id];
-      var row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px 2px;border-bottom:1px solid var(--border)';
-      // name + rate
-      var info = document.createElement('div');
-      info.style.cssText = 'flex:0 0 auto;min-width:0';
-      info.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;max-width:90px;overflow:hidden">' + f.name + '</div>'
-        + '<div style="font-size:11px;color:' + f.color + ';font-weight:600">' + f.rate + '% / yr</div>';
-      // slider
-      var sliderWrap = document.createElement('div');
-      sliderWrap.style.cssText = 'flex:1';
-      var slider = document.createElement('input');
-      slider.type = 'range'; slider.min = 0; slider.max = 100; slider.step = 5;
-      slider.value = p.alloc; slider.style.cssText = 'width:100%;accent-color:' + f.color;
-      slider.dataset.id = p.id;
-      slider.addEventListener('input', function() {
-        updateAlloc(this.dataset.id, +this.value);
-        var lbl = document.getElementById('alloc-lbl-' + this.dataset.id);
-        if (lbl) lbl.textContent = this.value + '%';
-      });
-      sliderWrap.appendChild(slider);
-      // alloc label
-      var allocLbl = document.createElement('div');
-      allocLbl.id = 'alloc-lbl-' + p.id;
-      allocLbl.style.cssText = 'flex:0 0 36px;text-align:right;font-size:14px;font-weight:800;color:' + f.color;
-      allocLbl.textContent = p.alloc + '%';
-      // remove btn
-      var btn = document.createElement('button');
-      btn.textContent = '✕'; btn.dataset.id = p.id;
-      btn.style.cssText = 'background:none;border:none;font-size:16px;color:var(--sub);cursor:pointer;padding:0 2px';
-      btn.addEventListener('click', function(){ removeFromPort(this.dataset.id); });
-      row.appendChild(info); row.appendChild(sliderWrap); row.appendChild(allocLbl); row.appendChild(btn);
-      box.appendChild(row);
-    });
   });
-  var totalAlloc = _port.reduce(function(s,p){ return s + p.alloc; }, 0);
-  var blended = getBlendedRate();
   var tEl = document.getElementById('r-total-pct');
   var wEl = document.getElementById('r-alloc-warn');
   var bar = document.getElementById('r-alloc-bar');
@@ -2252,10 +2216,54 @@ function renderPort() {
   if (wEl) wEl.textContent = totalAlloc === 100 ? '' : (totalAlloc < 100 ? '尚差 '+(100-totalAlloc)+'%' : '超過 '+(totalAlloc-100)+'%');
   if (bar) { bar.style.width = Math.min(totalAlloc,100) + '%'; bar.style.background = totalAlloc===100?'#22c55e':totalAlloc>100?'#ef4444':'var(--blue)'; }
   if (bEl) bEl.textContent = blended > 0 ? blended.toFixed(1) + '%' : '—';
-  retPlan();
+  if (_rafId) cancelAnimationFrame(_rafId);
+  _rafId = requestAnimationFrame(function() { retPlan(); updateAccumResult(); });
 }
 
-
+// ── 完整重建 DOM（僅新增/移除時呼叫）──
+function renderPort() {
+  ['stocks','etf','fund'].forEach(function(cat) {
+    var box = document.getElementById('port-' + cat);
+    if (!box) return;
+    var items = _port.filter(function(p){ return FUND_DB[p.id] && FUND_DB[p.id].cat === cat; });
+    box.innerHTML = '';
+    items.forEach(function(p) {
+      var f = FUND_DB[p.id];
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px 2px;border-bottom:1px solid var(--border)';
+      var info = document.createElement('div');
+      info.style.cssText = 'flex:0 0 auto;min-width:0';
+      info.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;max-width:90px;overflow:hidden">' + f.name + '</div>'
+        + '<div style="font-size:11px;color:' + f.color + ';font-weight:600">' + f.rate + '% / yr</div>';
+      var sliderWrap = document.createElement('div');
+      sliderWrap.style.cssText = 'flex:1';
+      var slider = document.createElement('input');
+      slider.type = 'range'; slider.min = 0; slider.max = 100; slider.step = 5;
+      slider.value = p.alloc; slider.style.cssText = 'width:100%;accent-color:' + f.color;
+      slider.dataset.id = p.id;
+      slider.addEventListener('input', function() {
+        var id = this.dataset.id;
+        var val = +this.value;
+        _port.forEach(function(x){ if (x.id === id) x.alloc = val; });
+        var lbl = document.getElementById('alloc-lbl-' + id);
+        if (lbl) lbl.textContent = val + '%';
+        updateTotals();
+      });
+      sliderWrap.appendChild(slider);
+      var allocLbl = document.createElement('div');
+      allocLbl.id = 'alloc-lbl-' + p.id;
+      allocLbl.style.cssText = 'flex:0 0 36px;text-align:right;font-size:14px;font-weight:800;color:' + f.color;
+      allocLbl.textContent = p.alloc + '%';
+      var btn = document.createElement('button');
+      btn.textContent = '✕'; btn.dataset.id = p.id;
+      btn.style.cssText = 'background:none;border:none;font-size:16px;color:var(--sub);cursor:pointer;padding:0 2px';
+      btn.addEventListener('click', function(){ removeFromPort(this.dataset.id); });
+      row.appendChild(info); row.appendChild(sliderWrap); row.appendChild(allocLbl); row.appendChild(btn);
+      box.appendChild(row);
+    });
+  });
+  updateTotals();
+}
 function updateAccumResult() {
   const pv  = +document.getElementById('r-pv').value * 10000;
   const pmt = +document.getElementById('r-pmt').value * 10000;
