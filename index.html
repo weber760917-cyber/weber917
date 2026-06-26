@@ -2230,35 +2230,37 @@ function renderPort() {
     items.forEach(function(p) {
       var f = FUND_DB[p.id];
       var row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px 2px;border-bottom:1px solid var(--border)';
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border)';
+      // name + rate
       var info = document.createElement('div');
-      info.style.cssText = 'flex:0 0 auto;min-width:0';
-      info.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;max-width:90px;overflow:hidden">' + f.name + '</div>'
+      info.style.cssText = 'flex:1;min-width:0';
+      info.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + f.name + '</div>'
         + '<div style="font-size:11px;color:' + f.color + ';font-weight:600">' + f.rate + '% / yr</div>';
-      var sliderWrap = document.createElement('div');
-      sliderWrap.style.cssText = 'flex:1';
-      var slider = document.createElement('input');
-      slider.type = 'range'; slider.min = 0; slider.max = 100; slider.step = 5;
-      slider.value = p.alloc; slider.style.cssText = 'width:100%;accent-color:' + f.color;
-      slider.dataset.id = p.id;
-      slider.addEventListener('input', function() {
+      // number input + % label
+      var inputWrap = document.createElement('div');
+      inputWrap.style.cssText = 'display:flex;align-items:center;gap:4px;flex:0 0 auto';
+      var numInput = document.createElement('input');
+      numInput.type = 'number'; numInput.min = 0; numInput.max = 100; numInput.step = 1;
+      numInput.value = p.alloc;
+      numInput.style.cssText = 'width:58px;padding:6px 8px;border:1.5px solid ' + f.color + ';border-radius:8px;font-size:15px;font-weight:800;color:' + f.color + ';text-align:center;background:var(--card);-moz-appearance:textfield';
+      numInput.dataset.id = p.id;
+      numInput.addEventListener('input', function() {
         var id = this.dataset.id;
-        var val = +this.value;
+        var val = Math.min(100, Math.max(0, +this.value || 0));
         _port.forEach(function(x){ if (x.id === id) x.alloc = val; });
-        var lbl = document.getElementById('alloc-lbl-' + id);
-        if (lbl) lbl.textContent = val + '%';
         updateTotals();
       });
-      sliderWrap.appendChild(slider);
-      var allocLbl = document.createElement('div');
-      allocLbl.id = 'alloc-lbl-' + p.id;
-      allocLbl.style.cssText = 'flex:0 0 36px;text-align:right;font-size:14px;font-weight:800;color:' + f.color;
-      allocLbl.textContent = p.alloc + '%';
+      var pctLbl = document.createElement('span');
+      pctLbl.textContent = '%';
+      pctLbl.style.cssText = 'font-size:14px;font-weight:700;color:var(--sub)';
+      inputWrap.appendChild(numInput);
+      inputWrap.appendChild(pctLbl);
+      // remove btn
       var btn = document.createElement('button');
       btn.textContent = '✕'; btn.dataset.id = p.id;
-      btn.style.cssText = 'background:none;border:none;font-size:16px;color:var(--sub);cursor:pointer;padding:0 2px';
+      btn.style.cssText = 'background:none;border:none;font-size:16px;color:var(--sub);cursor:pointer;padding:0 4px;flex:0 0 auto';
       btn.addEventListener('click', function(){ removeFromPort(this.dataset.id); });
-      row.appendChild(info); row.appendChild(sliderWrap); row.appendChild(allocLbl); row.appendChild(btn);
+      row.appendChild(info); row.appendChild(inputWrap); row.appendChild(btn);
       box.appendChild(row);
     });
   });
