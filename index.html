@@ -3089,12 +3089,12 @@ function calcLoan() {
 
 // ── 月配息基金資料 ──
 const FUND_DIST = {
-  jfzn3: { name:'摩根多重收益 JPM',   nav:75.39,   dist:0.69,    annRate:10.6, color:'#f59e0b', week:'第一週' },
-  tlzf9: { name:'安聯收益成長 AMg7',  nav:8.9107,  dist:0.06796, annRate:8.1,  color:'#3b82f6', week:'第二週' },
-  mmg55: { name:'M&G 入息基金',       nav:78.1795, dist:0.654,   annRate:4.9,  color:'#8b5cf6', week:'第三週' },
-  albt8: { name:'聯博美國成長 AP',    nav:72.23,   dist:0.8322,  annRate:10.9, color:'#10b981', week:'第四週' },
-  tlzl7: { name:'安聯AI收益成長 AM',  nav:27.9532, dist:0.14619, annRate:15.4, color:'#f97316', week:'第四週' },
-  shzv9: { name:'貝萊德世界科技 A10', nav:22.09,   dist:0.1375,  annRate:35.2, color:'#ec4899', week:'第四週' },
+  jfzn3: { name:'摩根多重收益 JPM',   nav:75.39,   dist:0.69,    annRate:10.6, color:'#f59e0b', week:'第一週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=JFZN3' },
+  tlzf9: { name:'安聯收益成長 AMg7',  nav:8.9107,  dist:0.06796, annRate:8.1,  color:'#3b82f6', week:'第二週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZF9' },
+  mmg55: { name:'M&G 入息基金',       nav:78.1795, dist:0.654,   annRate:4.9,  color:'#8b5cf6', week:'第三週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=MMG55' },
+  albt8: { name:'聯博美國成長 AP',    nav:72.23,   dist:0.8322,  annRate:10.9, color:'#10b981', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=ALBT8' },
+  tlzl7: { name:'安聯AI收益成長 AM',  nav:27.9532, dist:0.14619, annRate:15.4, color:'#f97316', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZL7' },
+  shzv9: { name:'貝萊德世界科技 A10', nav:22.09,   dist:0.1375,  annRate:35.2, color:'#ec4899', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=SHZV9' },
 };
 var _selFund = null;
 
@@ -3107,8 +3107,9 @@ function initFundCards() {
     card.id = 'fc-' + id;
     card.style.cssText = 'border:2px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all 0.2s';
     var weekBadge = f.week ? '<span style="font-size:10px;padding:2px 6px;border-radius:6px;background:' + f.color + '22;color:' + f.color + ';font-weight:700;margin-left:6px">' + f.week + '配息</span>' : '';
+    var djLink = f.url ? '<a href="' + f.url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:10px;color:var(--sub);text-decoration:none;margin-left:6px;padding:1px 5px;border:1px solid var(--border);border-radius:4px">MoneyDJ ↗</a>' : '';
     card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">'
-      + '<div><div style="font-size:14px;font-weight:700;color:var(--text)">' + f.name + weekBadge + '</div>'
+      + '<div><div style="font-size:14px;font-weight:700;color:var(--text)">' + f.name + weekBadge + djLink + '</div>'
       + '<div style="font-size:12px;color:var(--sub);margin-top:2px">每單位月配 ' + f.dist + ' USD｜NAV ' + f.nav + '</div></div>'
       + '<div style="text-align:right"><div style="font-size:18px;font-weight:900;color:' + f.color + '">' + (monthlyRate*12).toFixed(2) + '%</div>'
       + '<div style="font-size:11px;color:var(--sub)">年化配息率</div></div></div>';
