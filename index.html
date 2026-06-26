@@ -829,10 +829,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
         <div style="padding:8px 12px 10px">
           <select onchange="addToPort('fund',this.value);this.value=''" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:var(--card);appearance:none">
             <option value="">＋ 新增基金標的</option>
-            <option value="altech">安聯科技大壩（年化 ≈ 15.2%）</option>
-            <option value="aling">安聯收益成長（年化 ≈ 8.8%）</option>
-            <option value="fidelity">富達全球（年化 ≈ 7.5%）</option>
-            <option value="pimco">PIMCO 收益（年化 ≈ 5.5%）</option>
+            <option value="jpm">摩根多重收益（近3年年化 ≈ 10.6%）</option>
+            <option value="aling">安聯收益成長AMg7（近3年年化 ≈ 11.9%）</option>
+            <option value="mg">M&G入息基金（近3年年化 ≈ 7.3%）</option>
+            <option value="ab">聯博美國成長AP（近3年年化 ≈ 3.0%）</option>
           </select>
         </div>
       </div>
@@ -2130,13 +2130,13 @@ const FUND_DB = {
   e00878: { name:'00878 高股息',   cat:'etf',    rate:7.0,  color:'#16a34a' },
   e00919: { name:'00919 成長高息', cat:'etf',    rate:9.0,  color:'#16a34a' },
   // 基金
-  altech: { name:'安聯科技大壩',   cat:'fund',   rate:15.2, color:'#d97706' },
-  aling:  { name:'安聯收益成長',   cat:'fund',   rate:8.8,  color:'#d97706' },
-  fidelity:{ name:'富達全球',      cat:'fund',   rate:7.5,  color:'#d97706' },
-  pimco:  { name:'PIMCO 收益',     cat:'fund',   rate:5.5,  color:'#d97706' },
+  jpm:    { name:'摩根多重收益',   cat:'fund',   rate:10.6, color:'#d97706' },
+  aling:  { name:'安聯收益成長AMg7', cat:'fund', rate:11.9, color:'#d97706' },
+  mg:     { name:'M&G入息基金',    cat:'fund',   rate:7.3,  color:'#d97706' },
+  ab:     { name:'聯博美國成長AP', cat:'fund',   rate:3.0,  color:'#d97706' },
 };
 // portfolio: [{id, alloc}]
-let _port = [{ id:'sp500', alloc:100 }];
+let _port = [];
 
 function addToPort(cat, id) {
   if (!id || !FUND_DB[id]) return;
