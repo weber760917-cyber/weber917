@@ -841,6 +841,39 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       </div>
     </div>
 
+    <!-- 累積金額預覽 -->
+    <div style="border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px">
+      <div style="background:linear-gradient(90deg,#1B2A4A,#0f3460);padding:12px 16px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:15px;font-weight:700;color:#fff">💰 累積金額預覽</span>
+        <span style="font-size:12px;color:rgba(255,255,255,0.55)">以目前積蓄＋每月投入計算</span>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+          <div style="background:#f0f5ff;border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:11px;color:var(--sub);margin-bottom:4px">本金總投入</div>
+            <div id="acc-principal" style="font-size:18px;font-weight:800;color:var(--blue)">—</div>
+          </div>
+          <div style="background:#ecfdf5;border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:11px;color:var(--sub);margin-bottom:4px">退休時累積資產</div>
+            <div id="acc-total" style="font-size:18px;font-weight:800;color:#059669">—</div>
+          </div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="border-bottom:1.5px solid var(--border)">
+              <th style="text-align:left;padding:6px 4px;color:var(--sub);font-weight:600">年期</th>
+              <th style="text-align:right;padding:6px 4px;color:var(--sub);font-weight:600">本金投入</th>
+              <th style="text-align:right;padding:6px 4px;color:var(--sub);font-weight:600">累積資產</th>
+              <th style="text-align:right;padding:6px 4px;color:var(--sub);font-weight:600">增值</th>
+            </tr>
+          </thead>
+          <tbody id="acc-table-body">
+            <tr><td colspan="4" style="text-align:center;color:var(--sub);padding:12px">請先選擇投資標的並分配比例</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- 結果 -->
     <div style="background:linear-gradient(135deg,#0f3460,#1a1a2e);border-radius:16px;padding:20px 18px;color:white">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
@@ -2223,6 +2256,59 @@ function renderPort() {
 }
 
 
+function updateAccumResult() {
+  const pv  = +document.getElementById('r-pv').value * 10000;
+  const pmt = +document.getElementById('r-pmt').value * 10000;
+  const age = +document.getElementById('r-age').value;
+  const ret = Math.max(+document.getElementById('r-ret').value, age + 1);
+  const rate = getBlendedRate() / 100;
+  const r = rate / 12;
+
+  const fmt = v => {
+    const abs = Math.abs(v);
+    if (abs >= 1e8) return (v/1e8).toFixed(1) + ' 億';
+    if (abs >= 1e4) return Math.round(v/1e4) + ' 萬';
+    return Math.round(v).toLocaleString();
+  };
+
+  const tbody = document.getElementById('acc-table-body');
+  if (_port.length === 0 || getBlendedRate() === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--sub);padding:12px">請先選擇投資標的並分配比例</td></tr>';
+    document.getElementById('acc-principal').textContent = '—';
+    document.getElementById('acc-total').textContent = '—';
+    return;
+  }
+
+  const yToRet = ret - age;
+  const nRet = yToRet * 12;
+  const fvRet = r > 0
+    ? pv * Math.pow(1+r, nRet) + pmt * (Math.pow(1+r,nRet)-1)/r
+    : pv + pmt * nRet;
+  const principalRet = pv + pmt * nRet;
+  document.getElementById('acc-principal').textContent = fmt(principalRet);
+  document.getElementById('acc-total').textContent = fmt(fvRet);
+
+  const base = [5, 10, 15, 20, 30];
+  const allYears = [...new Set([...base.filter(y => y < yToRet), yToRet])].sort((a,b)=>a-b);
+
+  tbody.innerHTML = allYears.map(y => {
+    const n = y * 12;
+    const fv = r > 0
+      ? pv * Math.pow(1+r, n) + pmt * (Math.pow(1+r,n)-1)/r
+      : pv + pmt * n;
+    const principal = pv + pmt * n;
+    const gain = fv - principal;
+    const isRet = y === yToRet;
+    const rowBg = isRet ? 'background:#f0fdf4;font-weight:700;' : '';
+    return '<tr style="border-bottom:1px solid var(--border);' + rowBg + '">'
+      + '<td style="padding:8px 4px;color:var(--text)">' + (isRet ? '🎯 ' : '') + y + '年後</td>'
+      + '<td style="padding:8px 4px;text-align:right;color:var(--sub)">' + fmt(principal) + '</td>'
+      + '<td style="padding:8px 4px;text-align:right;color:#059669;font-weight:600">' + fmt(fv) + '</td>'
+      + '<td style="padding:8px 4px;text-align:right;color:#d97706">+' + fmt(gain) + '</td>'
+      + '</tr>';
+  }).join('');
+}
+
 function retPlan() {
   const age  = +document.getElementById('r-age').value;
   const ret  = Math.max(+document.getElementById('r-ret').value, age+1);
@@ -2267,6 +2353,7 @@ function retPlan() {
   document.getElementById('r-gap-note').textContent = gap >= 0
     ? '🎉 計畫超標！你的退休金很充裕'
     : '⚠️ 缺口需要提早規劃補足';
+  updateAccumResult();
 }
 
 // ── 退休缺口試算器 ──
