@@ -3046,11 +3046,11 @@ function calcLoan() {
   const amortInt   = amortPay * n - P;
   const totalInt   = graceTotal + Math.max(amortInt, 0);
 
-  document.getElementById('l-grace-pay').textContent  = fmtTWD(gracePay);
-  document.getElementById('l-amort-pay').textContent  = fmtTWD(amortPay);
-  document.getElementById('l-grace-total').textContent = fmtTWD(graceTotal);
-  document.getElementById('l-amort-int').textContent   = fmtTWD(Math.max(amortInt,0));
-  document.getElementById('l-total-int').textContent   = fmtTWD(totalInt);
+  document.getElementById('l-grace-pay').textContent  = fmtExact(gracePay);
+  document.getElementById('l-amort-pay').textContent  = fmtExact(amortPay);
+  document.getElementById('l-grace-total').textContent = fmtExact(graceTotal);
+  document.getElementById('l-amort-int').textContent   = fmtExact(Math.max(amortInt,0));
+  document.getElementById('l-total-int').textContent   = fmtExact(totalInt);
 
   // 同步更新基金對比
   calcFund();
