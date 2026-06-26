@@ -2192,7 +2192,6 @@ function renderPort(doFocus) {
   document.getElementById('r-alloc-bar').style.background = totalAlloc === 100 ? '#22c55e' : totalAlloc > 100 ? '#ef4444' : 'var(--blue)';
   document.getElementById('r-blend-rate').textContent = blended > 0 ? blended.toFixed(1) + '%' : '—';
   retPlan();
-renderPort();
 }
 
 function retPlan() {
@@ -2707,6 +2706,7 @@ loadUSNews();
 loadCrypto();
 loadCryptoNews();
 startCountdown();
+renderPort();
 </script>
 </body>
 </html>
