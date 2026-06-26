@@ -2943,9 +2943,14 @@ renderPort();
 
         <!-- 基金選擇 -->
         <div style="font-size:13px;font-weight:600;color:var(--sub);margin-bottom:6px">選擇基金</div>
-        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none" id="fund-cards"></div>
+        <div id="fund-cards" style="position:relative">
+          <select id="fund-select" onchange="onFundSelect(this.value)" style="width:100%;padding:10px 36px 10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-weight:600;color:var(--text);background:var(--card);appearance:none;-webkit-appearance:none;cursor:pointer">
+            <option value="">— 請選擇基金 —</option>
+          </select>
+          <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--sub);font-size:16px">▾</span>
+        </div>
         <!-- 選中基金資訊條 -->
-        <div id="fund-info-strip" style="display:none;background:var(--card);border-radius:10px;padding:10px 14px;border-left:3px solid #888;margin-top:2px">
+        <div id="fund-info-strip" style="display:none;background:var(--card);border-radius:10px;padding:10px 14px;border-left:3px solid #888;margin-top:6px">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
             <div>
               <span id="fis-name" style="font-size:13px;font-weight:700;color:var(--text)"></span>
@@ -3118,40 +3123,34 @@ const FUND_DIST = {
 var _selFund = null;
 
 function initFundCards() {
-  var box = document.getElementById('fund-cards');
-  box.innerHTML = '';
+  var sel = document.getElementById('fund-select');
   Object.entries(FUND_DIST).forEach(function([id, f]) {
-    var monthlyRate = f.dist / f.nav * 100;
-    var btn = document.createElement('button');
-    btn.id = 'fc-' + id;
-    btn.style.cssText = 'flex-shrink:0;padding:8px 14px;border-radius:20px;border:2px solid var(--border);background:var(--card);color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap';
-    btn.textContent = f.name;
-    btn.addEventListener('click', function() {
-      _selFund = id;
-      Object.keys(FUND_DIST).forEach(function(k) {
-        var b = document.getElementById('fc-' + k);
-        if (b) { b.style.border = '2px solid var(--border)'; b.style.background = 'var(--card)'; b.style.color = 'var(--sub)'; }
-      });
-      btn.style.border = '2px solid ' + f.color;
-      btn.style.background = f.color + '20';
-      btn.style.color = f.color;
-      // Update info strip
-      var strip = document.getElementById('fund-info-strip');
-      strip.style.display = '';
-      strip.style.borderColor = f.color;
-      document.getElementById('fis-name').textContent = f.name;
-      var wk = document.getElementById('fis-week');
-      wk.textContent = f.week ? f.week + '配息' : '';
-      wk.style.cssText = 'font-size:10px;padding:2px 6px;border-radius:6px;font-weight:700;margin-left:6px;background:' + f.color + '22;color:' + f.color;
-      document.getElementById('fis-rate').textContent = (monthlyRate*12).toFixed(2) + '%';
-      document.getElementById('fis-rate').style.color = f.color;
-      document.getElementById('fis-nav').textContent = f.nav + ' USD';
-      var link = document.getElementById('fis-link');
-      link.href = f.url || '#';
-      calcFund();
-    });
-    box.appendChild(btn);
+    var opt = document.createElement('option');
+    opt.value = id;
+    var monthlyRate = (f.dist / f.nav * 100 * 12).toFixed(1);
+    opt.textContent = f.name + '　' + (f.week || '') + '　年化 ' + monthlyRate + '%';
+    sel.appendChild(opt);
   });
+}
+
+function onFundSelect(id) {
+  if (!id) { _selFund = null; document.getElementById('fund-info-strip').style.display = 'none'; document.getElementById('fund-result').style.display = 'none'; return; }
+  _selFund = id;
+  var f = FUND_DIST[id];
+  var monthlyRate = f.dist / f.nav * 100;
+  var strip = document.getElementById('fund-info-strip');
+  strip.style.display = '';
+  strip.style.borderLeftColor = f.color;
+  document.getElementById('fis-name').textContent = f.name;
+  var wk = document.getElementById('fis-week');
+  wk.textContent = f.week ? f.week + '配息' : '';
+  wk.style.cssText = 'font-size:10px;padding:2px 6px;border-radius:6px;font-weight:700;margin-left:6px;background:' + f.color + '22;color:' + f.color;
+  document.getElementById('fis-rate').textContent = (monthlyRate*12).toFixed(2) + '%';
+  document.getElementById('fis-rate').style.color = f.color;
+  document.getElementById('fis-nav').textContent = f.nav + ' USD';
+  var link = document.getElementById('fis-link');
+  link.href = f.url || '#';
+  calcFund();
 }
 
 function calcFund() {
