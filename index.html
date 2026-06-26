@@ -758,37 +758,84 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       </div>
     </div>
 
-    <!-- 投資工具選擇 -->
-    <div style="font-size:12px;font-weight:700;color:var(--sub);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">投資工具（年化報酬率回測）</div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:22px" id="fund-list">
-      <label id="fund-sp500"  class="fund-opt active"   onclick="selectFund('sp500')" style="display:flex;justify-content:space-between;align-items:center;background:#f0f5ff;border:2px solid var(--blue);border-radius:12px;padding:12px 14px;cursor:pointer">
-        <div><div style="font-size:15px;font-weight:700;color:var(--text)">📈 S&P 500</div><div style="font-size:12px;color:var(--sub);margin-top:2px">近30年年化 ≈ 10.5%</div></div>
-        <div style="font-size:18px;font-weight:800;color:var(--blue)">10.5%</div>
-      </label>
-      <label id="fund-t0050" class="fund-opt" onclick="selectFund('t0050')" style="display:flex;justify-content:space-between;align-items:center;background:#f8f9fb;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer">
-        <div><div style="font-size:15px;font-weight:700;color:var(--text)">🇹🇼 台灣 0050</div><div style="font-size:12px;color:var(--sub);margin-top:2px">成立至今年化 ≈ 9.2%</div></div>
-        <div style="font-size:18px;font-weight:800;color:var(--sub)">9.2%</div>
-      </label>
-      <label id="fund-vt" class="fund-opt" onclick="selectFund('vt')" style="display:flex;justify-content:space-between;align-items:center;background:#f8f9fb;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer">
-        <div><div style="font-size:15px;font-weight:700;color:var(--text)">🌍 VT 全球股票</div><div style="font-size:12px;color:var(--sub);margin-top:2px">成立至今年化 ≈ 8.1%</div></div>
-        <div style="font-size:18px;font-weight:800;color:var(--sub)">8.1%</div>
-      </label>
-      <label id="fund-altech" class="fund-opt" onclick="selectFund('altech')" style="display:flex;justify-content:space-between;align-items:center;background:#f8f9fb;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer">
-        <div><div style="font-size:15px;font-weight:700;color:var(--text)">⚡ 安聯科技大壩</div><div style="font-size:12px;color:var(--sub);margin-top:2px">近10年年化 ≈ 15.2%（高波動）</div></div>
-        <div style="font-size:18px;font-weight:800;color:var(--sub)">15.2%</div>
-      </label>
-      <label id="fund-aling" class="fund-opt" onclick="selectFund('aling')" style="display:flex;justify-content:space-between;align-items:center;background:#f8f9fb;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer">
-        <div><div style="font-size:15px;font-weight:700;color:var(--text)">💼 安聯收益成長</div><div style="font-size:12px;color:var(--sub);margin-top:2px">近10年年化 ≈ 8.8%</div></div>
-        <div style="font-size:18px;font-weight:800;color:var(--sub)">8.8%</div>
-      </label>
-      <label id="fund-custom" class="fund-opt" onclick="selectFund('custom')" style="display:flex;justify-content:space-between;align-items:center;background:#f8f9fb;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer">
-        <div style="flex:1"><div style="font-size:15px;font-weight:700;color:var(--text)">✏️ 自訂報酬率</div>
-          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
-            <input type="range" id="r-custom" min="1" max="20" step="0.5" value="5" oninput="retPlan();document.getElementById('r-lbl-custom').textContent=this.value+'%'" onclick="event.stopPropagation()" style="flex:1;accent-color:var(--blue)">
-            <span id="r-lbl-custom" style="font-size:14px;font-weight:700;color:var(--blue);width:36px">5%</span>
-          </div>
+    <!-- 投資組合配置 -->
+    <div style="font-size:12px;font-weight:700;color:var(--sub);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">投資組合配置</div>
+
+    <!-- 加權報酬率總覽 -->
+    <div style="background:linear-gradient(135deg,#1B2A4A,#0f3460);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.55);margin-bottom:2px">加權年化報酬率</div>
+        <div id="r-blend-rate" style="font-size:26px;font-weight:900;color:#D4A843">—</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;color:rgba(255,255,255,0.55);margin-bottom:2px">總配置</div>
+        <div id="r-total-pct" style="font-size:22px;font-weight:800;color:#fff">0%</div>
+        <div id="r-alloc-warn" style="font-size:11px;color:#f87171;margin-top:2px"></div>
+      </div>
+    </div>
+    <!-- 配置進度條 -->
+    <div style="height:6px;background:var(--border);border-radius:3px;margin-bottom:20px;overflow:hidden">
+      <div id="r-alloc-bar" style="height:100%;background:var(--blue);border-radius:3px;width:0%;transition:width 0.3s"></div>
+    </div>
+
+    <!-- 三大類別 -->
+    <div id="port-builder" style="display:flex;flex-direction:column;gap:12px;margin-bottom:22px">
+
+      <!-- 股票 -->
+      <div style="border:1.5px solid var(--border);border-radius:12px;overflow:hidden">
+        <div style="background:#f0f5ff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleCat('stocks')">
+          <span style="font-size:14px;font-weight:700;color:var(--blue)">📈 股票</span>
+          <span id="cat-total-stocks" style="font-size:13px;font-weight:700;color:var(--blue)">0%</span>
         </div>
-      </label>
+        <div id="port-stocks" style="padding:0 12px"></div>
+        <div style="padding:8px 12px 10px">
+          <select onchange="addToPort('stocks',this.value);this.value=''" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:var(--card);appearance:none">
+            <option value="">＋ 新增股票標的</option>
+            <option value="sp500">S&P 500（年化 ≈ 10.5%）</option>
+            <option value="t0050">台灣 0050（年化 ≈ 9.2%）</option>
+            <option value="tsmc">台積電 2330（年化 ≈ 12%）</option>
+            <option value="aapl">蘋果 AAPL（年化 ≈ 11%）</option>
+            <option value="nvda">輝達 NVDA（年化 ≈ 20%）</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ETF -->
+      <div style="border:1.5px solid var(--border);border-radius:12px;overflow:hidden">
+        <div style="background:#f0fbf5;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleCat('etf')">
+          <span style="font-size:14px;font-weight:700;color:#16a34a">🏷️ ETF</span>
+          <span id="cat-total-etf" style="font-size:13px;font-weight:700;color:#16a34a">0%</span>
+        </div>
+        <div id="port-etf" style="padding:0 12px"></div>
+        <div style="padding:8px 12px 10px">
+          <select onchange="addToPort('etf',this.value);this.value=''" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:var(--card);appearance:none">
+            <option value="">＋ 新增 ETF 標的</option>
+            <option value="vt">VT 全球股票（年化 ≈ 8.1%）</option>
+            <option value="qqq">QQQ 科技（年化 ≈ 13%）</option>
+            <option value="spy">SPY 標普500（年化 ≈ 10.5%）</option>
+            <option value="e00878">00878 高股息（年化 ≈ 7%）</option>
+            <option value="e00919">00919 成長高股息（年化 ≈ 9%）</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 基金 -->
+      <div style="border:1.5px solid var(--border);border-radius:12px;overflow:hidden">
+        <div style="background:#fff8f0;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleCat('fund')">
+          <span style="font-size:14px;font-weight:700;color:#d97706">📋 基金</span>
+          <span id="cat-total-fund" style="font-size:13px;font-weight:700;color:#d97706">0%</span>
+        </div>
+        <div id="port-fund" style="padding:0 12px"></div>
+        <div style="padding:8px 12px 10px">
+          <select onchange="addToPort('fund',this.value);this.value=''" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:var(--card);appearance:none">
+            <option value="">＋ 新增基金標的</option>
+            <option value="altech">安聯科技大壩（年化 ≈ 15.2%）</option>
+            <option value="aling">安聯收益成長（年化 ≈ 8.8%）</option>
+            <option value="fidelity">富達全球（年化 ≈ 7.5%）</option>
+            <option value="pimco">PIMCO 收益（年化 ≈ 5.5%）</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <!-- 結果 -->
@@ -2069,26 +2116,85 @@ function cpGen(btn) {
 }
 
 // ── 退休規劃試算器 ──
-const FUNDS = {
-  sp500:  10.5,
-  t0050:  9.2,
-  vt:     8.1,
-  altech: 15.2,
-  aling:  8.8,
-  custom: 5.0
+const FUND_DB = {
+  // 股票
+  sp500:  { name:'S&P 500',       cat:'stocks', rate:10.5, color:'var(--blue)' },
+  t0050:  { name:'台灣 0050',      cat:'stocks', rate:9.2,  color:'var(--blue)' },
+  tsmc:   { name:'台積電 2330',    cat:'stocks', rate:12.0, color:'var(--blue)' },
+  aapl:   { name:'蘋果 AAPL',      cat:'stocks', rate:11.0, color:'var(--blue)' },
+  nvda:   { name:'輝達 NVDA',      cat:'stocks', rate:20.0, color:'var(--blue)' },
+  // ETF
+  vt:     { name:'VT 全球',        cat:'etf',    rate:8.1,  color:'#16a34a' },
+  qqq:    { name:'QQQ 科技',       cat:'etf',    rate:13.0, color:'#16a34a' },
+  spy:    { name:'SPY',            cat:'etf',    rate:10.5, color:'#16a34a' },
+  e00878: { name:'00878 高股息',   cat:'etf',    rate:7.0,  color:'#16a34a' },
+  e00919: { name:'00919 成長高息', cat:'etf',    rate:9.0,  color:'#16a34a' },
+  // 基金
+  altech: { name:'安聯科技大壩',   cat:'fund',   rate:15.2, color:'#d97706' },
+  aling:  { name:'安聯收益成長',   cat:'fund',   rate:8.8,  color:'#d97706' },
+  fidelity:{ name:'富達全球',      cat:'fund',   rate:7.5,  color:'#d97706' },
+  pimco:  { name:'PIMCO 收益',     cat:'fund',   rate:5.5,  color:'#d97706' },
 };
-let _retFund = 'sp500';
-function selectFund(id) {
-  _retFund = id;
-  document.querySelectorAll('.fund-opt').forEach(el => {
-    const active = el.id === 'fund-' + id;
-    el.style.background = active ? '#f0f5ff' : '#f8f9fb';
-    el.style.borderColor = active ? 'var(--blue)' : 'var(--border)';
-    const pct = el.querySelector('div > div:last-child, div:last-child');
-    if (pct) pct.style.color = active ? 'var(--blue)' : 'var(--sub)';
-  });
-  retPlan();
+// portfolio: [{id, alloc}]
+let _port = [{ id:'sp500', alloc:100 }];
+
+function addToPort(cat, id) {
+  if (!id || !FUND_DB[id]) return;
+  if (_port.find(p => p.id === id)) return; // already added
+  _port.push({ id, alloc: 0 });
+  renderPort();
 }
+function removeFromPort(id) {
+  _port = _port.filter(p => p.id !== id);
+  renderPort();
+}
+function updateAlloc(id, val) {
+  const item = _port.find(p => p.id === id);
+  if (item) item.alloc = +val;
+  renderPort(false);
+}
+function getBlendedRate() {
+  const total = _port.reduce((s,p) => s + p.alloc, 0);
+  if (total === 0) return 0;
+  return _port.reduce((s,p) => s + (FUND_DB[p.id]?.rate || 0) * p.alloc, 0) / total;
+}
+function renderPort(doFocus) {
+  const cats = ['stocks','etf','fund'];
+  cats.forEach(cat => {
+    const box = document.getElementById('port-' + cat);
+    if (!box) return;
+    const items = _port.filter(p => FUND_DB[p.id]?.cat === cat);
+    const catTotal = items.reduce((s,p) => s + p.alloc, 0);
+    document.getElementById('cat-total-' + cat).textContent = catTotal + '%';
+    box.innerHTML = items.map(p => {
+      const f = FUND_DB[p.id];
+      return '<div style="display:flex;align-items:center;gap:8px;padding:10px 2px;border-bottom:1px solid var(--border)">'
+        + '<div style="flex:0 0 auto;min-width:0">'
+        + '<div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;max-width:90px">' + f.name + '</div>'
+        + '<div style="font-size:11px;color:' + f.color + ';font-weight:600">' + f.rate + '% / yr</div>'
+        + '</div>'
+        + '<div style="flex:1;display:flex;flex-direction:column;gap:2px">'
+        + '<input type="range" min="0" max="100" step="5" value="' + p.alloc + '" '
+        + 'oninput="updateAlloc('' + p.id + '',this.value);document.getElementById('alloc-lbl-' + p.id + '').textContent=this.value+'%'" '
+        + 'style="width:100%;accent-color:' + f.color + '">'
+        + '</div>'
+        + '<div id="alloc-lbl-' + p.id + '" style="flex:0 0 36px;text-align:right;font-size:14px;font-weight:800;color:' + f.color + '">' + p.alloc + '%</div>'
+        + '<button onclick="removeFromPort('' + p.id + '')" style="flex:0 0 auto;background:none;border:none;font-size:16px;color:var(--sub);cursor:pointer;padding:0 2px">✕</button>'
+        + '</div>';
+    }).join('');
+  });
+  const totalAlloc = _port.reduce((s,p) => s + p.alloc, 0);
+  const blended = getBlendedRate();
+  document.getElementById('r-total-pct').textContent = totalAlloc + '%';
+  document.getElementById('r-total-pct').style.color = totalAlloc === 100 ? '#fff' : '#f87171';
+  document.getElementById('r-alloc-warn').textContent = totalAlloc === 100 ? '' : (totalAlloc < 100 ? '尚差 '+(100-totalAlloc)+'%' : '超過 '+(totalAlloc-100)+'%');
+  document.getElementById('r-alloc-bar').style.width = Math.min(totalAlloc, 100) + '%';
+  document.getElementById('r-alloc-bar').style.background = totalAlloc === 100 ? '#22c55e' : totalAlloc > 100 ? '#ef4444' : 'var(--blue)';
+  document.getElementById('r-blend-rate').textContent = blended > 0 ? blended.toFixed(1) + '%' : '—';
+  retPlan();
+renderPort();
+}
+
 function retPlan() {
   const age  = +document.getElementById('r-age').value;
   const ret  = Math.max(+document.getElementById('r-ret').value, age+1);
@@ -2096,9 +2202,7 @@ function retPlan() {
   const pv   = +document.getElementById('r-pv').value * 10000;
   const pmt  = +document.getElementById('r-pmt').value * 10000;
   const inf  = +document.getElementById('r-inf').value / 100;
-  const rate = (_retFund === 'custom'
-    ? +document.getElementById('r-custom').value
-    : FUNDS[_retFund]) / 100;
+  const rate = getBlendedRate() / 100;
 
   document.getElementById('r-lbl-age').textContent = age + ' 歲';
   document.getElementById('r-lbl-ret').textContent = ret + ' 歲';
