@@ -2786,14 +2786,15 @@ async function loadWCBracket() {
         + topRow + botRow + badge + '</div>';
     }
 
-    // Column-based bracket: pad each round to power-of-2 slots for alignment
+    // Column-based bracket: pad each round to its expected slot count
     var roundOrder = rounds.filter(function(r){return r.round!=='季軍賽';});
     var third = rounds.find(function(r){return r.round==='季軍賽';});
-    // Expected slot counts by round index: 16, 8, 4, 2, 1
-    var slotCounts = [16, 8, 4, 2, 1];
     var baseH = 62; // px per R32 slot
-    var cols = roundOrder.map(function(rnd, ri) {
-      var totalSlots = slotCounts[ri] || Math.pow(2, 4-ri);
+    // Determine column index for slot height calculation (R32=0, R16=1, ...)
+    var colIdx = {'32強':0,'16強':1,'八強':2,'四強':3,'決賽':4};
+    var cols = roundOrder.map(function(rnd) {
+      var ri = colIdx[rnd.round] !== undefined ? colIdx[rnd.round] : 0;
+      var totalSlots = rnd.slots || rnd.matches.length;
       var slotH = baseH * Math.pow(2, ri);
       var color = roundColors[rnd.round]||'var(--sub)';
       // Pad with empty slots if fewer matches than expected
