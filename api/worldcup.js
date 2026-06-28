@@ -20,12 +20,12 @@ export default async function handler(req, res) {
       const allEvents = allRaw.filter(ev => { if (seen.has(ev.id)) return false; seen.add(ev.id); return true; });
       // Map ESPN season.slug → Chinese round label + display order
       const slugMap = {
-        'round-of-32':  { label:'32強', order:0, slots:16 },
-        'round-of-16':  { label:'16強', order:1, slots:8 },
-        'quarterfinal': { label:'八強', order:2, slots:4 },
-        'semifinal':    { label:'四強', order:3, slots:2 },
-        'third-place':  { label:'季軍賽', order:4, slots:1 },
-        'final':        { label:'決賽', order:5, slots:1 },
+        'round-of-32':    { label:'32強', order:0, slots:16 },
+        'round-of-16':    { label:'16強', order:1, slots:8 },
+        'quarterfinals':  { label:'八強', order:2, slots:4 },
+        'semifinals':     { label:'四強', order:3, slots:2 },
+        '3rd-place-match':{ label:'季軍賽', order:4, slots:1 },
+        'final':          { label:'決賽', order:5, slots:1 },
       };
       // Group by slug
       const groups = {};
