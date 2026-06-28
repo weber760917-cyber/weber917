@@ -2768,31 +2768,31 @@ async function loadWCBracket() {
       var twTime = new Date(new Date(m.date).toLocaleString('en-US',{timeZone:'Asia/Taipei'}));
       var dateStr = (twTime.getMonth()+1)+'/'+(twTime.getDate());
       var timeStr = ('0'+twTime.getHours()).slice(-2)+':'+('0'+twTime.getMinutes()).slice(-2);
-      var hl = home.logo ? '<img src="'+home.logo+'" style="width:16px;height:12px;object-fit:contain;flex-shrink:0;border-radius:1px" onerror="this.style.display=\'none\'">' : '';
-      var al = away.logo ? '<img src="'+away.logo+'" style="width:16px;height:12px;object-fit:contain;flex-shrink:0;border-radius:1px" onerror="this.style.display=\'none\'">' : '';
+      var hl = home.logo ? '<img src="'+home.logo+'" style="width:20px;height:15px;object-fit:contain;flex-shrink:0;border-radius:1px" onerror="this.style.display=\'none\'">' : '';
+      var al = away.logo ? '<img src="'+away.logo+'" style="width:20px;height:15px;object-fit:contain;flex-shrink:0;border-radius:1px" onerror="this.style.display=\'none\'">' : '';
       var winH = isDone && parseInt(home.score||0) > parseInt(away.score||0);
       var winA = isDone && parseInt(away.score||0) > parseInt(home.score||0);
       var accent = isLive ? '#e53935' : (isDone ? 'var(--text)' : 'var(--sub)');
-      var topRow = '<div style="display:flex;align-items:center;gap:4px;padding:3px 6px;'+(winH?'font-weight:900;color:var(--text)':'color:var(--sub)')+'">'
-        + hl + '<span style="flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (home.name||'TBD') + '</span>'
-        + (isDone||isLive ? '<span style="font-size:12px;font-weight:800;color:'+accent+';margin-left:4px">'+(home.score||0)+'</span>' : '')
+      var topRow = '<div style="display:flex;align-items:center;gap:5px;padding:6px 8px;'+(winH?'font-weight:900;color:var(--text)':'color:var(--sub)')+'">'
+        + hl + '<span style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (home.name||'TBD') + '</span>'
+        + (isDone||isLive ? '<span style="font-size:15px;font-weight:800;color:'+accent+';margin-left:4px">'+(home.score||0)+'</span>' : '')
         + '</div>';
-      var botRow = '<div style="display:flex;align-items:center;gap:4px;padding:3px 6px;border-top:1px solid var(--border);'+(winA?'font-weight:900;color:var(--text)':'color:var(--sub)')+'">'
-        + al + '<span style="flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (away.name||'TBD') + '</span>'
-        + (isDone||isLive ? '<span style="font-size:12px;font-weight:800;color:'+accent+';margin-left:4px">'+(away.score||0)+'</span>' : '')
+      var botRow = '<div style="display:flex;align-items:center;gap:5px;padding:6px 8px;border-top:1px solid var(--border);'+(winA?'font-weight:900;color:var(--text)':'color:var(--sub)')+'">'
+        + al + '<span style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (away.name||'TBD') + '</span>'
+        + (isDone||isLive ? '<span style="font-size:15px;font-weight:800;color:'+accent+';margin-left:4px">'+(away.score||0)+'</span>' : '')
         + '</div>';
       var badge = '';
-      if (isDone) badge = '<div style="font-size:8px;color:var(--sub);text-align:center;padding:1px 0">'+(m.statusDesc||'FT')+'</div>';
-      else if (isLive) badge = '<div style="font-size:8px;color:#e53935;text-align:center;padding:1px 0">'+m.statusDesc+'</div>';
-      else badge = '<div style="font-size:8px;color:var(--sub);text-align:center;padding:1px 0">'+dateStr+' '+timeStr+'</div>';
-      return '<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:2px 0">'
+      if (isDone) badge = '<div style="font-size:11px;color:var(--sub);text-align:center;padding:2px 0">'+(m.statusDesc||'FT')+'</div>';
+      else if (isLive) badge = '<div style="font-size:11px;color:#e53935;text-align:center;padding:2px 0">'+m.statusDesc+'</div>';
+      else badge = '<div style="font-size:11px;color:var(--sub);text-align:center;padding:2px 0">'+dateStr+' '+timeStr+'</div>';
+      return '<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:2px 0">'
         + topRow + botRow + badge + '</div>';
     }
 
     // Column-based bracket: pad each round to its expected slot count
     var roundOrder = rounds.filter(function(r){return r.round!=='季軍賽';});
     var third = rounds.find(function(r){return r.round==='季軍賽';});
-    var baseH = 62; // px per R32 slot
+    var baseH = 85; // px per R32 slot (bigger cards)
     // Determine column index for slot height calculation (R32=0, R16=1, ...)
     var colIdx = {'32強':0,'16強':1,'八強':2,'四強':3,'決賽':4};
     var cols = roundOrder.map(function(rnd) {
@@ -2809,8 +2809,8 @@ async function loadWCBracket() {
                : '<div style="width:100%;background:var(--bg);border:1px dashed var(--border);border-radius:6px;height:52px;opacity:.4"></div>')
           + '</div>';
       }
-      return '<div style="display:inline-flex;flex-direction:column;vertical-align:top;width:138px;flex-shrink:0">'
-        + '<div style="font-size:10px;font-weight:800;color:'+color+';text-align:center;padding:4px 0;border-bottom:1.5px solid '+color+';margin-bottom:0">'+rnd.round+'</div>'
+      return '<div style="display:inline-flex;flex-direction:column;vertical-align:top;width:170px;flex-shrink:0">'
+        + '<div style="font-size:12px;font-weight:800;color:'+color+';text-align:center;padding:4px 0;border-bottom:1.5px solid '+color+';margin-bottom:0">'+rnd.round+'</div>'
         + cells
         + '</div>';
     }).join('<div style="display:inline-flex;flex-direction:column;vertical-align:top;width:10px;flex-shrink:0"><div style="height:16px"></div>'
