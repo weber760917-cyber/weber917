@@ -17,9 +17,9 @@ export default async function handler(req, res) {
       const allRaw = (await Promise.all(dates.map(fetchDay))).flat();
       const seen = new Set();
       const rounds = [
-        { label:'32強', range:['2026-06-28','2026-07-04'] },
-        { label:'16強', range:['2026-07-04','2026-07-08'] },
-        { label:'八強', range:['2026-07-08','2026-07-13'] },
+        { label:'32強', range:['2026-06-28','2026-07-05'] },
+        { label:'16強', range:['2026-07-05','2026-07-09'] },
+        { label:'八強', range:['2026-07-09','2026-07-13'] },
         { label:'四強', range:['2026-07-13','2026-07-16'] },
         { label:'季軍賽', range:['2026-07-17','2026-07-19'] },
         { label:'決賽', range:['2026-07-19','2026-07-21'] },
