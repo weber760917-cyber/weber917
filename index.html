@@ -2784,8 +2784,8 @@ async function loadWCBracket() {
             + '<div style="font-size:11px;color:var(--sub)">' + timeStr + '</div>'
             + '</div>';
         }
-        var homeLogo = home.logo ? '<img src="' + home.logo + '" style="width:18px;height:14px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">' : '';
-        var awayLogo = away.logo ? '<img src="' + away.logo + '" style="width:18px;height:14px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">' : '';
+        var homeLogo = home.logo ? '<img src="' + home.logo + '" style="width:18px;height:14px;object-fit:contain;flex-shrink:0" onerror="this.style.display=\'none\'">' : '';
+        var awayLogo = away.logo ? '<img src="' + away.logo + '" style="width:18px;height:14px;object-fit:contain;flex-shrink:0" onerror="this.style.display=\'none\'">' : '';
         return '<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);gap:4px">'
           + '<div style="flex:1;text-align:right;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:flex-end;gap:4px">' + (home.name||'TBD') + homeLogo + '</div>'
           + scoreBlock
