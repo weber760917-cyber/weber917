@@ -46,10 +46,26 @@ export default async function handler(req, res) {
           away: { name: away.team?.displayName||'TBD', logo: away.team?.logo||'', score: away.score||'' },
         });
       }
-      // Sort each group by date
-      for (const slug of Object.keys(groups)) {
-        groups[slug].sort((a,b) => new Date(a.date) - new Date(b.date));
+      // R32: hardcoded bracket display order (pairs that feed same R16 are adjacent)
+      const r32BracketOrder = [
+        '760486','760488', // R16#1: SA/Canada + Netherlands/Morocco
+        '760489','760492', // R16#2: Germany/Paraguay + France/Sweden
+        '760487','760490', // R16#3: Brazil/Japan + Ivory Coast/Norway
+        '760491','760495', // R16#4: Mexico/Ecuador + England/Congo DR
+        '760496','760497', // R16#5: Portugal/Croatia + Spain/Austria
+        '760494','760493', // R16#6: USA/Bosnia + Belgium/Senegal
+        '760500','760499', // R16#7: Argentina/Cape Verde + Australia/Egypt
+        '760498','760501', // R16#8: Switzerland/Algeria + Colombia/Ghana
+      ];
+      if (groups['round-of-32']) {
+        const idxMap = {};
+        r32BracketOrder.forEach((id,i) => { idxMap[id] = i; });
+        groups['round-of-32'].sort((a,b) => (idxMap[a.id]??99) - (idxMap[b.id]??99));
       }
+      // All other rounds: sort by date
+      ['round-of-16','quarterfinals','semifinals','3rd-place-match','final'].forEach(slug => {
+        if (groups[slug]) groups[slug].sort((a,b) => new Date(a.date) - new Date(b.date));
+      });
       // Output in round order
       const result = Object.entries(slugMap)
         .sort((a,b) => a[1].order - b[1].order)
