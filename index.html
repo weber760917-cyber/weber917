@@ -2786,32 +2786,38 @@ async function loadWCBracket() {
         + topRow + botRow + badge + '</div>';
     }
 
-    // Build column-based bracket layout (horizontal scroll)
+    // Column-based bracket: pad each round to power-of-2 slots for alignment
     var roundOrder = rounds.filter(function(r){return r.round!=='季軍賽';});
     var third = rounds.find(function(r){return r.round==='季軍賽';});
-    // Each round is a column; match slots double in height each round
-    var baseH = 68; // px per match slot in R32
+    // Expected slot counts by round index: 16, 8, 4, 2, 1
+    var slotCounts = [16, 8, 4, 2, 1];
+    var baseH = 62; // px per R32 slot
     var cols = roundOrder.map(function(rnd, ri) {
-      var n = rnd.matches.length;
-      var slotH = baseH * Math.pow(2, ri); // height per match slot doubles
+      var totalSlots = slotCounts[ri] || Math.pow(2, 4-ri);
+      var slotH = baseH * Math.pow(2, ri);
       var color = roundColors[rnd.round]||'var(--sub)';
-      var cells = rnd.matches.map(function(m) {
-        return '<div style="display:flex;align-items:center;height:'+slotH+'px;box-sizing:border-box;padding:2px 0">'
-          + '<div style="width:100%">' + matchCard(m) + '</div>'
+      // Pad with empty slots if fewer matches than expected
+      var cells = '';
+      for (var si = 0; si < totalSlots; si++) {
+        var m = rnd.matches[si];
+        cells += '<div style="height:'+slotH+'px;box-sizing:border-box;padding:2px 3px;display:flex;align-items:center">'
+          + (m ? '<div style="width:100%">' + matchCard(m) + '</div>'
+               : '<div style="width:100%;background:var(--bg);border:1px dashed var(--border);border-radius:6px;height:52px;opacity:.4"></div>')
           + '</div>';
-      }).join('');
-      return '<div style="display:inline-flex;flex-direction:column;vertical-align:top;width:140px;flex-shrink:0">'
-        + '<div style="font-size:10px;font-weight:800;color:'+color+';text-align:center;padding:4px 0;border-bottom:1.5px solid '+color+';margin-bottom:4px">'+rnd.round+'</div>'
+      }
+      return '<div style="display:inline-flex;flex-direction:column;vertical-align:top;width:138px;flex-shrink:0">'
+        + '<div style="font-size:10px;font-weight:800;color:'+color+';text-align:center;padding:4px 0;border-bottom:1.5px solid '+color+';margin-bottom:0">'+rnd.round+'</div>'
         + cells
         + '</div>';
-    }).join('<div style="display:inline-block;vertical-align:top;width:6px"></div>');
+    }).join('<div style="display:inline-flex;flex-direction:column;vertical-align:top;width:10px;flex-shrink:0"><div style="height:16px"></div>'
+      + '<div style="flex:1;border-right:none"></div></div>');
 
-    var thirdHtml = third ? '<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px">'
+    var thirdHtml = third ? '<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;padding-left:2px">'
       + '<div style="font-size:10px;font-weight:800;color:'+roundColors['季軍賽']+';margin-bottom:4px">🥉 季軍賽</div>'
       + third.matches.map(function(m){return matchCard(m);}).join('') + '</div>' : '';
 
-    box.innerHTML = '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px">'
-      + '<div style="display:inline-flex;gap:6px;min-width:max-content;padding:4px 2px">' + cols + '</div>'
+    box.innerHTML = '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px">'
+      + '<div style="display:inline-flex;gap:0;min-width:max-content;padding:4px 2px">' + cols + '</div>'
       + '</div>' + thirdHtml;
     _bracketLoaded = true;
   } catch(e) {
