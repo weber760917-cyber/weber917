@@ -311,6 +311,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
         <div class="card-title">⚽ 2026 FIFA 世界盃</div>
         <div style="display:flex;gap:6px;margin-top:8px">
           <button class="copy-ptab active" id="wc-tab-schedule" onclick="switchWCSub(this,'wc-pane-schedule')">📅 賽程</button>
+          <button class="copy-ptab" id="wc-tab-bracket" onclick="switchWCSub(this,'wc-pane-bracket');loadWCBracket()">🏆 淘汰賽</button>
           <button class="copy-ptab" id="wc-tab-analysis" onclick="switchWCSub(this,'wc-pane-analysis')">🔮 分析</button>
         </div>
       </div>
@@ -321,10 +322,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
           <div style="padding:8px 16px 4px">
             <div id="wc-rows" style="font-size:15px"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
           </div>
-          <div style="border-top:1px solid var(--border);padding:12px 16px 12px">
-            <div style="font-size:14px;font-weight:700;color:var(--sub);margin-bottom:8px">📊 積分榜</div>
-            <div id="wc-stand-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
-          </div>
+        </div>
+
+        <!-- 淘汰賽子頁面 -->
+        <div id="wc-pane-bracket" style="display:none;padding:12px 16px 12px">
+          <div id="wc-bracket-rows"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
         </div>
 
         <!-- 分析子頁面 -->
@@ -2667,9 +2669,11 @@ function wcTableHTML(matches) {
     var timeStr = ('0'+twTime.getHours()).slice(-2) + ':' + ('0'+twTime.getMinutes()).slice(-2);
     var scoreBlock;
     if (isDone) {
-      scoreBlock = '<span style="font-size:18px;font-weight:900;color:var(--text)">' + (home.score||0) + ' - ' + (away.score||0) + '</span>';
+      var ftBadge = m.statusDesc ? '<span style="font-size:9px;display:block;color:var(--sub);margin-top:1px">' + m.statusDesc + '</span>' : '';
+      scoreBlock = '<div style="text-align:center">' + '<span style="font-size:18px;font-weight:900;color:var(--text)">' + (home.score||0) + ' - ' + (away.score||0) + '</span>' + ftBadge + '</div>';
     } else if (isLive) {
-      scoreBlock = '<span style="font-size:14px;font-weight:700;color:#e53935">' + (home.score||0) + ' - ' + (away.score||0) + '</span>';
+      var minBadge = m.statusDesc ? '<span style="font-size:9px;display:block;color:#e53935;margin-top:1px">' + m.statusDesc + '</span>' : '';
+      scoreBlock = '<div style="text-align:center">' + '<span style="font-size:14px;font-weight:700;color:#e53935">' + (home.score||0) + ' - ' + (away.score||0) + '</span>' + minBadge + '</div>';
     } else {
       scoreBlock = '<span style="font-size:14px;font-weight:600;color:var(--sub)">' + timeStr + '</span>';
     }
@@ -2741,8 +2745,62 @@ async function loadWorldCup() {
     el.dataset.loaded = '1';
     el.innerHTML = `<div class="error-note">賽程載入失敗 · <a href="https://www.espn.com/soccer/league/_/name/fifa.world" target="_blank" style="color:var(--blue)">ESPN →</a></div>`;
   }
-  // 自動載積分榜
-  loadWCStandings();
+}
+
+var _bracketLoaded = false;
+async function loadWCBracket() {
+  if (_bracketLoaded) return;
+  const box = document.getElementById('wc-bracket-rows');
+  if (!box) return;
+  box.innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入淘汰賽資料…</div>';
+  try {
+    const rounds = await fetch('/api/worldcup?mode=bracket').then(r => r.ok ? r.json() : Promise.reject(r.status));
+    if (!Array.isArray(rounds) || !rounds.length) { box.innerHTML = '<div class="error-note">暫無淘汰賽資料</div>'; return; }
+    const roundColors = { '32強':'#3b82f6','16強':'#8b5cf6','八強':'#f59e0b','四強':'#ef4444','季軍賽':'#10b981','決賽':'#ec4899' };
+    box.innerHTML = rounds.map(function(rnd) {
+      var color = roundColors[rnd.round] || 'var(--sub)';
+      var matchRows = rnd.matches.map(function(m) {
+        var home = m.home || {};
+        var away = m.away || {};
+        var isDone = m.status === 'post';
+        var isLive = m.status === 'in';
+        var twTime = new Date(new Date(m.date).toLocaleString('en-US', {timeZone:'Asia/Taipei'}));
+        var timeStr = ('0'+twTime.getHours()).slice(-2) + ':' + ('0'+twTime.getMinutes()).slice(-2);
+        var dateStr = (twTime.getMonth()+1) + '/' + twTime.getDate();
+        var scoreBlock;
+        if (isDone) {
+          scoreBlock = '<div style="text-align:center;min-width:54px">'
+            + '<div style="font-size:16px;font-weight:900;color:var(--text)">' + (home.score||0) + ' – ' + (away.score||0) + '</div>'
+            + '<div style="font-size:9px;color:var(--sub);margin-top:1px">' + (m.statusDesc||'FT') + '</div>'
+            + '</div>';
+        } else if (isLive) {
+          scoreBlock = '<div style="text-align:center;min-width:54px">'
+            + '<div style="font-size:15px;font-weight:900;color:#e53935">' + (home.score||0) + ' – ' + (away.score||0) + '</div>'
+            + '<div style="font-size:9px;color:#e53935;margin-top:1px">' + (m.statusDesc||'LIVE') + '</div>'
+            + '</div>';
+        } else {
+          scoreBlock = '<div style="text-align:center;min-width:54px">'
+            + '<div style="font-size:12px;font-weight:700;color:var(--sub)">' + dateStr + '</div>'
+            + '<div style="font-size:11px;color:var(--sub)">' + timeStr + '</div>'
+            + '</div>';
+        }
+        var homeLogo = home.logo ? '<img src="' + home.logo + '" style="width:18px;height:14px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">' : '';
+        var awayLogo = away.logo ? '<img src="' + away.logo + '" style="width:18px;height:14px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">' : '';
+        return '<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);gap:4px">'
+          + '<div style="flex:1;text-align:right;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:flex-end;gap:4px">' + (home.name||'TBD') + homeLogo + '</div>'
+          + scoreBlock
+          + '<div style="flex:1;text-align:left;font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px">' + awayLogo + (away.name||'TBD') + '</div>'
+          + '</div>';
+      }).join('');
+      return '<div style="margin-bottom:16px">'
+        + '<div style="font-size:13px;font-weight:800;color:' + color + ';padding:5px 0 4px;border-bottom:2px solid ' + color + ';margin-bottom:4px">🏆 ' + rnd.round + '</div>'
+        + matchRows
+        + '</div>';
+    }).join('');
+    _bracketLoaded = true;
+  } catch(e) {
+    box.innerHTML = '<div class="error-note">淘汰賽載入失敗</div>';
+  }
 }
 
 async function loadWCStandings() {
