@@ -2562,6 +2562,9 @@ function switchWCSub(btn, paneId) {
   if (paneId === 'wc-pane-analysis' && !document.getElementById('wc-preview-rows').dataset.loaded) {
     loadWCPreview();
   }
+  // Update URL hash for deep linking
+  const subMap = {'wc-pane-schedule':'wc','wc-pane-bracket':'wc-bracket','wc-pane-analysis':'wc-analysis'};
+  if (subMap[paneId]) history.replaceState(null,'','#' + subMap[paneId]);
 }
 
 
@@ -2925,7 +2928,18 @@ async function loadNewsTab() {
 (function() {
   const TABS = ['stories','news','retire','about','market','copy'];
   const hash = window.location.hash.slice(1);
-  if (hash && (TABS.includes(hash) || hash.startsWith('story-'))) {
+  const wcSubs = {'wc':'wc-pane-schedule','wc-bracket':'wc-pane-bracket','wc-analysis':'wc-pane-analysis'};
+  if (hash && wcSubs[hash]) {
+    // Deep link to WC sub-tab
+    switchTab('news');
+    setTimeout(function() {
+      const paneId = wcSubs[hash];
+      const tabId = {'wc-pane-schedule':'wc-tab-schedule','wc-pane-bracket':'wc-tab-bracket','wc-pane-analysis':'wc-tab-analysis'}[paneId];
+      const btn = document.getElementById(tabId);
+      if (btn) switchWCSub(btn, paneId);
+      if (hash === 'wc-bracket') loadWCBracket();
+    }, 100);
+  } else if (hash && (TABS.includes(hash) || hash.startsWith('story-'))) {
     switchTab(hash.startsWith('story-') ? 'stories' : hash);
   } else {
     try {
