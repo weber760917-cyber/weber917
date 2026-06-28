@@ -4,7 +4,7 @@ export default async function handler(req, res) {
 
   try {
     if (mode === 'bracket') {
-      // Fetch all knockout stage matches (R32 through Final)
+      // Fetch all knockout stage matches using season.slug for accurate round classification
       const fmt = d => d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2);
       const start = new Date('2026-06-28T00:00:00Z');
       const dates = Array.from({length:23}, (_,i) => fmt(new Date(+start + i*86400000)));
@@ -15,41 +15,48 @@ export default async function handler(req, res) {
         return dx.events || [];
       };
       const allRaw = (await Promise.all(dates.map(fetchDay))).flat();
+      // Deduplicate
       const seen = new Set();
-      const rounds = [
-        { label:'32強', range:['2026-06-28','2026-07-05'] },
-        { label:'16強', range:['2026-07-05','2026-07-09'] },
-        { label:'八強', range:['2026-07-09','2026-07-13'] },
-        { label:'四強', range:['2026-07-13','2026-07-16'] },
-        { label:'季軍賽', range:['2026-07-17','2026-07-19'] },
-        { label:'決賽', range:['2026-07-19','2026-07-21'] },
-      ];
-      const inRange = (dateStr, [from, to]) => dateStr >= from && dateStr < to;
-      const result = rounds.map(rnd => {
-        const matches = allRaw.filter(ev => {
-          if (seen.has(ev.id)) return false;
-          const d = ev.date?.slice(0,10) || '';
-          if (!inRange(d, rnd.range)) return false;
-          seen.add(ev.id); return true;
-        }).map(ev => {
-          const comp = ev.competitions?.[0];
-          const teams = comp?.competitors || [];
-          const home = teams.find(t=>t.homeAway==='home') || teams[0] || {};
-          const away = teams.find(t=>t.homeAway==='away') || teams[1] || {};
-          const st = comp?.status?.type || {};
-          return {
-            date: ev.date, id: ev.id,
-            status: st.state || 'pre',
-            statusDesc: st.shortDetail || '',
-            clock: ev.status?.displayClock || '',
-            home: { name: home.team?.displayName||'TBD', logo: home.team?.logo||'', score: home.score||'' },
-            away: { name: away.team?.displayName||'TBD', logo: away.team?.logo||'', score: away.score||'' },
-          };
+      const allEvents = allRaw.filter(ev => { if (seen.has(ev.id)) return false; seen.add(ev.id); return true; });
+      // Map ESPN season.slug → Chinese round label + display order
+      const slugMap = {
+        'round-of-32':  { label:'32強', order:0, slots:16 },
+        'round-of-16':  { label:'16強', order:1, slots:8 },
+        'quarterfinal': { label:'八強', order:2, slots:4 },
+        'semifinal':    { label:'四強', order:3, slots:2 },
+        'third-place':  { label:'季軍賽', order:4, slots:1 },
+        'final':        { label:'決賽', order:5, slots:1 },
+      };
+      // Group by slug
+      const groups = {};
+      for (const ev of allEvents) {
+        const slug = ev.season?.slug || '';
+        if (!slugMap[slug]) continue;
+        if (!groups[slug]) groups[slug] = [];
+        const comp = ev.competitions?.[0];
+        const teams = comp?.competitors || [];
+        const home = teams.find(t=>t.homeAway==='home') || teams[0] || {};
+        const away = teams.find(t=>t.homeAway==='away') || teams[1] || {};
+        const st = comp?.status?.type || {};
+        groups[slug].push({
+          date: ev.date, id: ev.id,
+          status: st.state || 'pre',
+          statusDesc: st.shortDetail || '',
+          home: { name: home.team?.displayName||'TBD', logo: home.team?.logo||'', score: home.score||'' },
+          away: { name: away.team?.displayName||'TBD', logo: away.team?.logo||'', score: away.score||'' },
         });
-        return { round: rnd.label, matches };
-      });
+      }
+      // Sort each group by date
+      for (const slug of Object.keys(groups)) {
+        groups[slug].sort((a,b) => new Date(a.date) - new Date(b.date));
+      }
+      // Output in round order
+      const result = Object.entries(slugMap)
+        .sort((a,b) => a[1].order - b[1].order)
+        .filter(([slug]) => groups[slug]?.length)
+        .map(([slug, info]) => ({ round: info.label, slots: info.slots, matches: groups[slug] }));
       res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=120');
-      return res.json(result.filter(r => r.matches.length > 0));
+      return res.json(result);
     }
 
     if (mode === 'standings') {
