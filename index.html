@@ -3792,7 +3792,7 @@ function printIncReport() {
     var c=COLORS[fi%COLORS.length];
     return '<tr>'+
       '<td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+c+';margin-right:6px;vertical-align:middle"></span>'+f.name+'</td>'+
-      '<td style="text-align:center"><span style="padding:2px 8px;border-radius:10px;font-size:10px;background:'+(isDiv?'#dbeafe':'#dcfce7')+';color:'+(isDiv?'#1d4ed8':'#15803d')+'">'+(isDiv?'配息領出':'再投入')+'</span></td>'+
+      '<td style="text-align:center"><span style="padding:2px 8px;border-radius:10px;font-size:12px;background:'+(isDiv?'#dbeafe':'#dcfce7')+';color:'+(isDiv?'#1d4ed8':'#15803d')+'">'+(isDiv?'配息領出':'再投入')+'</span></td>'+
       '<td style="text-align:right;font-weight:700">'+s.alloc+'%</td>'+
       '<td style="text-align:right">'+incFmtP(amt)+'</td>'+
       '<td style="text-align:right;color:#0891b2;font-weight:600">'+f.divRate.toFixed(2)+'%</td>'+
@@ -3808,14 +3808,14 @@ function printIncReport() {
     var rc=riskColor[info.risk]||'#64748b';
     return '<div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin-bottom:8px">'+
       '<div style="background:'+c+';padding:8px 12px;display:flex;justify-content:space-between;align-items:center">'+
-        '<div style="color:white;font-weight:800;font-size:12px">'+info.icon+' '+f.name+'</div>'+
+        '<div style="color:white;font-weight:800;font-size:14px">'+info.icon+' '+f.name+'</div>'+
         '<div style="display:flex;gap:6px;align-items:center">'+
-          '<span style="background:rgba(255,255,255,0.2);color:white;font-size:9px;padding:2px 8px;border-radius:10px">'+info.tag+'</span>'+
-          '<span style="background:'+rc+';color:white;font-size:9px;padding:2px 8px;border-radius:10px">風險：'+info.risk+'</span>'+
+          '<span style="background:rgba(255,255,255,0.2);color:white;font-size:11px;padding:2px 8px;border-radius:10px">'+info.tag+'</span>'+
+          '<span style="background:'+rc+';color:white;font-size:11px;padding:2px 8px;border-radius:10px">風險：'+info.risk+'</span>'+
         '</div>'+
       '</div>'+
-      '<div style="padding:8px 12px;font-size:11px;line-height:1.7;color:#334155">'+info.desc+'</div>'+
-      '<div style="padding:4px 12px 8px;display:flex;gap:16px;font-size:10px;background:#f8fafc">'+
+      '<div style="padding:8px 12px;font-size:13px;line-height:1.7;color:#334155">'+info.desc+'</div>'+
+      '<div style="padding:4px 12px 8px;display:flex;gap:16px;font-size:12px;background:#f8fafc">'+
         '<span>近一年殖利率 <b style="color:#0891b2">'+f.divRate.toFixed(2)+'%</b></span>'+
         '<span>長期年化報酬 <b style="color:#d97706">'+f.annReturn.toFixed(1)+'%</b></span>'+
         '<span>配息頻率 <b>'+f.freq+'</b></span>'+
@@ -3827,16 +3827,16 @@ function printIncReport() {
   var cardGrads=['linear-gradient(135deg,#1e3a8a,#1d4ed8)','linear-gradient(135deg,#164e63,#0891b2)','linear-gradient(135deg,#14532d,#16a34a)'];
   var projCards=results.map(function(r,i){
     var fRows=r.byFund.map(function(b){
-      return '<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.15)">'+
+      return '<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.15)">'+
         '<span style="opacity:0.85">'+b.name+'</span><span style="font-weight:700">'+incFmtP(b.fAccount)+'</span></div>';
     }).join('');
-    var tot=r.byFund.length>1?'<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:900;padding:5px 0 0;color:#fde68a"><span>合計</span><span>'+incFmtP(r.finalAccount)+'</span></div>':'';
+    var tot=r.byFund.length>1?'<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:900;padding:5px 0 0;color:#fde68a"><span>合計</span><span>'+incFmtP(r.finalAccount)+'</span></div>':'';
     return '<div style="background:'+cardGrads[i]+';border-radius:14px;padding:18px;color:white;display:flex;flex-direction:column;gap:10px">'+
-      '<div style="font-size:22px;font-weight:900;text-align:center;letter-spacing:2px;opacity:0.9">'+periods[i]+' 年後</div>'+
-      (r.y1Monthly>0?'<div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;opacity:0.7;margin-bottom:2px">首月現金配息</div><div style="font-size:28px;font-weight:900;line-height:1">'+incFmtP(Math.round(r.y1Monthly))+'</div></div>':'')+
-      (r.totalReceived>0?'<div style="text-align:center"><div style="font-size:10px;opacity:0.7">'+periods[i]+'年累積領回</div><div style="font-size:18px;font-weight:800;color:#fde68a">'+incFmtP(Math.round(r.totalReceived))+'</div></div>':'')+
-      '<div><div style="font-size:10px;opacity:0.7;margin-bottom:4px">各基金期末帳戶價值</div>'+fRows+tot+'</div>'+
-      '<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:10px;text-align:center;margin-top:auto"><div style="font-size:10px;opacity:0.7">期末月配息（全轉配現金）</div><div style="font-size:24px;font-weight:900;color:#fde68a">'+incFmtP(Math.round(r.finalMonthly))+'</div></div>'+
+      '<div style="font-size:24px;font-weight:900;text-align:center;letter-spacing:2px;opacity:0.9">'+periods[i]+' 年後</div>'+
+      (r.y1Monthly>0?'<div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:10px;text-align:center"><div style="font-size:12px;opacity:0.7;margin-bottom:2px">首月現金配息</div><div style="font-size:30px;font-weight:900;line-height:1">'+incFmtP(Math.round(r.y1Monthly))+'</div></div>':'')+
+      (r.totalReceived>0?'<div style="text-align:center"><div style="font-size:12px;opacity:0.7">'+periods[i]+'年累積領回</div><div style="font-size:20px;font-weight:800;color:#fde68a">'+incFmtP(Math.round(r.totalReceived))+'</div></div>':'')+
+      '<div><div style="font-size:12px;opacity:0.7;margin-bottom:4px">各基金期末帳戶價值</div>'+fRows+tot+'</div>'+
+      '<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:10px;text-align:center;margin-top:auto"><div style="font-size:12px;opacity:0.7">期末月配息（全轉配現金）</div><div style="font-size:26px;font-weight:900;color:#fde68a">'+incFmtP(Math.round(r.finalMonthly))+'</div></div>'+
     '</div>';
   }).join('');
 
@@ -3850,24 +3850,24 @@ function printIncReport() {
   '<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>'+
   '<style>'+
   '*{box-sizing:border-box;margin:0;padding:0}'+
-  'body{font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:12px;color:#1e293b;background:#f1f5f9;margin:0}'+
+  'body{font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:16px;color:#1e293b;background:#f1f5f9;margin:0}'+
   '.page{background:white;max-width:900px;margin:0 auto}'+
   '.header{background:linear-gradient(135deg,#0f172a 0%,#1e40af 60%,#0891b2 100%);padding:20px 28px;color:white;display:flex;justify-content:space-between;align-items:center}'+
-  '.header-title{font-size:22px;font-weight:900;letter-spacing:1px}'+
-  '.header-sub{font-size:10px;opacity:0.65;margin-top:3px}'+
-  '.header-amt-lbl{font-size:10px;opacity:0.65;text-align:right}'+
-  '.header-amt-val{font-size:28px;font-weight:900;text-align:right}'+
+  '.header-title{font-size:24px;font-weight:900;letter-spacing:1px}'+
+  '.header-sub{font-size:12px;opacity:0.65;margin-top:3px}'+
+  '.header-amt-lbl{font-size:12px;opacity:0.65;text-align:right}'+
+  '.header-amt-val{font-size:30px;font-weight:900;text-align:right}'+
   '.body{padding:16px 24px}'+
-  '.sec{font-size:11px;font-weight:700;color:#1e40af;margin:12px 0 7px;padding:4px 10px;background:#eff6ff;border-radius:6px;border-left:3px solid #1e40af}'+
+  '.sec{font-size:13px;font-weight:700;color:#1e40af;margin:12px 0 7px;padding:4px 10px;background:#eff6ff;border-radius:6px;border-left:3px solid #1e40af}'+
   'table{width:100%;border-collapse:collapse;margin-bottom:6px}'+
-  'th{background:#0f172a;color:white;padding:6px 10px;font-size:10px;text-align:left;font-weight:600}'+
-  'td{padding:5px 10px;border-bottom:1px solid #f1f5f9;font-size:11px}'+
+  'th{background:#0f172a;color:white;padding:6px 10px;font-size:12px;text-align:left;font-weight:600}'+
+  'td{padding:5px 10px;border-bottom:1px solid #f1f5f9;font-size:13px}'+
   'tr:nth-child(even) td{background:#f8fafc}'+
   '.charts-row{display:grid;grid-template-columns:190px 1fr;gap:12px;margin-bottom:6px}'+
   '.chart-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px}'+
-  '.chart-title{font-size:10px;font-weight:700;color:#475569;text-align:center;margin-bottom:6px}'+
+  '.chart-title{font-size:12px;font-weight:700;color:#475569;text-align:center;margin-bottom:6px}'+
   '.proj-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}'+
-  '.note{font-size:9px;color:#94a3b8;line-height:1.6;border-top:1px solid #e2e8f0;padding-top:8px}'+
+  '.note{font-size:11px;color:#94a3b8;line-height:1.6;border-top:1px solid #e2e8f0;padding-top:8px}'+
   '@page{size:A4;margin:8mm}'+
   '@media print{body{background:white}.page{max-width:100%}}'+
   '<\/style></head><body><div class="page">'+
@@ -3893,10 +3893,10 @@ function printIncReport() {
   '</div></div>'+
   '<script>var D='+chartDataStr+';'+
   'window.addEventListener("load",function(){'+
-    'new Chart(document.getElementById("pieChart").getContext("2d"),{type:"doughnut",data:{labels:D.pieLabels,datasets:[{data:D.pieData,backgroundColor:D.pieColors,borderWidth:2,borderColor:"#fff"}]},options:{plugins:{legend:{position:"bottom",labels:{font:{size:9},padding:4,boxWidth:10}}},cutout:"45%",animation:{duration:0}}});'+
+    'new Chart(document.getElementById("pieChart").getContext("2d"),{type:"doughnut",data:{labels:D.pieLabels,datasets:[{data:D.pieData,backgroundColor:D.pieColors,borderWidth:2,borderColor:"#fff"}]},options:{plugins:{legend:{position:"bottom",labels:{font:{size:11},padding:4,boxWidth:10}}},cutout:"45%",animation:{duration:0}}});'+
     'var ds=D.growthDatasets.map(function(d){return{label:d.label,data:d.data.map(function(v){return Math.round(v/10000);}),backgroundColor:d.color+"bb",borderColor:d.color,borderWidth:1,stack:"val",order:1};});'+
     'ds.push({label:"累積領回配息",data:D.divReceived.map(function(v){return Math.round(v/10000);}),type:"bar",backgroundColor:"#ef444455",borderColor:"#ef4444",borderWidth:2,stack:"div",order:0});'+
-    'new Chart(document.getElementById("barChart").getContext("2d"),{type:"bar",data:{labels:D.yearPoints.map(function(y){return y===0?"現在":y+"年後";}),datasets:ds},options:{plugins:{legend:{position:"bottom",labels:{font:{size:9},padding:4,boxWidth:10}}},scales:{x:{stacked:true,ticks:{font:{size:9}}},y:{ticks:{font:{size:9},callback:function(v){return v>=10000?(v/10000).toFixed(0)+"億":v+"萬";}}}},animation:{duration:0}}});'+
+    'new Chart(document.getElementById("barChart").getContext("2d"),{type:"bar",data:{labels:D.yearPoints.map(function(y){return y===0?"現在":y+"年後";}),datasets:ds},options:{plugins:{legend:{position:"bottom",labels:{font:{size:11},padding:4,boxWidth:10}}},scales:{x:{stacked:true,ticks:{font:{size:11}}},y:{ticks:{font:{size:11},callback:function(v){return v>=10000?(v/10000).toFixed(0)+"億":v+"萬";}}}},animation:{duration:0}}});'+
     'setTimeout(function(){window.print();},800);'+
   '});<\/script></body></html>');
   w.document.close();
