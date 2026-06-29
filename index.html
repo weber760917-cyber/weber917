@@ -1202,6 +1202,8 @@ function switchTab(name) {
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
+  // rview-loan 在 panel-retire 外部，切換 tab 時需手動隱藏
+  if (name !== 'retire') { var rvl = document.getElementById('rview-loan'); if (rvl) rvl.style.display = 'none'; }
   if (name === 'news' && !document.getElementById('wc-rows').dataset.loaded) loadNewsTab();
   if (name === 'about') { try { retCalc(); } catch(e){} }
   if (name === 'retire') { try { retPlan(); } catch(e){} }
