@@ -3728,19 +3728,51 @@ function printIncReport() {
   if (!checked.length) { alert('請先勾選基金並設定配置比例'); return; }
   var periods=[5,10,20];
   var results=periods.map(function(yr){ return incSimulate(principal,checked,yr); });
-  var today = new Date(); var dateStr = today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate();
-  var fundRows = checked.map(function(f){
+  var today=new Date(); var dateStr=today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate();
+  var COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6'];
+
+  // ── 圓餅圖資料 ──
+  var pieLabels=checked.map(function(f){ return f.name; });
+  var pieData=checked.map(function(f){ return _incState[f.id].alloc||0; });
+  var pieColors=checked.map(function(f,i){ return COLORS[i%COLORS.length]; });
+
+  // ── 成長長條圖資料 (0,5,10,15,20年) ──
+  var yearPoints=[0,5,10,15,20];
+  var growthDatasets=checked.map(function(f,fi){
+    var vals=yearPoints.map(function(yr){
+      if(yr===0) return principal*(_incState[f.id].alloc||0)/100;
+      var r=incSimulate(principal,[f],yr);
+      return r.byFund.length?r.byFund[0].fAccount:0;
+    });
+    return {label:f.name, data:vals, color:COLORS[fi%COLORS.length]};
+  });
+  // 加一條「累積領回配息」折線
+  var divReceivedByYear=yearPoints.map(function(yr){
+    if(yr===0) return 0;
+    var tot=0;
+    checked.forEach(function(f){
+      var s=_incState[f.id]; if(s.mode!=='div') return;
+      var V=principal*(s.alloc||0)/100, divR=f.divRate/100, capR=f.capRate/100, acc=V;
+      for(var y=0;y<yr;y++){tot+=acc*divR; acc=acc*(1+capR);}
+    });
+    return tot;
+  });
+
+  // ── 基金明細表 ──
+  var fundRows=checked.map(function(f){
     var s=_incState[f.id], isDiv=s.mode==='div', amt=principal*s.alloc/100;
     var units=f.nav>0?(amt/f.nav):0;
     var uLbl=units>=1000?Math.round(units/1000)+'K':units.toFixed(1);
-    return '<tr><td>'+f.name+'</td><td style="text-align:center">'+(isDiv?'月配息領出':'配股再投入')+'</td>'+
+    return '<tr><td>'+f.name+'</td><td style="text-align:center">'+(isDiv?'配息領出':'再投入')+'</td>'+
       '<td style="text-align:right">'+s.alloc+'%</td>'+
       '<td style="text-align:right">'+incFmtP(amt)+'</td>'+
       '<td style="text-align:right">'+f.divRate.toFixed(2)+'%</td>'+
       '<td style="text-align:right">'+f.annReturn.toFixed(1)+'%</td>'+
       '<td style="text-align:right">'+uLbl+' 單位</td></tr>';
   }).join('');
-  var projCols = results.map(function(r,i){
+
+  // ── 推估欄 ──
+  var projCols=results.map(function(r,i){
     var fRows=r.byFund.map(function(b){
       return '<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;border-bottom:1px dashed #e2e8f0">'+
         '<span>'+b.name+'</span><span style="font-weight:600">'+incFmtP(b.fAccount)+'</span></div>';
@@ -3755,40 +3787,71 @@ function printIncReport() {
       '<div style="background:#fef3c7;border-radius:6px;padding:8px;text-align:center"><div style="font-size:10px;color:#92400e">期末月配息</div><div style="font-size:18px;font-weight:900;color:#d97706">'+incFmtP(Math.round(r.finalMonthly))+'</div><div style="font-size:9px;color:#92400e">（帳戶全轉配現金）</div></div>'+
     '</td>';
   }).join('');
-  var html = '<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8">'+
-    '<title>理財試算報表</title>'+
-    '<style>*{box-sizing:border-box;margin:0;padding:0}'+
-    'body{font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:13px;color:#1e293b;padding:24px 28px;max-width:800px;margin:0 auto}'+
-    'h1{font-size:20px;color:#1e40af;margin-bottom:4px}'+
-    '.sub{color:#64748b;font-size:11px}'+
-    'table{width:100%;border-collapse:collapse;margin-bottom:20px}'+
-    'th{background:#1e40af;color:white;padding:7px 10px;font-size:11px;text-align:left}'+
-    'td{padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:12px}'+
-    'tr:nth-child(even) td{background:#f8fafc}'+
-    '.proj-table{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}'+
-    '.note{font-size:10px;color:#94a3b8;line-height:1.7;border-top:1px solid #e2e8f0;padding-top:12px}'+
-    '@media print{body{padding:10px}button{display:none!important}}'+
-    '</style></head><body>'+
-    '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #1e40af">'+
-      '<div><h1>月配息理財試算報表</h1><div class="sub">製表日期：'+dateStr+'　　僅供參考，不構成投資建議</div></div>'+
-      '<div style="text-align:right"><div style="font-size:11px;color:#64748b">投入總金額</div><div style="font-size:22px;font-weight:900;color:#1e40af">'+incFmtP(principal)+'</div></div>'+
-    '</div>'+
-    '<div style="font-size:13px;font-weight:700;color:#1e40af;margin-bottom:8px">▍ 基金配置明細</div>'+
-    '<table><thead><tr><th>基金名稱</th><th style="text-align:center">配息方式</th><th style="text-align:right">配置</th><th style="text-align:right">投入金額</th><th style="text-align:right">近一年殖利率</th><th style="text-align:right">長期年化報酬</th><th style="text-align:right">可買單位數</th></tr></thead><tbody>'+fundRows+'</tbody></table>'+
-    '<div style="font-size:13px;font-weight:700;color:#1e40af;margin-bottom:12px">▍ 本金成長推估</div>'+
-    '<div class="proj-table"><table style="border:none"><tr>'+projCols+'</tr></table></div>'+
-    '<div class="note">'+
-      '※ 試算假設：配息率以 MoneyDJ 近一年實際配息÷現在淨值為準；長期年化報酬率取各基金自成立以來歷史資料（境內ETF取自上市以來）。<br>'+
-      '※ 配息領出模式：每期配息領出，本金依增值率複利成長。再投入模式：配息與增值全數累積，以複利推算終值。<br>'+
-      '※ 期末月配息 = 期末帳戶總值 × 配息率 ÷ 12，適用於到期後將資產全數轉為月配商品的情境。<br>'+
-      '※ 以上數據為估算，實際報酬受市場波動影響，過去績效不代表未來表現。本報表不構成任何投資建議。'+
-    '</div>'+
-    '<script>window.onload=function(){window.print();}<\/script>'+
-    '</body></html>';
+
+  var chartDataStr = JSON.stringify({
+    pieLabels:pieLabels, pieData:pieData, pieColors:pieColors,
+    growthDatasets:growthDatasets, yearPoints:yearPoints, divReceived:divReceivedByYear
+  });
+
   var w=window.open('','_blank');
-  w.document.write(html);
+  w.document.write('<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8"><title>理財試算報表</title>'+
+  '<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>'+
+  '<style>*{box-sizing:border-box;margin:0;padding:0}'+
+  'body{font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:13px;color:#1e293b;padding:24px 28px;max-width:820px;margin:0 auto}'+
+  'h2{font-size:13px;font-weight:700;color:#1e40af;margin:18px 0 10px;padding-left:8px;border-left:3px solid #1e40af}'+
+  'table{width:100%;border-collapse:collapse;margin-bottom:20px}'+
+  'th{background:#1e40af;color:white;padding:7px 10px;font-size:11px;text-align:left}'+
+  'td{padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:12px}'+
+  'tr:nth-child(even) td{background:#f8fafc}'+
+  '.charts-row{display:grid;grid-template-columns:1fr 1.8fr;gap:16px;margin-bottom:20px;align-items:start}'+
+  '.chart-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px}'+
+  '.chart-title{font-size:12px;font-weight:700;color:#334155;text-align:center;margin-bottom:8px}'+
+  '.proj-table{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}'+
+  '.note{font-size:10px;color:#94a3b8;line-height:1.7;border-top:1px solid #e2e8f0;padding-top:12px}'+
+  '@media print{@page{margin:15mm}button{display:none!important}.no-break{page-break-inside:avoid}}'+
+  '<\/style></head><body>'+
+  '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #1e40af">'+
+    '<div><div style="font-size:22px;font-weight:900;color:#1e40af">月配息理財試算報表</div>'+
+    '<div style="font-size:11px;color:#64748b;margin-top:2px">製表日期：'+dateStr+'　　僅供參考，不構成投資建議</div></div>'+
+    '<div style="text-align:right"><div style="font-size:11px;color:#64748b">投入總金額</div>'+
+    '<div style="font-size:24px;font-weight:900;color:#1e40af">'+incFmtP(principal)+'</div></div>'+
+  '</div>'+
+  '<h2>基金配置明細</h2>'+
+  '<table><thead><tr><th>基金名稱</th><th style="text-align:center">配息方式</th><th style="text-align:right">配置</th><th style="text-align:right">投入金額</th><th style="text-align:right">近一年殖利率</th><th style="text-align:right">長期年化報酬</th><th style="text-align:right">可買單位數</th></tr></thead><tbody>'+fundRows+'</tbody></table>'+
+  '<h2>投資分布 &amp; 資產成長預估</h2>'+
+  '<div class="charts-row">'+
+    '<div class="chart-box no-break"><div class="chart-title">投資分布（配置比例）</div><canvas id="pieChart" height="220"></canvas></div>'+
+    '<div class="chart-box no-break"><div class="chart-title">資產成長推估（萬元）</div><canvas id="barChart" height="220"></canvas></div>'+
+  '</div>'+
+  '<h2>本金成長推估</h2>'+
+  '<div class="proj-table no-break"><table style="border:none"><tr>'+projCols+'</tr></table></div>'+
+  '<div class="note">'+
+    '※ 試算假設：配息率以 MoneyDJ 近一年實際配息÷現在淨值為準；長期年化報酬率取各基金自成立以來歷史資料。<br>'+
+    '※ 配息領出模式：每期配息領出，本金依增值率複利成長。再投入模式：配息與增值全數複利累積。<br>'+
+    '※ 期末月配息 = 期末帳戶總值 × 配息率 ÷ 12（適用於到期後資產全數轉配息情境）。<br>'+
+    '※ 以上數據為估算，實際報酬受市場波動影響，過去績效不代表未來表現。本報表不構成任何投資建議。'+
+  '</div>'+
+  '<script>'+
+  'var D='+chartDataStr+';'+
+  'window.addEventListener("load",function(){'+
+    // Pie chart
+    'var pc=document.getElementById("pieChart").getContext("2d");'+
+    'new Chart(pc,{type:"doughnut",data:{labels:D.pieLabels,datasets:[{data:D.pieData,backgroundColor:D.pieColors,borderWidth:2,borderColor:"#fff"}]},'+
+    'options:{plugins:{legend:{position:"bottom",labels:{font:{size:10},padding:8,boxWidth:12}}},cutout:"50%",animation:{duration:0}}});'+
+    // Stacked bar chart
+    'var bc=document.getElementById("barChart").getContext("2d");'+
+    'var datasets=D.growthDatasets.map(function(d){return{label:d.label,data:d.data.map(function(v){return Math.round(v/10000);}),backgroundColor:d.color+"cc",borderColor:d.color,borderWidth:1,stack:"val"};});'+
+    // Add dividend line
+    'datasets.push({label:"累積領回配息",data:D.divReceived.map(function(v){return Math.round(v/10000);}),type:"line",borderColor:"#f59e0b",backgroundColor:"transparent",borderWidth:2,borderDash:[4,3],pointRadius:4,pointBackgroundColor:"#f59e0b",stack:undefined,order:0});'+
+    'new Chart(bc,{type:"bar",data:{labels:D.yearPoints.map(function(y){return y===0?"現在":y+"年後";}),datasets:datasets},'+
+    'options:{plugins:{legend:{position:"bottom",labels:{font:{size:9},padding:6,boxWidth:10}}},scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:function(v){return v>=10000?(v/10000).toFixed(0)+"億":v+"萬";}}}},animation:{duration:0}}});'+
+    'setTimeout(function(){window.print();},800);'+
+  '});'+
+  '<\/script></body></html>');
   w.document.close();
 }
+
+
 
 </script>
 </body>
