@@ -3739,8 +3739,7 @@ function printIncReport() {
   var growthDatasets=checked.map(function(f,fi){
     var vals=yearPoints.map(function(yr){
       if(yr===0) return principal*(_incState[f.id].alloc||0)/100;
-      var r=incSimulate(principal,[f],yr);
-      return r.byFund.length?r.byFund[0].fAccount:0;
+      var r=incSimulate(principal,[f],yr); return r.byFund.length?r.byFund[0].fAccount:0;
     });
     return {label:f.name, data:vals, color:COLORS[fi%COLORS.length]};
   });
@@ -3755,32 +3754,51 @@ function printIncReport() {
     return tot;
   });
 
-  var fundRows=checked.map(function(f){
+  // table rows
+  var fundTableRows=checked.map(function(f,fi){
     var s=_incState[f.id], isDiv=s.mode==='div', amt=principal*s.alloc/100;
     var units=f.nav>0?(amt/f.nav):0;
     var uLbl=units>=1000?Math.round(units/1000)+'K':units.toFixed(1);
-    return '<tr><td>'+f.name+'</td><td style="text-align:center">'+(isDiv?'配息領出':'再投入')+'</td>'+
-      '<td style="text-align:right">'+s.alloc+'%</td>'+
+    var c=COLORS[fi%COLORS.length];
+    return '<tr>'+
+      '<td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+c+';margin-right:6px;vertical-align:middle"></span>'+f.name+'</td>'+
+      '<td style="text-align:center"><span style="padding:2px 8px;border-radius:10px;font-size:10px;background:'+(isDiv?'#dbeafe':'#dcfce7')+';color:'+(isDiv?'#1d4ed8':'#15803d')+'">'+(isDiv?'配息領出':'再投入')+'</span></td>'+
+      '<td style="text-align:right;font-weight:700">'+s.alloc+'%</td>'+
       '<td style="text-align:right">'+incFmtP(amt)+'</td>'+
-      '<td style="text-align:right">'+f.divRate.toFixed(2)+'%</td>'+
-      '<td style="text-align:right">'+f.annReturn.toFixed(1)+'%</td>'+
+      '<td style="text-align:right;color:#0891b2;font-weight:600">'+f.divRate.toFixed(2)+'%</td>'+
+      '<td style="text-align:right;color:#d97706;font-weight:600">'+f.annReturn.toFixed(1)+'%</td>'+
       '<td style="text-align:right">'+uLbl+' 單位</td></tr>';
   }).join('');
 
-  var projCols=results.map(function(r,i){
+  // projection cards
+  var cardGrads=['linear-gradient(135deg,#1e3a8a,#1d4ed8)','linear-gradient(135deg,#164e63,#0891b2)','linear-gradient(135deg,#14532d,#16a34a)'];
+  var projCards=results.map(function(r,i){
     var fRows=r.byFund.map(function(b){
-      return '<div style="display:flex;justify-content:space-between;font-size:10px;padding:1px 0;border-bottom:1px dashed #e2e8f0">'+
-        '<span>'+b.name+'</span><span style="font-weight:600">'+incFmtP(b.fAccount)+'</span></div>';
+      return '<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.15)">'+
+        '<span style="opacity:0.85">'+b.name+'</span><span style="font-weight:700">'+incFmtP(b.fAccount)+'</span></div>';
     }).join('');
-    var tot=r.byFund.length>1?'<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:800;padding:3px 0;border-top:2px solid #16a34a;margin-top:2px;color:#16a34a"><span>合計</span><span>'+incFmtP(r.finalAccount)+'</span></div>':'';
-    return '<td style="vertical-align:top;padding:8px;border:1px solid #e2e8f0;border-radius:6px">'+
-      '<div style="font-size:14px;font-weight:900;color:#1e40af;text-align:center;margin-bottom:8px">'+periods[i]+' 年後</div>'+
-      (r.y1Monthly>0?'<div style="background:#eff6ff;border-radius:5px;padding:5px;text-align:center;margin-bottom:6px"><div style="font-size:9px;color:#64748b">首月現金配息</div><div style="font-size:16px;font-weight:900;color:#1d4ed8">'+incFmtP(Math.round(r.y1Monthly))+'</div></div>':'')+
-      (r.totalReceived>0?'<div style="text-align:center;margin-bottom:6px"><div style="font-size:9px;color:#64748b">'+periods[i]+'年累積領回</div><div style="font-size:13px;font-weight:800;color:#0891b2">'+incFmtP(Math.round(r.totalReceived))+'</div></div>':'')+
-      '<div style="font-size:9px;color:#64748b;margin-bottom:3px">期末帳戶價值</div>'+
-      '<div style="background:#f0fdf4;border-radius:5px;padding:5px;margin-bottom:6px">'+fRows+tot+'</div>'+
-      '<div style="background:#fef3c7;border-radius:5px;padding:5px;text-align:center"><div style="font-size:9px;color:#92400e">期末月配息</div><div style="font-size:15px;font-weight:900;color:#d97706">'+incFmtP(Math.round(r.finalMonthly))+'</div><div style="font-size:9px;color:#92400e">（全轉配現金）</div></div>'+
-    '</td>';
+    var tot=r.byFund.length>1?'<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:900;padding:5px 0 0;color:#fde68a"><span>合計</span><span>'+incFmtP(r.finalAccount)+'</span></div>':'';
+    return '<div style="background:'+cardGrads[i]+';border-radius:14px;padding:18px;color:white;display:flex;flex-direction:column;gap:10px">'+
+      '<div style="font-size:22px;font-weight:900;text-align:center;letter-spacing:2px;opacity:0.9">'+periods[i]+' 年後</div>'+
+      (r.y1Monthly>0?
+        '<div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:10px;text-align:center">'+
+          '<div style="font-size:10px;opacity:0.7;margin-bottom:2px">首月現金配息</div>'+
+          '<div style="font-size:28px;font-weight:900;line-height:1">'+incFmtP(Math.round(r.y1Monthly))+'</div>'+
+        '</div>':'')+
+      (r.totalReceived>0?
+        '<div style="text-align:center">'+
+          '<div style="font-size:10px;opacity:0.7">'+periods[i]+'年累積領回</div>'+
+          '<div style="font-size:18px;font-weight:800;color:#fde68a">'+incFmtP(Math.round(r.totalReceived))+'</div>'+
+        '</div>':'')+
+      '<div>'+
+        '<div style="font-size:10px;opacity:0.7;margin-bottom:4px">各基金期末帳戶價值</div>'+
+        fRows+tot+
+      '</div>'+
+      '<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:10px;text-align:center;margin-top:auto">'+
+        '<div style="font-size:10px;opacity:0.7">期末月配息（全轉配現金）</div>'+
+        '<div style="font-size:24px;font-weight:900;color:#fde68a">'+incFmtP(Math.round(r.finalMonthly))+'</div>'+
+      '</div>'+
+    '</div>';
   }).join('');
 
   var chartDataStr=JSON.stringify({
@@ -3793,53 +3811,60 @@ function printIncReport() {
   '<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>'+
   '<style>'+
   '*{box-sizing:border-box;margin:0;padding:0}'+
-  'body{font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:12px;color:#1e293b;padding:14px 18px;max-width:860px;margin:0 auto}'+
-  'h2{font-size:12px;font-weight:700;color:#1e40af;margin:10px 0 6px;padding-left:7px;border-left:3px solid #1e40af}'+
-  'table{width:100%;border-collapse:collapse;margin-bottom:10px}'+
-  'th{background:#1e40af;color:white;padding:5px 8px;font-size:10px;text-align:left}'+
-  'td{padding:4px 8px;border-bottom:1px solid #e2e8f0;font-size:11px}'+
+  'body{font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:12px;color:#1e293b;background:#f1f5f9;margin:0}'+
+  '.page{background:white;max-width:900px;margin:0 auto;padding:0}'+
+  '.header{background:linear-gradient(135deg,#0f172a 0%,#1e40af 60%,#0891b2 100%);padding:20px 28px;color:white;display:flex;justify-content:space-between;align-items:center}'+
+  '.header-title{font-size:22px;font-weight:900;letter-spacing:1px}'+
+  '.header-sub{font-size:10px;opacity:0.65;margin-top:3px}'+
+  '.header-amt{text-align:right}'+
+  '.header-amt-lbl{font-size:10px;opacity:0.65}'+
+  '.header-amt-val{font-size:28px;font-weight:900}'+
+  '.body{padding:18px 24px}'+
+  '.section-title{font-size:11px;font-weight:700;color:#1e40af;margin:14px 0 7px;padding:4px 10px;background:#eff6ff;border-radius:6px;border-left:3px solid #1e40af}'+
+  'table{width:100%;border-collapse:collapse;margin-bottom:4px}'+
+  'th{background:#0f172a;color:white;padding:6px 10px;font-size:10px;text-align:left;font-weight:600}'+
+  'td{padding:5px 10px;border-bottom:1px solid #f1f5f9;font-size:11px}'+
   'tr:nth-child(even) td{background:#f8fafc}'+
-  '.charts-row{display:grid;grid-template-columns:220px 1fr;gap:12px;margin-bottom:10px}'+
-  '.chart-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px}'+
-  '.chart-title{font-size:11px;font-weight:700;color:#334155;text-align:center;margin-bottom:6px}'+
-  '.proj-table{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}'+
+  '.charts-row{display:grid;grid-template-columns:200px 1fr;gap:14px;margin-bottom:4px}'+
+  '.chart-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px}'+
+  '.chart-title{font-size:10px;font-weight:700;color:#475569;text-align:center;margin-bottom:6px}'+
+  '.proj-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}'+
   '.note{font-size:9px;color:#94a3b8;line-height:1.6;border-top:1px solid #e2e8f0;padding-top:8px}'+
-  '@page{size:A4;margin:10mm}'+
-  '@media print{html,body{height:auto}body{padding:0}.no-pb{page-break-inside:avoid}}'+
-  '<\/style></head><body>'+
-  '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid #1e40af">'+
-    '<div><div style="font-size:18px;font-weight:900;color:#1e40af">月配息理財試算報表</div>'+
-    '<div style="font-size:10px;color:#64748b">製表日期：'+dateStr+'　　僅供參考，不構成投資建議</div></div>'+
-    '<div style="text-align:right"><div style="font-size:10px;color:#64748b">投入總金額</div>'+
-    '<div style="font-size:22px;font-weight:900;color:#1e40af">'+incFmtP(principal)+'</div></div>'+
+  '@page{size:A4;margin:8mm}'+
+  '@media print{body{background:white}.page{max-width:100%;box-shadow:none}}'+
+  '<\/style></head><body><div class="page">'+
+  '<div class="header">'+
+    '<div><div class="header-title">月配息理財試算報表</div><div class="header-sub">製表日期：'+dateStr+'　｜　僅供參考，不構成投資建議</div></div>'+
+    '<div class="header-amt"><div class="header-amt-lbl">投入總金額</div><div class="header-amt-val">'+incFmtP(principal)+'</div></div>'+
   '</div>'+
-  '<h2>基金配置明細</h2>'+
+  '<div class="body">'+
+  '<div class="section-title">▍ 基金配置明細</div>'+
   '<table><thead><tr><th>基金名稱</th><th style="text-align:center">配息方式</th><th style="text-align:right">配置</th><th style="text-align:right">投入金額</th><th style="text-align:right">近一年殖利率</th><th style="text-align:right">長期年化報酬</th><th style="text-align:right">可買單位數</th></tr></thead>'+
-  '<tbody>'+fundRows+'</tbody></table>'+
-  '<h2>投資分布 &amp; 資產成長推估</h2>'+
-  '<div class="charts-row no-pb">'+
+  '<tbody>'+fundTableRows+'</tbody></table>'+
+  '<div class="section-title">▍ 投資分布 &amp; 資產成長推估</div>'+
+  '<div class="charts-row">'+
     '<div class="chart-box"><div class="chart-title">投資分布（配置比例）</div><canvas id="pieChart"></canvas></div>'+
     '<div class="chart-box"><div class="chart-title">資產成長 &amp; 累積配息（萬元）</div><canvas id="barChart"></canvas></div>'+
   '</div>'+
-  '<h2>本金成長推估</h2>'+
-  '<div class="proj-table no-pb"><table style="border:none"><tr>'+projCols+'</tr></table></div>'+
+  '<div class="section-title">▍ 本金成長推估</div>'+
+  '<div class="proj-row">'+projCards+'</div>'+
   '<div class="note">'+
     '※ 試算假設：配息率以 MoneyDJ 近一年實際配息÷現在淨值為準；長期年化報酬率取各基金自成立以來歷史資料（境內ETF取自上市以來）。<br>'+
-    '※ 配息領出模式：每期配息領出，本金依增值率複利成長。再投入模式：配息與增值全數複利累積。期末月配息 = 期末帳戶總值 × 配息率 ÷ 12。<br>'+
+    '※ 配息領出：每期配息領出，本金依增值率複利成長。再投入：配息與增值全數複利累積。期末月配息 = 期末帳戶總值 × 配息率 ÷ 12（適用於到期後資產全數轉配息）。<br>'+
     '※ 以上數據為估算，實際報酬受市場波動影響，過去績效不代表未來表現。本報表不構成任何投資建議。'+
   '</div>'+
+  '</div></div>'+
   '<script>'+
   'var D='+chartDataStr+';'+
   'window.addEventListener("load",function(){'+
     'var pc=document.getElementById("pieChart").getContext("2d");'+
     'new Chart(pc,{type:"doughnut",data:{labels:D.pieLabels,datasets:[{data:D.pieData,backgroundColor:D.pieColors,borderWidth:2,borderColor:"#fff"}]},'+
-    'options:{plugins:{legend:{position:"bottom",labels:{font:{size:9},padding:5,boxWidth:10}}},cutout:"45%",animation:{duration:0}}});'+
+    'options:{plugins:{legend:{position:"bottom",labels:{font:{size:9},padding:4,boxWidth:10}}},cutout:"45%",animation:{duration:0}}});'+
     'var bc=document.getElementById("barChart").getContext("2d");'+
     'var datasets=D.growthDatasets.map(function(d){return{label:d.label,data:d.data.map(function(v){return Math.round(v/10000);}),backgroundColor:d.color+"bb",borderColor:d.color,borderWidth:1,stack:"val",order:1};});'+
-    // Red bar for cumulative dividends
-    'datasets.push({label:"累積領回配息",data:D.divReceived.map(function(v){return Math.round(v/10000);}),type:"bar",backgroundColor:"#ef444466",borderColor:"#ef4444",borderWidth:2,stack:"div",order:0});'+
+    'datasets.push({label:"累積領回配息",data:D.divReceived.map(function(v){return Math.round(v/10000);}),type:"bar",backgroundColor:"#ef444455",borderColor:"#ef4444",borderWidth:2,stack:"div",order:0});'+
     'new Chart(bc,{type:"bar",data:{labels:D.yearPoints.map(function(y){return y===0?"現在":y+"年後";}),datasets:datasets},'+
-    'options:{plugins:{legend:{position:"bottom",labels:{font:{size:9},padding:5,boxWidth:10}}},'+
+    'options:{plugins:{legend:{position:"bottom",labels:{font:{size:9},padding:4,boxWidth:10}}},'+
     'scales:{x:{stacked:true,ticks:{font:{size:9}}},y:{ticks:{font:{size:9},callback:function(v){return v>=10000?(v/10000).toFixed(0)+"億":v+"萬";}}}},animation:{duration:0}}});'+
     'setTimeout(function(){window.print();},800);'+
   '});'+
