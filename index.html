@@ -3373,18 +3373,18 @@ function calcFund() {
 
 // ── 月配息搭配試算 ──
 var INCOME_FUNDS = [
-  { id:'aling',   name:'安聯收益成長 AMg7', divRate:6.5,  capRate:1.6,  note:'月配', defMode:'div' },
-  { id:'tlz64',   name:'安聯收益成長 AM',   divRate:6.0,  capRate:1.8,  note:'月配', defMode:'div' },
-  { id:'aiai',    name:'安聯AI收益成長',    divRate:5.0,  capRate:10.4, note:'月配', defMode:'div' },
-  { id:'jpm',     name:'摩根多重收益',      divRate:5.0,  capRate:5.6,  note:'月配', defMode:'div' },
-  { id:'mg',      name:'M&G入息基金',       divRate:4.0,  capRate:0.9,  note:'月配', defMode:'div' },
-  { id:'ab',      name:'聯博美國成長 AP',   divRate:0.5,  capRate:10.4, note:'年配', defMode:'acc' },
+  { id:'aling',   name:'安聯收益成長 AMg7', divRate:6.5,  capRate:1.6,  note:'月配',    defMode:'div' },
+  { id:'tlz64',   name:'安聯收益成長 AM',   divRate:6.0,  capRate:1.8,  note:'月配',    defMode:'div' },
+  { id:'aiai',    name:'安聯AI收益成長',    divRate:5.0,  capRate:10.4, note:'月配',    defMode:'div' },
+  { id:'jpm',     name:'摩根多重收益',      divRate:5.0,  capRate:5.6,  note:'月配',    defMode:'div' },
+  { id:'mg',      name:'M&G入息基金',       divRate:4.0,  capRate:0.9,  note:'月配',    defMode:'div' },
+  { id:'ab',      name:'聯博美國成長 AP',   divRate:0.5,  capRate:10.4, note:'年配',    defMode:'acc' },
   { id:'brwt',    name:'貝萊德世界科技 A10',divRate:0.3,  capRate:34.9, note:'幾乎不配',defMode:'acc' },
-  { id:'t0050',   name:'0050 元大台灣50',   divRate:3.0,  capRate:6.2,  note:'年配', defMode:'div' },
-  { id:'e006208', name:'006208 富邦台灣50', divRate:2.5,  capRate:6.7,  note:'半年配',defMode:'div' },
-  { id:'e0056',   name:'0056 元大高股息',   divRate:5.5,  capRate:1.5,  note:'年配', defMode:'div' },
-  { id:'vt',      name:'VT 全球股市',       divRate:2.0,  capRate:6.1,  note:'季配', defMode:'div' },
-  { id:'vwra',    name:'VWRA 全世界',       divRate:1.5,  capRate:11.9, note:'季配', defMode:'acc' },
+  { id:'t0050',   name:'0050 元大台灣50',   divRate:3.0,  capRate:6.2,  note:'年配',    defMode:'div' },
+  { id:'e006208', name:'006208 富邦台灣50', divRate:2.5,  capRate:6.7,  note:'半年配',  defMode:'div' },
+  { id:'e0056',   name:'0056 元大高股息',   divRate:5.5,  capRate:1.5,  note:'年配',    defMode:'div' },
+  { id:'vt',      name:'VT 全球股市',       divRate:2.0,  capRate:6.1,  note:'季配',    defMode:'div' },
+  { id:'vwra',    name:'VWRA 全世界',       divRate:1.5,  capRate:11.9, note:'季配',    defMode:'acc' },
 ];
 var _incState = {};
 var _incInited = false;
@@ -3414,34 +3414,6 @@ function initIncomeTab() {
   renderIncomeFunds();
   calcIncome();
 }
-function renderIncomeFunds() {
-  var rows = document.getElementById('inc-fund-rows');
-  if (!rows) return;
-  rows.innerHTML = INCOME_FUNDS.map(function(f) {
-    var s = _incState[f.id] || { checked:false, alloc:0, mode:f.defMode };
-    var isDiv = s.mode === 'div';
-    var dc = '#0891b2'; var ac = '#16a34a';
-    var borderC = s.checked ? (isDiv ? dc : ac) : 'var(--border)';
-    var bgC = s.checked ? (isDiv ? '#f0f9ff' : '#f0fdf4') : 'white';
-    return '<div style="border:1.5px solid ' + borderC + ';border-radius:10px;padding:10px 12px;background:' + bgC + '">' +
-      '<div style="display:flex;align-items:center;gap:10px">' +
-        '<input type="checkbox" ' + (s.checked?'checked':'') + ' onchange="incToggle('' + f.id + '',this.checked)" style="width:16px;height:16px;accent-color:var(--blue);flex-shrink:0">' +
-        '<div style="flex:1;min-width:0">' +
-          '<div style="font-size:13px;font-weight:700;color:var(--text)">' + f.name + '</div>' +
-          '<div style="font-size:11px;color:var(--sub)">配息率 ' + f.divRate + '% · 增值 ' + f.capRate + '% · ' + f.note + '</div>' +
-        '</div>' +
-        (s.checked ? '<div style="display:flex;align-items:center;gap:4px">' +
-          '<input type="number" value="' + (s.alloc||0) + '" min="0" max="100" step="5" oninput="incSetAlloc('' + f.id + '',+this.value)" style="width:54px;border:1.5px solid var(--border);border-radius:6px;padding:4px 6px;font-size:14px;font-weight:700;text-align:center;font-family:inherit">' +
-          '<span style="font-size:12px;color:var(--sub)">%</span>' +
-        '</div>' : '') +
-      '</div>' +
-      (s.checked ? '<div style="display:flex;gap:6px;margin-top:8px;padding-left:26px">' +
-        '<button onclick="incSetMode('' + f.id + '','div')" style="font-size:12px;padding:3px 12px;border-radius:20px;border:1.5px solid ' + (isDiv?dc:'var(--border)') + ';background:' + (isDiv?dc:'white') + ';color:' + (isDiv?'white':'var(--sub)') + ';cursor:pointer;font-weight:600">💵 配現金</button>' +
-        '<button onclick="incSetMode('' + f.id + '','acc')" style="font-size:12px;padding:3px 12px;border-radius:20px;border:1.5px solid ' + (!isDiv?ac:'var(--border)') + ';background:' + (!isDiv?ac:'white') + ';color:' + (!isDiv?'white':'var(--sub)') + ';cursor:pointer;font-weight:600">📈 配股再投入</button>' +
-      '</div>' : '') +
-    '</div>';
-  }).join('');
-}
 function incToggle(id, checked) {
   if (!_incState[id]) _incState[id] = { checked:false, alloc:0, mode:'div' };
   _incState[id].checked = checked;
@@ -3449,13 +3421,45 @@ function incToggle(id, checked) {
   renderIncomeFunds(); calcIncome();
 }
 function incSetAlloc(id, val) {
-  if (_incState[id]) { _incState[id].alloc = val; calcIncome(); }
+  if (_incState[id]) { _incState[id].alloc = +val; calcIncome(); }
 }
 function incSetMode(id, mode) {
   if (_incState[id]) { _incState[id].mode = mode; renderIncomeFunds(); calcIncome(); }
 }
+function renderIncomeFunds() {
+  var rows = document.getElementById('inc-fund-rows');
+  if (!rows) return;
+  var dc = '#0891b2'; var ac = '#16a34a';
+  rows.innerHTML = INCOME_FUNDS.map(function(f) {
+    var s = _incState[f.id] || { checked:false, alloc:0, mode:f.defMode };
+    var isDiv = s.mode === 'div';
+    var borderC = s.checked ? (isDiv ? dc : ac) : 'var(--border)';
+    var bgC = s.checked ? (isDiv ? '#f0f9ff' : '#f0fdf4') : 'white';
+    var html = '<div style="border:1.5px solid ' + borderC + ';border-radius:10px;padding:10px 12px;background:' + bgC + '">';
+    html += '<div style="display:flex;align-items:center;gap:10px">';
+    html += '<input type="checkbox" data-fid="' + f.id + '" ' + (s.checked?'checked':'') + ' onchange="incToggle(this.dataset.fid,this.checked)" style="width:16px;height:16px;accent-color:var(--blue);flex-shrink:0">';
+    html += '<div style="flex:1;min-width:0">';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--text)">' + f.name + '</div>';
+    html += '<div style="font-size:11px;color:var(--sub)">' + '配息率 ' + f.divRate + '% · 增値 ' + f.capRate + '% · ' + f.note + '</div>';
+    html += '</div>';
+    if (s.checked) {
+      html += '<div style="display:flex;align-items:center;gap:4px">';
+      html += '<input type="number" data-fid="' + f.id + '" value="' + (s.alloc||0) + '" min="0" max="100" step="5" oninput="incSetAlloc(this.dataset.fid,this.value)" style="width:54px;border:1.5px solid var(--border);border-radius:6px;padding:4px 6px;font-size:14px;font-weight:700;text-align:center;font-family:inherit">';
+      html += '<span style="font-size:12px;color:var(--sub)">%</span></div>';
+    }
+    html += '</div>';
+    if (s.checked) {
+      html += '<div style="display:flex;gap:6px;margin-top:8px;padding-left:26px">';
+      html += '<button data-fid="' + f.id + '" data-m="div" onclick="incSetMode(this.dataset.fid,this.dataset.m)" style="font-size:12px;padding:3px 12px;border-radius:20px;border:1.5px solid ' + (isDiv?dc:'var(--border)') + ';background:' + (isDiv?dc:'white') + ';color:' + (isDiv?'white':'var(--sub)') + ';cursor:pointer;font-weight:600">💵 配現金</button>';
+      html += '<button data-fid="' + f.id + '" data-m="acc" onclick="incSetMode(this.dataset.fid,this.dataset.m)" style="font-size:12px;padding:3px 12px;border-radius:20px;border:1.5px solid ' + (!isDiv?ac:'var(--border)') + ';background:' + (!isDiv?ac:'white') + ';color:' + (!isDiv?'white':'var(--sub)') + ';cursor:pointer;font-weight:600">📈 配股再投入</button>';
+      html += '</div>';
+    }
+    html += '</div>';
+    return html;
+  }).join('');
+}
 function calcIncome() {
-  var principal = +(document.getElementById('inc-amt')||{}).value || 0;
+  var principal = +((document.getElementById('inc-amt')||{}).value||0);
   var lbl = document.getElementById('inc-amt-lbl');
   if (lbl) lbl.textContent = principal ? '≈ ' + incFmtM(principal) : '';
   var checked = INCOME_FUNDS.filter(function(f){ return _incState[f.id] && _incState[f.id].checked; });
@@ -3496,9 +3500,8 @@ function incRenderResults(results, periods, funds, principal) {
     var s=_incState[f.id], isDiv=s.mode==='div', amt=principal*s.alloc/100;
     return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 0;border-bottom:1px dashed var(--border)">' +
       '<div><span style="font-weight:600">' + f.name + '</span>' +
-        '<span style="font-size:11px;margin-left:6px;padding:1px 7px;border-radius:10px;background:' + (isDiv?'#e0f2fe':'#dcfce7') + ';color:' + (isDiv?'#0891b2':'#16a34a') + '">' + (isDiv?'💵配現金':'📈配股') + '</span></div>' +
-      '<span style="font-weight:700">' + s.alloc + '% = ' + incFmtM(amt) + '</span>' +
-    '</div>';
+      '<span style="font-size:11px;margin-left:6px;padding:1px 7px;border-radius:10px;background:' + (isDiv?'#e0f2fe':'#dcfce7') + ';color:' + (isDiv?'#0891b2':'#16a34a') + '">' + (isDiv?'💵配現金':'📈配股') + '</span></div>' +
+      '<span style="font-weight:700">' + s.alloc + '% = ' + incFmtM(amt) + '</span></div>';
   }).join('');
   var cols = results.map(function(r,i) {
     return '<td style="text-align:center;padding:12px 8px;vertical-align:top;' + (i<2?'border-right:1px solid var(--border)':'') + '">' +
@@ -3507,21 +3510,20 @@ function incRenderResults(results, periods, funds, principal) {
       '<div style="font-size:16px;font-weight:900;color:' + (r.y1Monthly>0?'var(--blue)':'#bbb') + ';margin-bottom:12px">' + incFmtM(Math.round(r.y1Monthly)) + '</div>' +
       '<div style="font-size:10px;color:var(--sub);margin-bottom:2px">累積領回現金</div>' +
       '<div style="font-size:14px;font-weight:800;color:#0891b2;margin-bottom:12px">' + incFmtM(Math.round(r.totalReceived)) + '</div>' +
-      '<div style="font-size:10px;color:var(--sub);margin-bottom:2px">期末帳戶價值</div>' +
+      '<div style="font-size:10px;color:var(--sub);margin-bottom:2px">期未帳戶價値</div>' +
       '<div style="font-size:14px;font-weight:800;color:#16a34a;margin-bottom:12px">' + incFmtM(Math.round(r.finalAccount)) + '</div>' +
       '<div style="background:#fef3c7;border-radius:8px;padding:7px 4px">' +
-        '<div style="font-size:10px;color:#92400e;margin-bottom:2px">期末月配息</div>' +
+        '<div style="font-size:10px;color:#92400e;margin-bottom:2px">期未月配息</div>' +
         '<div style="font-size:14px;font-weight:900;color:#d97706">' + incFmtM(Math.round(r.finalMonthly)) + '</div>' +
-        '<div style="font-size:10px;color:#92400e;margin-top:2px">（帳戶全轉配息）</div>' +
-      '</div>' +
-    '</td>';
+        '<div style="font-size:10px;color:#92400e;margin-top:2px">(帳戶全轉配現金)</div>' +
+      '</div></td>';
   }).join('');
   el.innerHTML =
     '<div style="margin-bottom:14px">' + breakdown + '</div>' +
     '<table style="width:100%;border-collapse:collapse;border:1px solid var(--border);border-radius:8px;overflow:hidden"><tr>' + cols + '</tr></table>' +
     '<div style="font-size:11px;color:var(--sub);margin-top:10px;line-height:1.6;text-align:center">' +
-      '※ 配息率、增值率為歷史估算，不代表未來績效。<br>' +
-      '配現金：配息領出，本金按增值率成長。配股再投入：全複利累積，期末可轉配現金。' +
+      '※ 配息率、增値率為歷史估算，不代表未來績效。<br>' +
+      '配現金：配息領出，本金按增値率成長。配股再投入：全複利累積，期未可轉配現金。' +
     '</div>';
 }
 
