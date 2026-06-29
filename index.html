@@ -1241,6 +1241,9 @@ function switchRetireSub(view, btnId) {
   const btn = document.getElementById(btnId);
   if (btn) btn.classList.add('active');
   if (view === 'rview-loan') { calcLoan(); }
+  // URL deep link
+  const hm = {'rview-income':'#income','rview-loan':'#loan','rview-retire':'#retire'};
+  if (hm[view]) history.replaceState(null, '', hm[view]);
 }
 
 function switchNSub(view, btnId) {
@@ -3392,6 +3395,18 @@ function calcFund() {
     if (orig) orig();
     initFundCards();
     calcLoan();
+    // Deep link: auto-navigate based on URL hash
+    (function() {
+      var h = window.location.hash;
+      if (h === '#income') {
+        switchTab('retire');
+        switchRetireSub('rview-income','rtab-income');
+        initIncomeTab();
+      } else if (h === '#loan') {
+        switchTab('retire');
+        switchRetireSub('rview-loan','rtab-loan');
+      }
+    })();
   };
 })();
 
