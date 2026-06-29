@@ -920,8 +920,26 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 
 </div>
 
-<div id="rview-income" style="display:none;max-width:640px;margin:0 auto;padding:0 0 16px 0">
+<div id="rview-income" style="display:none;max-width:660px;margin:0 auto;padding:0 0 16px 0">
 
+  <!-- 基金/ETF 即時資訊卡 -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head" onclick="toggleIncInfo()" style="cursor:pointer;user-select:none">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="card-title">📋 基金/ETF 即時資訊</div>
+        <span id="inc-info-arrow" style="font-size:12px;color:var(--sub);font-weight:600">▼ 收合</span>
+      </div>
+      <div style="font-size:12px;color:var(--sub);margin-top:2px">現在淨值 · 近一年殖利率 · 配息記錄 · MoneyDJ ↗</div>
+    </div>
+    <div id="inc-info-body" class="card-body" style="padding-top:8px">
+      <div id="inc-info-cards" style="display:flex;flex-direction:column;gap:10px">
+        <div style="text-align:center;color:var(--sub);font-size:13px;padding:10px">載入中…</div>
+      </div>
+      <div id="inc-price-note" style="font-size:11px;color:var(--sub);margin-top:8px;text-align:right"></div>
+    </div>
+  </div>
+
+  <!-- 月配息搭配試算 -->
   <div class="card" style="margin-bottom:14px">
     <div class="card-head">
       <div class="card-title">💰 月配息搭配試算</div>
@@ -946,7 +964,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
         </div>
       </div>
 
-      <div style="font-size:12px;font-weight:700;color:var(--sub);letter-spacing:1px;margin-bottom:10px">基金配置</div>
+      <div style="font-size:12px;font-weight:700;color:var(--sub);letter-spacing:1px;margin-bottom:10px">基金配置（勾選並設定比例）</div>
       <div id="inc-fund-rows" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
         <span style="font-size:12px;color:var(--sub)">已配置：<span id="inc-total-pct" style="font-weight:700;color:var(--blue)">0%</span></span>
@@ -3376,21 +3394,83 @@ function calcFund() {
 
 // ── 月配息搭配試算 ──
 var INCOME_FUNDS = [
-  { id:'aling',   name:'安聯收益成長 AMg7', divRate:6.5,  capRate:1.6,  note:'月配',    defMode:'div' },
-  { id:'tlz64',   name:'安聯收益成長 AM',   divRate:6.0,  capRate:1.8,  note:'月配',    defMode:'div' },
-  { id:'aiai',    name:'安聯AI收益成長',    divRate:5.0,  capRate:10.4, note:'月配',    defMode:'div' },
-  { id:'jpm',     name:'摩根多重收益',      divRate:5.0,  capRate:5.6,  note:'月配',    defMode:'div' },
-  { id:'mg',      name:'M&G入息基金',       divRate:4.0,  capRate:0.9,  note:'月配',    defMode:'div' },
-  { id:'ab',      name:'聯博美國成長 AP',   divRate:0.5,  capRate:10.4, note:'年配',    defMode:'acc' },
-  { id:'brwt',    name:'貝萊德世界科技 A10',divRate:0.3,  capRate:34.9, note:'幾乎不配',defMode:'acc' },
-  { id:'t0050',   name:'0050 元大台灣50',   divRate:3.0,  capRate:6.2,  note:'年配',    defMode:'div' },
-  { id:'e006208', name:'006208 富邦台灣50', divRate:2.5,  capRate:6.7,  note:'半年配',  defMode:'div' },
-  { id:'e0056',   name:'0056 元大高股息',   divRate:5.5,  capRate:1.5,  note:'年配',    defMode:'div' },
-  { id:'vt',      name:'VT 全球股市',       divRate:2.0,  capRate:6.1,  note:'季配',    defMode:'div' },
-  { id:'vwra',    name:'VWRA 全世界',       divRate:1.5,  capRate:11.9, note:'季配',    defMode:'acc' },
+  { id:'jpm',    name:'摩根多重收益',
+    nav:75.39,  navCur:'USD', navKey:'jfzn3',  distMo:0.69,
+    divRate:10.98, capRate:-0.38, annReturn:10.6,
+    note:'月配', freq:'月配', defMode:'div',
+    mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=JFZN3',
+    divHist:[{d:'2026/06',a:'$0.69'},{d:'2026/05',a:'$0.69'},{d:'2026/04',a:'$0.69'},{d:'2026/03',a:'$0.69'}] },
+  { id:'aling',  name:'安聯收益成長 AMg7',
+    nav:8.9107, navCur:'TWD', navKey:'tlzf9',  distMo:0.06796,
+    divRate:9.15,  capRate:-1.05, annReturn:8.1,
+    note:'月配', freq:'月配', defMode:'div',
+    mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZF9',
+    divHist:[{d:'2026/06',a:'NT$0.0680'},{d:'2026/05',a:'NT$0.0680'},{d:'2026/04',a:'NT$0.0680'},{d:'2026/03',a:'NT$0.0680'}] },
+  { id:'tlz64',  name:'安聯收益成長 AM',
+    nav:8.7281, navCur:'TWD', navKey:'tlz64',  distMo:0.055,
+    divRate:7.56,  capRate:0.24, annReturn:7.8,
+    note:'月配', freq:'月配', defMode:'div',
+    mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZ64',
+    divHist:[{d:'2026/06',a:'NT$0.055'},{d:'2026/05',a:'NT$0.055'},{d:'2026/04',a:'NT$0.055'},{d:'2026/03',a:'NT$0.055'}] },
+  { id:'mg',     name:'M&G 入息基金',
+    nav:78.1795,navCur:'USD', navKey:'mmg55',  distMo:0.654,
+    divRate:10.04, capRate:-5.14, annReturn:4.9,
+    note:'月配', freq:'月配', defMode:'div',
+    mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=MMG55',
+    divHist:[{d:'2026/06',a:'$0.654'},{d:'2026/05',a:'$0.654'},{d:'2026/04',a:'$0.654'},{d:'2026/03',a:'$0.654'}] },
+  { id:'ab',     name:'聯博美國成長 AP',
+    nav:72.23,  navCur:'USD', navKey:'albt8',  distMo:0.8322,
+    divRate:13.82, capRate:-2.92, annReturn:10.9,
+    note:'月配', freq:'月配', defMode:'div',
+    mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=ALBT8',
+    divHist:[{d:'2026/06',a:'$0.832'},{d:'2026/05',a:'$0.832'},{d:'2026/04',a:'$0.832'},{d:'2026/03',a:'$0.832'}] },
+  { id:'aiai',   name:'安聯AI收益成長',
+    nav:27.9532,navCur:'TWD', navKey:'tlzl7',  distMo:0.14619,
+    divRate:6.27,  capRate:9.13, annReturn:15.4,
+    note:'月配', freq:'月配', defMode:'div',
+    mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZL7',
+    divHist:[{d:'2026/06',a:'NT$0.146'},{d:'2026/05',a:'NT$0.146'},{d:'2026/04',a:'NT$0.146'},{d:'2026/03',a:'NT$0.146'}] },
+  { id:'brwt',   name:'貝萊德世界科技 A10',
+    nav:22.09,  navCur:'TWD', navKey:'shzv9',  distMo:0.1375,
+    divRate:7.47,  capRate:27.73, annReturn:35.2,
+    note:'月配', freq:'月配', defMode:'div',
+    mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=SHZV9',
+    divHist:[{d:'2026/06',a:'NT$0.138'},{d:'2026/05',a:'NT$0.138'},{d:'2026/04',a:'NT$0.138'},{d:'2026/03',a:'NT$0.138'}] },
+  { id:'e0050',  name:'0050 元大台灣50',
+    nav:104.40, navCur:'TWD', twseCode:'0050', distMo:1.36/2,
+    divRate:1.30,  capRate:8.90,  annReturn:10.2,
+    note:'半年配', freq:'半年配', defMode:'div',
+    mdjUrl:'https://www.moneydj.com/ETF/X/Basic/Basic0004.xdjhtm?etfid=0050.TW',
+    divHist:[{d:'2026/01',a:'NT$1.00'},{d:'2025/07',a:'NT$0.36'},{d:'2025/01',a:'NT$0.68'},{d:'2024/07',a:'NT$0.25'}] },
+  { id:'e006208',name:'006208 富邦台灣50',
+    nav:242.75, navCur:'TWD', twseCode:'006208', distMo:4.437/2,
+    divRate:1.83,  capRate:17.57, annReturn:19.4,
+    note:'半年配', freq:'半年配', defMode:'div',
+    mdjUrl:'https://www.moneydj.com/ETF/X/Basic/Basic0004.xdjhtm?etfid=006208.TW',
+    divHist:[{d:'2025/11',a:'NT$3.45'},{d:'2025/07',a:'NT$0.99'},{d:'2024/11',a:'NT$0.90'},{d:'2024/07',a:'NT$0.78'}] },
+  { id:'e0056',  name:'0056 元大高股息',
+    nav:51.80,  navCur:'TWD', twseCode:'0056', distMo:3.598/4,
+    divRate:6.95,  capRate:2.05,  annReturn:9.0,
+    note:'季配', freq:'季配', defMode:'div',
+    mdjUrl:'https://www.moneydj.com/ETF/X/Basic/Basic0004.xdjhtm?etfid=0056.TW',
+    divHist:[{d:'2026/04',a:'NT$1.00'},{d:'2026/01',a:'NT$0.87'},{d:'2025/10',a:'NT$0.87'},{d:'2025/07',a:'NT$0.87'}] },
+  { id:'vt',     name:'VT 全球股市',
+    nav:153.95, navCur:'USD', distMo:3.078/4,
+    divRate:2.00,  capRate:7.00,  annReturn:9.0,
+    note:'季配', freq:'季配', defMode:'div',
+    mdjUrl:'https://www.moneydj.com/ETF/X/Basic/Basic0004.xdjhtm?etfid=VT',
+    divHist:[{d:'2026/06',a:'$0.563'},{d:'2026/03',a:'$0.327'},{d:'2025/12',a:'$1.115'},{d:'2025/09',a:'$0.478'}] },
+  { id:'vwra',   name:'VWRA 全世界（累積型）',
+    nav:186.84, navCur:'USD', distMo:0,
+    divRate:0,     capRate:13.7,  annReturn:13.7,
+    note:'累積型(不配息)', freq:'不配息', defMode:'acc',
+    mdjUrl:'https://www.moneydj.com/ETF/X/Basic/Basic0004.xdjhtm?etfid=VWRA',
+    divHist:[] },
 ];
 var _incState = {};
 var _incInited = false;
+var _incInfoOpen = true;
+var _incNavLoaded = false;
 
 function setIncAmt(v) {
   var el = document.getElementById('inc-amt');
@@ -3403,17 +3483,92 @@ function incFmtM(n) {
   if (a >= 10000) return Math.round(n/10000) + '萬';
   return Math.round(n).toLocaleString();
 }
+function toggleIncInfo() {
+  _incInfoOpen = !_incInfoOpen;
+  var body = document.getElementById('inc-info-body');
+  var arrow = document.getElementById('inc-info-arrow');
+  if (body) body.style.display = _incInfoOpen ? '' : 'none';
+  if (arrow) arrow.textContent = _incInfoOpen ? '▼ 收合' : '▶ 展開';
+}
+function fetchTwEtfPrices() {
+  if (_incNavLoaded) return;
+  var twCodes = INCOME_FUNDS.filter(function(f){ return f.twseCode; }).map(function(f){ return 'tse_'+f.twseCode+'.tw'; }).join('|');
+  if (!twCodes) return;
+  var url = 'https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=' + twCodes + '&json=1&delay=0';
+  fetch(url).then(function(r){ return r.json(); }).then(function(d){
+    var arr = d.msgArray || [];
+    arr.forEach(function(item){
+      var code = item.c;
+      var price = parseFloat(item.pz || item.z || 0);
+      if (!price) return;
+      var fund = INCOME_FUNDS.find(function(f){ return f.twseCode === code; });
+      if (fund) { fund.nav = price; fund.navLive = true; }
+    });
+    _incNavLoaded = true;
+    renderIncInfoCards();
+    renderIncomeFunds();
+    calcIncome();
+    var note = document.getElementById('inc-price-note');
+    if (note) {
+      var now = new Date();
+      note.textContent = '台灣ETF股價已更新 (' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0') + ' 即時)';
+    }
+  }).catch(function(){});
+}
+function renderIncInfoCards() {
+  var container = document.getElementById('inc-info-cards');
+  if (!container) return;
+  container.innerHTML = INCOME_FUNDS.map(function(f) {
+    var navLbl = (f.navLive ? '⚡ ' : '') + (f.navCur==='USD'?'$':'NT$') + f.nav.toFixed(2);
+    var units1m = f.nav > 0 ? Math.floor(1000000/f.nav) : 0;
+    var histHtml = f.divHist && f.divHist.length
+      ? '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">' +
+        f.divHist.map(function(h){ return '<span style="font-size:10px;padding:2px 6px;background:#f1f5f9;border-radius:4px;color:var(--sub)">' + h.d + ' ' + h.a + '</span>'; }).join('') +
+        '</div>'
+      : '<div style="font-size:10px;color:var(--sub);margin-top:4px">累積型ETF，自動再投入，不配現金</div>';
+    var yC = f.divRate>=8?'#16a34a':f.divRate>=4?'#0891b2':'#64748b';
+    var rC = f.annReturn>=15?'#7c3aed':f.annReturn>=8?'#d97706':'#64748b';
+    var perStr = f.freq.includes('月')?'/月':f.freq.includes('季')?'/季':f.freq.includes('半')?'/半年':'/次';
+    var distStr = f.distMo>0 ? (f.navCur==='USD'?'$':'NT$')+(f.distMo).toFixed(3)+perStr : '—';
+    return '<div style="border:1px solid var(--border);border-radius:10px;padding:10px 12px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+        '<div><div style="font-weight:700;font-size:13px">' + f.name + '</div>' +
+        '<div style="font-size:11px;color:var(--sub)">' + f.freq + ' · ' + f.navCur + '</div></div>' +
+        '<a href="' + f.mdjUrl + '" target="_blank" rel="noopener" style="font-size:11px;font-weight:600;padding:3px 10px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;color:#0891b2;text-decoration:none">MoneyDJ ↗</a>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">' +
+        '<div style="background:#f8fafc;border-radius:7px;padding:7px;text-align:center">' +
+          '<div style="font-size:9px;color:var(--sub)">現在淨值/股價</div>' +
+          '<div style="font-size:13px;font-weight:800">' + navLbl + '</div>' +
+          '<div style="font-size:9px;color:var(--sub)">百萬可買 ' + units1m.toLocaleString() + ' 單位</div>' +
+        '</div>' +
+        '<div style="background:#f0fdf4;border-radius:7px;padding:7px;text-align:center">' +
+          '<div style="font-size:9px;color:var(--sub)">近一年殖利率</div>' +
+          '<div style="font-size:13px;font-weight:800;color:' + yC + '">' + f.divRate.toFixed(2) + '%</div>' +
+          '<div style="font-size:9px;color:var(--sub)">' + distStr + '</div>' +
+        '</div>' +
+        '<div style="background:#fef9c3;border-radius:7px;padding:7px;text-align:center">' +
+          '<div style="font-size:9px;color:var(--sub)">長期年化報酬</div>' +
+          '<div style="font-size:13px;font-weight:800;color:' + rC + '">' + f.annReturn.toFixed(1) + '%</div>' +
+          '<div style="font-size:9px;color:var(--sub)">' + (f.twseCode?'自上市以來':'成立以來') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:10px;font-weight:600;color:var(--sub);margin-top:6px">近期配息記錄</div>' +
+      histHtml +
+    '</div>';
+  }).join('');
+  var note = document.getElementById('inc-price-note');
+  if (note && !_incNavLoaded) note.textContent = '境外基金淨值為手動更新(2026/06/29)，點 MoneyDJ ↗ 查看最新';
+}
 function initIncomeTab() {
   if (!_incInited) {
     _incInited = true;
     INCOME_FUNDS.forEach(function(f) {
-      _incState[f.id] = {
-        checked: f.id === 'aling' || f.id === 'brwt',
-        alloc: f.id === 'aling' ? 80 : f.id === 'brwt' ? 20 : 0,
-        mode: f.defMode
-      };
+      _incState[f.id] = { checked:f.id==='aling'||f.id==='brwt', alloc:f.id==='aling'?80:f.id==='brwt'?20:0, mode:f.defMode };
     });
   }
+  renderIncInfoCards();
+  fetchTwEtfPrices();
   renderIncomeFunds();
   calcIncome();
 }
@@ -3424,7 +3579,7 @@ function incToggle(id, checked) {
   renderIncomeFunds(); calcIncome();
 }
 function incSetAlloc(id, val) {
-  if (_incState[id]) { _incState[id].alloc = +val; calcIncome(); }
+  if (_incState[id]) { _incState[id].alloc = +val; renderIncomeFunds(); calcIncome(); }
 }
 function incSetMode(id, mode) {
   if (_incState[id]) { _incState[id].mode = mode; renderIncomeFunds(); calcIncome(); }
@@ -3432,29 +3587,38 @@ function incSetMode(id, mode) {
 function renderIncomeFunds() {
   var rows = document.getElementById('inc-fund-rows');
   if (!rows) return;
-  var dc = '#0891b2'; var ac = '#16a34a';
+  var principal = +((document.getElementById('inc-amt')||{}).value||0);
+  var dc='#0891b2', ac='#16a34a';
   rows.innerHTML = INCOME_FUNDS.map(function(f) {
-    var s = _incState[f.id] || { checked:false, alloc:0, mode:f.defMode };
-    var isDiv = s.mode === 'div';
-    var borderC = s.checked ? (isDiv ? dc : ac) : 'var(--border)';
-    var bgC = s.checked ? (isDiv ? '#f0f9ff' : '#f0fdf4') : 'white';
-    var html = '<div style="border:1.5px solid ' + borderC + ';border-radius:10px;padding:10px 12px;background:' + bgC + '">';
+    var s = _incState[f.id]||{checked:false,alloc:0,mode:f.defMode};
+    var isDiv = s.mode==='div';
+    var bc = s.checked?(isDiv?dc:ac):'var(--border)';
+    var bg = s.checked?(isDiv?'#f0f9ff':'#f0fdf4'):'white';
+    var html = '<div style="border:1.5px solid '+bc+';border-radius:10px;padding:10px 12px;background:'+bg+'">';
     html += '<div style="display:flex;align-items:center;gap:10px">';
-    html += '<input type="checkbox" data-fid="' + f.id + '" ' + (s.checked?'checked':'') + ' onchange="incToggle(this.dataset.fid,this.checked)" style="width:16px;height:16px;accent-color:var(--blue);flex-shrink:0">';
+    html += '<input type="checkbox" data-fid="'+f.id+'" '+(s.checked?'checked':'')+' onchange="incToggle(this.dataset.fid,this.checked)" style="width:16px;height:16px;accent-color:var(--blue);flex-shrink:0">';
     html += '<div style="flex:1;min-width:0">';
-    html += '<div style="font-size:13px;font-weight:700;color:var(--text)">' + f.name + '</div>';
-    html += '<div style="font-size:11px;color:var(--sub)">' + '配息率 ' + f.divRate + '% · 增値 ' + f.capRate + '% · ' + f.note + '</div>';
+    html += '<div style="font-size:13px;font-weight:700">' + f.name + '</div>';
+    var dLbl = f.divRate>0?'配息率 '+f.divRate.toFixed(2)+'% · 增值 '+f.capRate.toFixed(1)+'%':'增值 '+f.capRate.toFixed(1)+'%（累積型）';
+    html += '<div style="font-size:11px;color:var(--sub)">'+dLbl+' · '+f.freq+'</div>';
     html += '</div>';
     if (s.checked) {
-      html += '<div style="display:flex;align-items:center;gap:4px">';
-      html += '<input type="number" data-fid="' + f.id + '" value="' + (s.alloc||0) + '" min="0" max="100" step="5" oninput="incSetAlloc(this.dataset.fid,this.value)" style="width:54px;border:1.5px solid var(--border);border-radius:6px;padding:4px 6px;font-size:14px;font-weight:700;text-align:center;font-family:inherit">';
-      html += '<span style="font-size:12px;color:var(--sub)">%</span></div>';
+      html += '<div style="display:flex;align-items:center;gap:4px"><input type="number" data-fid="'+f.id+'" value="'+(s.alloc||0)+'" min="0" max="100" step="5" oninput="incSetAlloc(this.dataset.fid,this.value)" style="width:54px;border:1.5px solid var(--border);border-radius:6px;padding:4px 6px;font-size:14px;font-weight:700;text-align:center;font-family:inherit"><span style="font-size:12px;color:var(--sub)">%</span></div>';
     }
     html += '</div>';
+    if (s.checked && principal>0 && (s.alloc||0)>0 && f.nav>0) {
+      var amt = principal*s.alloc/100;
+      var units = amt/f.nav;
+      var uLbl = units>=1000?Math.round(units/1000)+'K':units>=1?units.toFixed(1):units.toFixed(3);
+      html += '<div style="background:rgba(59,130,246,0.08);border-radius:7px;padding:5px 10px;margin-top:6px;font-size:12px;display:flex;justify-content:space-between">';
+      html += '<span style="color:var(--sub)">現在進場可買</span>';
+      html += '<span style="font-weight:700;color:var(--blue)">'+uLbl+' 單位 ('+(f.navCur==='USD'?'$':'NT$')+f.nav.toFixed(2)+'/單位)</span>';
+      html += '</div>';
+    }
     if (s.checked) {
       html += '<div style="display:flex;gap:6px;margin-top:8px;padding-left:26px">';
-      html += '<button data-fid="' + f.id + '" data-m="div" onclick="incSetMode(this.dataset.fid,this.dataset.m)" style="font-size:12px;padding:3px 12px;border-radius:20px;border:1.5px solid ' + (isDiv?dc:'var(--border)') + ';background:' + (isDiv?dc:'white') + ';color:' + (isDiv?'white':'var(--sub)') + ';cursor:pointer;font-weight:600">💵 配現金</button>';
-      html += '<button data-fid="' + f.id + '" data-m="acc" onclick="incSetMode(this.dataset.fid,this.dataset.m)" style="font-size:12px;padding:3px 12px;border-radius:20px;border:1.5px solid ' + (!isDiv?ac:'var(--border)') + ';background:' + (!isDiv?ac:'white') + ';color:' + (!isDiv?'white':'var(--sub)') + ';cursor:pointer;font-weight:600">📈 配股再投入</button>';
+      html += '<button data-fid="'+f.id+'" data-m="div" onclick="incSetMode(this.dataset.fid,this.dataset.m)" style="font-size:12px;padding:3px 12px;border-radius:20px;border:1.5px solid '+(isDiv?dc:'var(--border)')+';background:'+(isDiv?dc:'white')+';color:'+(isDiv?'white':'var(--sub)')+';cursor:pointer;font-weight:600">💵 配現金</button>';
+      html += '<button data-fid="'+f.id+'" data-m="acc" onclick="incSetMode(this.dataset.fid,this.dataset.m)" style="font-size:12px;padding:3px 12px;border-radius:20px;border:1.5px solid '+(!isDiv?ac:'var(--border)')+';background:'+(!isDiv?ac:'white')+';color:'+(!isDiv?'white':'var(--sub)')+';cursor:pointer;font-weight:600">📈 配股再投入</button>';
       html += '</div>';
     }
     html += '</div>';
@@ -3464,70 +3628,67 @@ function renderIncomeFunds() {
 function calcIncome() {
   var principal = +((document.getElementById('inc-amt')||{}).value||0);
   var lbl = document.getElementById('inc-amt-lbl');
-  if (lbl) lbl.textContent = principal ? '≈ ' + incFmtM(principal) : '';
-  var checked = INCOME_FUNDS.filter(function(f){ return _incState[f.id] && _incState[f.id].checked; });
-  var totalPct = checked.reduce(function(s,f){ return s+(_incState[f.id].alloc||0); }, 0);
-  var pEl = document.getElementById('inc-total-pct');
-  var wEl = document.getElementById('inc-pct-warn');
-  if (pEl) { pEl.textContent = totalPct+'%'; pEl.style.color = totalPct===100?'#16a34a':'var(--blue)'; }
-  if (wEl) wEl.style.display = totalPct>0&&totalPct!==100?'':'none';
-  var periods = [5,10,20];
-  var results = periods.map(function(yr){ return incSimulate(principal, checked, yr); });
-  incRenderResults(results, periods, checked, principal);
+  if (lbl) lbl.textContent = principal?'≈ '+incFmtM(principal):'';
+  renderIncomeFunds();
+  var checked = INCOME_FUNDS.filter(function(f){ return _incState[f.id]&&_incState[f.id].checked; });
+  var totalPct = checked.reduce(function(s,f){ return s+(_incState[f.id].alloc||0); },0);
+  var pEl=document.getElementById('inc-total-pct'), wEl=document.getElementById('inc-pct-warn');
+  if (pEl){ pEl.textContent=totalPct+'%'; pEl.style.color=totalPct===100?'#16a34a':'var(--blue)'; }
+  if (wEl) wEl.style.display=totalPct>0&&totalPct!==100?'':'none';
+  var periods=[5,10,20];
+  var results=periods.map(function(yr){ return incSimulate(principal,checked,yr); });
+  incRenderResults(results,periods,checked,principal);
 }
-function incSimulate(principal, funds, years) {
-  var y1Monthly=0, totalReceived=0, finalAccount=0, finalMonthly=0;
-  funds.forEach(function(f) {
-    var s = _incState[f.id];
-    var V = principal * (s.alloc||0) / 100;
-    if (V <= 0) return;
-    var divR = f.divRate/100, capR = f.capRate/100;
-    if (s.mode === 'div') {
-      y1Monthly += V * divR / 12;
-      var received=0, acc=V;
-      for (var y=0; y<years; y++) { received += acc*divR; acc = acc*(1+capR); }
-      totalReceived += received; finalAccount += acc; finalMonthly += acc*divR/12;
-    } else {
-      var finalV = V * Math.pow(1+divR+capR, years);
-      finalAccount += finalV; finalMonthly += finalV*divR/12;
+function incSimulate(principal,funds,years) {
+  var y1Monthly=0,totalReceived=0,finalAccount=0,finalMonthly=0;
+  funds.forEach(function(f){
+    var s=_incState[f.id]; var V=principal*(s.alloc||0)/100; if(V<=0)return;
+    var divR=f.divRate/100, capR=f.capRate/100;
+    if(s.mode==='div'){
+      y1Monthly+=V*divR/12;
+      var received=0,acc=V;
+      for(var y=0;y<years;y++){received+=acc*divR;acc=acc*(1+capR);}
+      totalReceived+=received;finalAccount+=acc;finalMonthly+=acc*divR/12;
+    }else{
+      var fV=V*Math.pow(1+divR+capR,years);
+      finalAccount+=fV;finalMonthly+=fV*divR/12;
     }
   });
-  return { y1Monthly:y1Monthly, totalReceived:totalReceived, finalAccount:finalAccount, finalMonthly:finalMonthly };
+  return{y1Monthly,totalReceived,finalAccount,finalMonthly};
 }
-function incRenderResults(results, periods, funds, principal) {
-  var el = document.getElementById('inc-result-body');
-  if (!el) return;
-  var valid = funds.filter(function(f){ return (_incState[f.id].alloc||0)>0; });
-  if (!valid.length) { el.innerHTML='<div style="text-align:center;color:var(--sub);padding:20px">請勾選基金並設定配置比例</div>'; return; }
-  var breakdown = valid.map(function(f) {
-    var s=_incState[f.id], isDiv=s.mode==='div', amt=principal*s.alloc/100;
+function incRenderResults(results,periods,funds,principal){
+  var el=document.getElementById('inc-result-body'); if(!el)return;
+  var valid=funds.filter(function(f){return(_incState[f.id].alloc||0)>0;});
+  if(!valid.length){el.innerHTML='<div style="text-align:center;color:var(--sub);padding:20px">請勾選基金並設定配置比例</div>';return;}
+  var breakdown=valid.map(function(f){
+    var s=_incState[f.id],isDiv=s.mode==='div',amt=principal*s.alloc/100;
+    var units=f.nav>0?(amt/f.nav):0;
+    var uLbl=units>=1000?Math.round(units/1000)+'K 單位':units.toFixed(1)+' 單位';
     return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 0;border-bottom:1px dashed var(--border)">' +
-      '<div><span style="font-weight:600">' + f.name + '</span>' +
-      '<span style="font-size:11px;margin-left:6px;padding:1px 7px;border-radius:10px;background:' + (isDiv?'#e0f2fe':'#dcfce7') + ';color:' + (isDiv?'#0891b2':'#16a34a') + '">' + (isDiv?'💵配現金':'📈配股') + '</span></div>' +
-      '<span style="font-weight:700">' + s.alloc + '% = ' + incFmtM(amt) + '</span></div>';
+      '<div><span style="font-weight:600">'+f.name+'</span><span style="font-size:11px;margin-left:6px;padding:1px 7px;border-radius:10px;background:'+(isDiv?'#e0f2fe':'#dcfce7')+';color:'+(isDiv?'#0891b2':'#16a34a')+'">'+(isDiv?'💵配現金':'📈配股')+'</span></div>'+
+      '<div style="text-align:right"><div style="font-weight:700">'+s.alloc+'% = '+incFmtM(amt)+'</div><div style="font-size:10px;color:var(--sub)">可買 '+uLbl+'</div></div></div>';
   }).join('');
-  var cols = results.map(function(r,i) {
-    return '<td style="text-align:center;padding:12px 8px;vertical-align:top;' + (i<2?'border-right:1px solid var(--border)':'') + '">' +
-      '<div style="font-size:13px;font-weight:800;color:var(--blue);margin-bottom:12px">' + periods[i] + ' 年</div>' +
-      '<div style="font-size:10px;color:var(--sub);margin-bottom:2px">首月現金配息</div>' +
-      '<div style="font-size:16px;font-weight:900;color:' + (r.y1Monthly>0?'var(--blue)':'#bbb') + ';margin-bottom:12px">' + incFmtM(Math.round(r.y1Monthly)) + '</div>' +
-      '<div style="font-size:10px;color:var(--sub);margin-bottom:2px">累積領回現金</div>' +
-      '<div style="font-size:14px;font-weight:800;color:#0891b2;margin-bottom:12px">' + incFmtM(Math.round(r.totalReceived)) + '</div>' +
-      '<div style="font-size:10px;color:var(--sub);margin-bottom:2px">期未帳戶價値</div>' +
-      '<div style="font-size:14px;font-weight:800;color:#16a34a;margin-bottom:12px">' + incFmtM(Math.round(r.finalAccount)) + '</div>' +
-      '<div style="background:#fef3c7;border-radius:8px;padding:7px 4px">' +
-        '<div style="font-size:10px;color:#92400e;margin-bottom:2px">期未月配息</div>' +
-        '<div style="font-size:14px;font-weight:900;color:#d97706">' + incFmtM(Math.round(r.finalMonthly)) + '</div>' +
-        '<div style="font-size:10px;color:#92400e;margin-top:2px">(帳戶全轉配現金)</div>' +
+  var cols=results.map(function(r,i){
+    return '<td style="text-align:center;padding:12px 8px;vertical-align:top;'+(i<2?'border-right:1px solid var(--border)':'')+'">'+
+      '<div style="font-size:13px;font-weight:800;color:var(--blue);margin-bottom:12px">'+periods[i]+' 年</div>'+
+      '<div style="font-size:10px;color:var(--sub);margin-bottom:2px">首月現金配息</div>'+
+      '<div style="font-size:16px;font-weight:900;color:'+(r.y1Monthly>0?'var(--blue)':'#bbb')+';margin-bottom:12px">'+incFmtM(Math.round(r.y1Monthly))+'</div>'+
+      '<div style="font-size:10px;color:var(--sub);margin-bottom:2px">累積領回現金</div>'+
+      '<div style="font-size:14px;font-weight:800;color:#0891b2;margin-bottom:12px">'+incFmtM(Math.round(r.totalReceived))+'</div>'+
+      '<div style="font-size:10px;color:var(--sub);margin-bottom:2px">期末帳戶價值</div>'+
+      '<div style="font-size:14px;font-weight:800;color:#16a34a;margin-bottom:12px">'+incFmtM(Math.round(r.finalAccount))+'</div>'+
+      '<div style="background:#fef3c7;border-radius:8px;padding:7px 4px">'+
+        '<div style="font-size:10px;color:#92400e;margin-bottom:2px">期末月配息</div>'+
+        '<div style="font-size:14px;font-weight:900;color:#d97706">'+incFmtM(Math.round(r.finalMonthly))+'</div>'+
+        '<div style="font-size:10px;color:#92400e;margin-top:2px">(帳戶全轉配現金)</div>'+
       '</div></td>';
   }).join('');
-  el.innerHTML =
-    '<div style="margin-bottom:14px">' + breakdown + '</div>' +
-    '<table style="width:100%;border-collapse:collapse;border:1px solid var(--border);border-radius:8px;overflow:hidden"><tr>' + cols + '</tr></table>' +
-    '<div style="font-size:11px;color:var(--sub);margin-top:10px;line-height:1.6;text-align:center">' +
-      '※ 配息率、增値率為歷史估算，不代表未來績效。<br>' +
-      '配現金：配息領出，本金按增値率成長。配股再投入：全複利累積，期未可轉配現金。' +
-    '</div>';
+  el.innerHTML=
+    '<div style="margin-bottom:14px">'+breakdown+'</div>'+
+    '<table style="width:100%;border-collapse:collapse;border:1px solid var(--border);border-radius:8px;overflow:hidden"><tr>'+cols+'</tr></table>'+
+    '<div style="font-size:11px;color:var(--sub);margin-top:10px;line-height:1.6;text-align:center">'+
+    '※ 配息率以 MoneyDJ 近一年實際配息÷現在淨值計算。年化報酬率為歷史估算，不代表未來績效。<br>'+
+    '配現金：配息領出，本金按增值率成長。配股再投入：全複利累積，期末可轉配現金。</div>';
 }
 
 </script>
