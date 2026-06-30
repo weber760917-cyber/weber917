@@ -992,16 +992,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   <!-- Banner -->
   <div style="background:linear-gradient(135deg,#1e1b4b,#4c1d95,#7c3aed);border-radius:14px;padding:16px 18px;margin-bottom:14px;color:white">
     <div style="font-size:17px;font-weight:900">📊 月月雙收配息策略</div>
-    <div style="font-size:12px;opacity:0.85;margin-top:4px">同時持有多檔不同日期配息基金，每月多次入帳，現金流更穩定</div>
+    <div style="font-size:12px;opacity:0.85;margin-top:4px">選擇不同入帳週的基金，每月多次領息，分散在月中與月底</div>
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-      <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🟣 10日 安聯AMg7</div>
-      <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🔵 12日 M&amp;G入息</div>
-      <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🔴 13日 聯博AP</div>
-      <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🟡 14日 摩根多重</div>
+      <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🟡 第3週 摩根（約16日）</div>
+      <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🟣 第3週 安聯AMg7（約18日）</div>
+      <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🔵 第4週 M&amp;G（約23日）</div>
+      <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🔴 月底 聯博（約30日）</div>
     </div>
   </div>
 
-  <!-- 本金設定 -->
+  <!-- 本金 -->
   <div class="card" style="margin-bottom:10px">
     <div class="card-head">
       <div class="card-title">💵 本金設定</div>
@@ -1014,143 +1014,71 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
         <span>50萬</span><span>500萬</span><span>1000萬</span><span>2000萬</span>
       </div>
       <div style="margin-top:8px;background:var(--border);border-radius:6px;height:8px;overflow:hidden">
-        <div id="inc2-bar" style="height:100%;background:linear-gradient(90deg,#7c3aed,#dc2626);width:100%;transition:width 0.3s"></div>
+        <div id="inc2-bar" style="height:100%;background:linear-gradient(90deg,#d97706,#7c3aed,#dc2626);width:80%;transition:width 0.3s"></div>
       </div>
-      <div style="font-size:11px;color:var(--sub);margin-top:4px">已配置：<span id="inc2-alloc" style="color:#7c3aed;font-weight:700">100%</span>（各基金加總）</div>
+      <div style="font-size:11px;color:var(--sub);margin-top:4px">
+        已配置：<span id="inc2-alloc" style="color:#7c3aed;font-weight:700">80%</span>
+      </div>
     </div>
   </div>
 
-  <!-- 基金選擇 -->
+  <!-- 配息行事曆 -->
   <div class="card" style="margin-bottom:10px">
-    <div class="card-head"><div class="card-title">🎯 選擇基金與配置比例</div></div>
+    <div class="card-head"><div class="card-title">📅 每月入帳時間軸（資料來源：MoneyDJ）</div></div>
+    <div class="card-body">
+      <div style="position:relative;margin:8px 0 4px">
+        <!-- timeline bar -->
+        <div style="height:4px;background:var(--border);border-radius:2px;margin:24px 0 8px"></div>
+        <!-- dots -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;text-align:center;margin-top:-4px">
+          <div>
+            <div id="i2dot-jpm" style="width:36px;height:36px;border-radius:50%;border:2px solid #d97706;background:#d97706;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:900;margin:0 auto -18px">16</div>
+            <div style="padding-top:24px;font-size:10px;color:#d97706;font-weight:600" id="i2dotlbl-jpm">🟡 摩根</div>
+          </div>
+          <div>
+            <div id="i2dot-aling" style="width:36px;height:36px;border-radius:50%;border:2px solid #e5e7eb;background:transparent;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px;font-weight:400;margin:0 auto -18px">18</div>
+            <div style="padding-top:24px;font-size:10px;color:#9ca3af" id="i2dotlbl-aling">🟣 安聯</div>
+          </div>
+          <div>
+            <div id="i2dot-mg" style="width:36px;height:36px;border-radius:50%;border:2px solid #e5e7eb;background:transparent;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px;font-weight:400;margin:0 auto -18px">23</div>
+            <div style="padding-top:24px;font-size:10px;color:#9ca3af" id="i2dotlbl-mg">🔵 M&amp;G</div>
+          </div>
+          <div>
+            <div id="i2dot-ab" style="width:36px;height:36px;border-radius:50%;border:2px solid #dc2626;background:#dc2626;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:900;margin:0 auto -18px">30</div>
+            <div style="padding-top:24px;font-size:10px;color:#dc2626;font-weight:600" id="i2dotlbl-ab">🔴 聯博</div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:10px;color:var(--sub);margin-top:28px">彩色＝已選取　灰色＝未選取　（除息/入帳日依基金當月實際公告為準）</div>
+    </div>
+  </div>
+
+  <!-- 第3週基金 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-head">
+      <div class="card-title">🟡🟣 第3週配息基金 <span style="font-size:11px;font-weight:400;color:var(--sub)">入帳約每月16-20日</span></div>
+      <div style="font-size:12px;font-weight:700;color:#d97706">月配：<span id="inc2-w3lbl">—</span></div>
+    </div>
     <div class="card-body" style="padding-top:4px">
-<div id="i2card-aling" style="border:1px solid #7c3aed;border-radius:12px;margin-bottom:10px;overflow:hidden">
-  <div id="i2hdr-aling" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:#f5f3ff" onclick="i2Toggle('aling')">
-    <div id="i2chk-aling" style="width:20px;height:20px;border-radius:5px;border:2px solid #7c3aed;background:#7c3aed;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:900">✓</div>
+<div id="i2card-jpm" style="border:1px solid #d97706;border-radius:12px;margin-bottom:8px;overflow:hidden">
+  <div id="i2hdr-jpm" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:#fffbeb" onclick="i2Toggle('jpm')">
+    <div id="i2chk-jpm" style="width:20px;height:20px;border-radius:5px;border:2px solid #d97706;background:#d97706;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:900">✓</div>
     <div style="flex:1">
       <div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-        安聯收益成長 AMg7
-        <a href="https://kgilife.moneydj.com/w/wb/wb01.djhtm?a=TLZF9-TFR1" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#7c3aed;border:1px solid #7c3aed;border-radius:4px;padding:1px 6px;text-decoration:none">KGI ↗</a>
+        摩根多重收益 A
+        <a href="https://www.moneydj.com/funddj/yp/wb05.djhtm?a=JFZN3" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#d97706;border:1px solid #d97706;border-radius:4px;padding:1px 6px;text-decoration:none">MoneyDJ ↗</a>
       </div>
       <div style="font-size:11px;color:var(--sub);margin-top:3px">
-        每月<b style="color:#7c3aed">10日</b>配息　配息率 <b>9.15%</b>　年化報酬 <b style="color:#7c3aed">8.1%</b>
-      </div>
-    </div>
-    <div id="i2mo-aling" style="font-size:12px;font-weight:700;color:#7c3aed;white-space:nowrap;text-align:right"></div>
-  </div>
-  <div id="i2det-aling" style="display:block;padding:10px 14px 12px;background:#f5f3ff">
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">
-      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
-        <div style="color:var(--sub);font-size:10px">單位淨值</div>
-        <div style="font-weight:700;color:#1f2937">8.9107 TWD</div>
-      </div>
-      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
-        <div style="color:var(--sub);font-size:10px">每單位配息</div>
-        <div style="font-weight:700;color:#7c3aed">NT$0.068</div>
-      </div>
-      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
-        <div style="color:var(--sub);font-size:10px">每萬元月配</div>
-        <div style="font-weight:700;color:#7c3aed">76元</div>
-      </div>
-    </div>
-    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">近4月：NT$0.068 ▸ NT$0.068 ▸ NT$0.068 ▸ NT$0.068</div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:11px;color:var(--sub);flex-shrink:0">配置</span>
-      <input type="range" id="i2pct-aling" min="0" max="100" step="5" value="50" style="flex:1;accent-color:#7c3aed" oninput="calcIncome2()">
-      <span id="i2pctlbl-aling" style="font-size:13px;font-weight:700;color:#7c3aed;width:40px;text-align:right">50%</span>
-    </div>
-  </div>
-</div><div id="i2card-mg" style="border:1px solid #e5e7eb;border-radius:12px;margin-bottom:10px;overflow:hidden">
-  <div id="i2hdr-mg" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:transparent" onclick="i2Toggle('mg')">
-    <div id="i2chk-mg" style="width:20px;height:20px;border-radius:5px;border:2px solid #0369a1;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:900"></div>
-    <div style="flex:1">
-      <div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-        M&amp;G 入息基金 A(月配)
-        <a href="https://kgilife.moneydj.com/w/wb/wb01.djhtm?a=MMG55-TFT3" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#0369a1;border:1px solid #0369a1;border-radius:4px;padding:1px 6px;text-decoration:none">KGI ↗</a>
-      </div>
-      <div style="font-size:11px;color:var(--sub);margin-top:3px">
-        每月<b style="color:#0369a1">12日</b>配息　配息率 <b>10.04%</b>　年化報酬 <b style="color:#0369a1">4.9%</b>
-      </div>
-    </div>
-    <div id="i2mo-mg" style="font-size:12px;font-weight:700;color:#0369a1;white-space:nowrap;text-align:right"></div>
-  </div>
-  <div id="i2det-mg" style="display:none;padding:10px 14px 12px;background:#eff6ff">
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">
-      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
-        <div style="color:var(--sub);font-size:10px">單位淨值</div>
-        <div style="font-weight:700;color:#1f2937">78.18 USD</div>
-      </div>
-      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
-        <div style="color:var(--sub);font-size:10px">每單位配息</div>
-        <div style="font-weight:700;color:#0369a1">$0.654</div>
-      </div>
-      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
-        <div style="color:var(--sub);font-size:10px">每萬元月配</div>
-        <div style="font-weight:700;color:#0369a1">84元</div>
-      </div>
-    </div>
-    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">近4月：$0.654 ▸ $0.654 ▸ $0.654 ▸ $0.654</div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:11px;color:var(--sub);flex-shrink:0">配置</span>
-      <input type="range" id="i2pct-mg" min="0" max="100" step="5" value="0" style="flex:1;accent-color:#0369a1" oninput="calcIncome2()">
-      <span id="i2pctlbl-mg" style="font-size:13px;font-weight:700;color:#0369a1;width:40px;text-align:right">0%</span>
-    </div>
-  </div>
-</div><div id="i2card-ab" style="border:1px solid #dc2626;border-radius:12px;margin-bottom:10px;overflow:hidden">
-  <div id="i2hdr-ab" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:#fef2f2" onclick="i2Toggle('ab')">
-    <div id="i2chk-ab" style="width:20px;height:20px;border-radius:5px;border:2px solid #dc2626;background:#dc2626;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:900">✓</div>
-    <div style="flex:1">
-      <div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-        聯博美國成長 AP(月配)
-        <a href="https://kgilife.moneydj.com/w/wb/wb01.djhtm?a=ALBT8-TFU6" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#dc2626;border:1px solid #dc2626;border-radius:4px;padding:1px 6px;text-decoration:none">KGI ↗</a>
-      </div>
-      <div style="font-size:11px;color:var(--sub);margin-top:3px">
-        每月<b style="color:#dc2626">13日</b>配息　配息率 <b>13.82%</b>　年化報酬 <b style="color:#dc2626">10.9%</b>
-      </div>
-    </div>
-    <div id="i2mo-ab" style="font-size:12px;font-weight:700;color:#dc2626;white-space:nowrap;text-align:right"></div>
-  </div>
-  <div id="i2det-ab" style="display:block;padding:10px 14px 12px;background:#fef2f2">
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">
-      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
-        <div style="color:var(--sub);font-size:10px">單位淨值</div>
-        <div style="font-weight:700;color:#1f2937">72.23 USD</div>
-      </div>
-      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
-        <div style="color:var(--sub);font-size:10px">每單位配息</div>
-        <div style="font-weight:700;color:#dc2626">$0.832</div>
-      </div>
-      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
-        <div style="color:var(--sub);font-size:10px">每萬元月配</div>
-        <div style="font-weight:700;color:#dc2626">115元</div>
-      </div>
-    </div>
-    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">近4月：$0.832 ▸ $0.832 ▸ $0.832 ▸ $0.832</div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:11px;color:var(--sub);flex-shrink:0">配置</span>
-      <input type="range" id="i2pct-ab" min="0" max="100" step="5" value="50" style="flex:1;accent-color:#dc2626" oninput="calcIncome2()">
-      <span id="i2pctlbl-ab" style="font-size:13px;font-weight:700;color:#dc2626;width:40px;text-align:right">50%</span>
-    </div>
-  </div>
-</div><div id="i2card-jpm" style="border:1px solid #e5e7eb;border-radius:12px;margin-bottom:10px;overflow:hidden">
-  <div id="i2hdr-jpm" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:transparent" onclick="i2Toggle('jpm')">
-    <div id="i2chk-jpm" style="width:20px;height:20px;border-radius:5px;border:2px solid #d97706;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:900"></div>
-    <div style="flex:1">
-      <div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-        摩根多重收益 A(月配)
-        <a href="https://kgilife.moneydj.com/w/wb/wb01.djhtm?a=JFZN3-TFU5" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#d97706;border:1px solid #d97706;border-radius:4px;padding:1px 6px;text-decoration:none">KGI ↗</a>
-      </div>
-      <div style="font-size:11px;color:var(--sub);margin-top:3px">
-        每月<b style="color:#d97706">14日</b>配息　配息率 <b>10.98%</b>　年化報酬 <b style="color:#d97706">10.6%</b>
+        入帳約每月<b style="color:#d97706">16日</b>（第3週）　配息率 <b>11.0%</b>
       </div>
     </div>
     <div id="i2mo-jpm" style="font-size:12px;font-weight:700;color:#d97706;white-space:nowrap;text-align:right"></div>
   </div>
-  <div id="i2det-jpm" style="display:none;padding:10px 14px 12px;background:#fffbeb">
+  <div id="i2det-jpm" style="display:block;padding:10px 14px 12px;background:#fffbeb">
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">
       <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
-        <div style="color:var(--sub);font-size:10px">單位淨值</div>
-        <div style="font-weight:700;color:#1f2937">75.39 USD</div>
+        <div style="color:var(--sub);font-size:10px">最新淨值</div>
+        <div style="font-weight:700;color:#1f2937">$75.42 USD</div>
       </div>
       <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
         <div style="color:var(--sub);font-size:10px">每單位配息</div>
@@ -1158,66 +1086,164 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       </div>
       <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
         <div style="color:var(--sub);font-size:10px">每萬元月配</div>
-        <div style="font-weight:700;color:#d97706">92元</div>
+        <div style="font-weight:700;color:#d97706">≈92元</div>
       </div>
     </div>
-    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">近4月：$0.69 ▸ $0.69 ▸ $0.69 ▸ $0.69</div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">近4月配息：$0.69 ▸ $0.696 ▸ $0.672 ▸ $0.68　（資料來源：MoneyDJ）</div>
     <div style="display:flex;align-items:center;gap:8px">
       <span style="font-size:11px;color:var(--sub);flex-shrink:0">配置</span>
-      <input type="range" id="i2pct-jpm" min="0" max="100" step="5" value="0" style="flex:1;accent-color:#d97706" oninput="calcIncome2()">
-      <span id="i2pctlbl-jpm" style="font-size:13px;font-weight:700;color:#d97706;width:40px;text-align:right">0%</span>
+      <input type="range" id="i2pct-jpm" min="0" max="100" step="5" value="40" style="flex:1;accent-color:#d97706" oninput="calcIncome2()">
+      <span id="i2pctlbl-jpm" style="font-size:13px;font-weight:700;color:#d97706;width:40px;text-align:right">40%</span>
+    </div>
+  </div>
+</div><div id="i2card-aling" style="border:1px solid #e5e7eb;border-radius:12px;margin-bottom:8px;overflow:hidden">
+  <div id="i2hdr-aling" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:transparent" onclick="i2Toggle('aling')">
+    <div id="i2chk-aling" style="width:20px;height:20px;border-radius:5px;border:2px solid #7c3aed;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:900"></div>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        安聯收益成長 AMg7
+        <a href="https://www.moneydj.com/funddj/yp/wb05.djhtm?a=TLZF9" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#7c3aed;border:1px solid #7c3aed;border-radius:4px;padding:1px 6px;text-decoration:none">MoneyDJ ↗</a>
+      </div>
+      <div style="font-size:11px;color:var(--sub);margin-top:3px">
+        入帳約每月<b style="color:#7c3aed">18日</b>（第3週）　配息率 <b>9.09%</b>
+      </div>
+    </div>
+    <div id="i2mo-aling" style="font-size:12px;font-weight:700;color:#7c3aed;white-space:nowrap;text-align:right"></div>
+  </div>
+  <div id="i2det-aling" style="display:none;padding:10px 14px 12px;background:#f5f3ff">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">
+      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
+        <div style="color:var(--sub);font-size:10px">最新淨值</div>
+        <div style="font-weight:700;color:#1f2937">$8.91 USD</div>
+      </div>
+      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
+        <div style="color:var(--sub);font-size:10px">每單位配息</div>
+        <div style="font-weight:700;color:#7c3aed">$0.068</div>
+      </div>
+      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
+        <div style="color:var(--sub);font-size:10px">每萬元月配</div>
+        <div style="font-weight:700;color:#7c3aed">≈76元</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">近4月配息：$0.068 ▸ $0.068 ▸ $0.068 ▸ $0.068　（資料來源：MoneyDJ）</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:11px;color:var(--sub);flex-shrink:0">配置</span>
+      <input type="range" id="i2pct-aling" min="0" max="100" step="5" value="0" style="flex:1;accent-color:#7c3aed" oninput="calcIncome2()">
+      <span id="i2pctlbl-aling" style="font-size:13px;font-weight:700;color:#7c3aed;width:40px;text-align:right">0%</span>
     </div>
   </div>
 </div>
-      <div style="background:#f3f4f6;border-radius:8px;padding:8px 12px;font-size:11px;color:var(--sub)">
-        ⚠️ 各基金配置比例合計不須等於100%，超過100%會以實際本金比例計算
-      </div>
     </div>
   </div>
 
-  <!-- 月配息行事曆 -->
+  <!-- 第4週基金 -->
   <div class="card" style="margin-bottom:10px">
-    <div class="card-head"><div class="card-title">📅 每月配息入帳時間</div></div>
-    <div class="card-body">
-      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding:4px 0">
-        <div style="text-align:center">
-          <div id="i2dot-aling" style="width:48px;height:48px;border-radius:50%;border:2px solid #7c3aed;background:#7c3aed;display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-weight:900;margin:0 auto">10</div>
-          <div style="font-size:10px;color:#7c3aed;margin-top:4px;font-weight:600">安聯AMg7</div>
-        </div>
-        <div style="display:flex;align-items:center;color:#9ca3af;font-size:18px;margin-top:-12px">→</div>
-        <div style="text-align:center">
-          <div id="i2dot-mg" style="width:48px;height:48px;border-radius:50%;border:2px solid #d1d5db;background:transparent;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:16px;font-weight:400;margin:0 auto">12</div>
-          <div style="font-size:10px;color:#9ca3af;margin-top:4px;font-weight:400">M&amp;G入息</div>
-        </div>
-        <div style="display:flex;align-items:center;color:#9ca3af;font-size:18px;margin-top:-12px">→</div>
-        <div style="text-align:center">
-          <div id="i2dot-ab" style="width:48px;height:48px;border-radius:50%;border:2px solid #dc2626;background:#dc2626;display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-weight:900;margin:0 auto">13</div>
-          <div style="font-size:10px;color:#dc2626;margin-top:4px;font-weight:600">聯博AP</div>
-        </div>
-        <div style="display:flex;align-items:center;color:#9ca3af;font-size:18px;margin-top:-12px">→</div>
-        <div style="text-align:center">
-          <div id="i2dot-jpm" style="width:48px;height:48px;border-radius:50%;border:2px solid #d1d5db;background:transparent;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:16px;font-weight:400;margin:0 auto">14</div>
-          <div style="font-size:10px;color:#9ca3af;margin-top:4px;font-weight:400">摩根多重</div>
-        </div>
+    <div class="card-head">
+      <div class="card-title">🔵 第4週配息基金 <span style="font-size:11px;font-weight:400;color:var(--sub)">入帳約每月21-28日</span></div>
+      <div style="font-size:12px;font-weight:700;color:#0369a1">月配：<span id="inc2-w4lbl">—</span></div>
+    </div>
+    <div class="card-body" style="padding-top:4px">
+<div id="i2card-mg" style="border:1px solid #e5e7eb;border-radius:12px;margin-bottom:8px;overflow:hidden">
+  <div id="i2hdr-mg" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:transparent" onclick="i2Toggle('mg')">
+    <div id="i2chk-mg" style="width:20px;height:20px;border-radius:5px;border:2px solid #0369a1;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:900"></div>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        M&amp;G 入息基金 A
+        <a href="https://www.moneydj.com/funddj/yp/wb05.djhtm?a=MMG55" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#0369a1;border:1px solid #0369a1;border-radius:4px;padding:1px 6px;text-decoration:none">MoneyDJ ↗</a>
       </div>
-      <div style="text-align:center;font-size:11px;color:var(--sub);margin-top:8px">彩色 = 已選取；灰色 = 未選取</div>
+      <div style="font-size:11px;color:var(--sub);margin-top:3px">
+        入帳約每月<b style="color:#0369a1">23日</b>（第4週）　配息率 <b>10.05%</b>
+      </div>
+    </div>
+    <div id="i2mo-mg" style="font-size:12px;font-weight:700;color:#0369a1;white-space:nowrap;text-align:right"></div>
+  </div>
+  <div id="i2det-mg" style="display:none;padding:10px 14px 12px;background:#eff6ff">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">
+      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
+        <div style="color:var(--sub);font-size:10px">最新淨值</div>
+        <div style="font-weight:700;color:#1f2937">$78.07 USD</div>
+      </div>
+      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
+        <div style="color:var(--sub);font-size:10px">每單位配息</div>
+        <div style="font-weight:700;color:#0369a1">$0.654</div>
+      </div>
+      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
+        <div style="color:var(--sub);font-size:10px">每萬元月配</div>
+        <div style="font-weight:700;color:#0369a1">≈84元</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">近4月配息：$0.654 ▸ $0.654 ▸ $0.654 ▸ $0.654　（資料來源：MoneyDJ）</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:11px;color:var(--sub);flex-shrink:0">配置</span>
+      <input type="range" id="i2pct-mg" min="0" max="100" step="5" value="0" style="flex:1;accent-color:#0369a1" oninput="calcIncome2()">
+      <span id="i2pctlbl-mg" style="font-size:13px;font-weight:700;color:#0369a1;width:40px;text-align:right">0%</span>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+
+  <!-- 月底基金 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-head">
+      <div class="card-title">🔴 月底配息基金 <span style="font-size:11px;font-weight:400;color:var(--sub)">除息約每月底28-31日</span></div>
+      <div style="font-size:12px;font-weight:700;color:#dc2626">月配：<span id="inc2-mblbl">—</span></div>
+    </div>
+    <div class="card-body" style="padding-top:4px">
+<div id="i2card-ab" style="border:1px solid #dc2626;border-radius:12px;margin-bottom:8px;overflow:hidden">
+  <div id="i2hdr-ab" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:#fef2f2" onclick="i2Toggle('ab')">
+    <div id="i2chk-ab" style="width:20px;height:20px;border-radius:5px;border:2px solid #dc2626;background:#dc2626;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:900">✓</div>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        聯博美國成長 AP
+        <a href="https://www.moneydj.com/funddj/yp/wb05.djhtm?a=ALBT8" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#dc2626;border:1px solid #dc2626;border-radius:4px;padding:1px 6px;text-decoration:none">MoneyDJ ↗</a>
+      </div>
+      <div style="font-size:11px;color:var(--sub);margin-top:3px">
+        入帳約每月<b style="color:#dc2626">30日</b>（月底）　配息率 <b>12.95%</b>
+      </div>
+    </div>
+    <div id="i2mo-ab" style="font-size:12px;font-weight:700;color:#dc2626;white-space:nowrap;text-align:right"></div>
+  </div>
+  <div id="i2det-ab" style="display:block;padding:10px 14px 12px;background:#fef2f2">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">
+      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
+        <div style="color:var(--sub);font-size:10px">最新淨值</div>
+        <div style="font-weight:700;color:#1f2937">$73.68 USD</div>
+      </div>
+      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
+        <div style="color:var(--sub);font-size:10px">每單位配息</div>
+        <div style="font-weight:700;color:#dc2626">$0.8322</div>
+      </div>
+      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px">
+        <div style="color:var(--sub);font-size:10px">每萬元月配</div>
+        <div style="font-weight:700;color:#dc2626">≈108元</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">近4月配息：$0.8322 ▸ $0.8322 ▸ $0.8322 ▸ $0.8322　（資料來源：MoneyDJ）</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:11px;color:var(--sub);flex-shrink:0">配置</span>
+      <input type="range" id="i2pct-ab" min="0" max="100" step="5" value="40" style="flex:1;accent-color:#dc2626" oninput="calcIncome2()">
+      <span id="i2pctlbl-ab" style="font-size:13px;font-weight:700;color:#dc2626;width:40px;text-align:right">40%</span>
+    </div>
+  </div>
+</div>
     </div>
   </div>
 
   <!-- 試算結果 -->
   <div class="card" style="margin-bottom:10px">
-    <div class="card-head"><div class="card-title">💰 月配息試算結果</div></div>
+    <div class="card-head"><div class="card-title">💰 月配息試算</div></div>
     <div class="card-body">
       <div id="i2-res-rows" style="margin-bottom:12px"></div>
       <div style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <div>
           <div style="font-size:12px;color:#065f46;font-weight:600">💵 合計每月配息</div>
-          <div style="font-size:10px;color:#6ee7b7">選取基金合計（依配置比例）</div>
+          <div style="font-size:10px;color:#6ee7b7">以 USD/TWD＝32 換算</div>
         </div>
         <div id="inc2-totmo" style="font-size:24px;font-weight:900;color:#064e3b">—</div>
       </div>
       <div style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:12px;color:#1e40af;font-weight:600">📅 預估年度總配息</div>
+        <div style="font-size:12px;color:#1e40af;font-weight:600">📅 預估年度配息</div>
         <div id="inc2-totyr" style="font-size:24px;font-weight:900;color:#1e3a8a">—</div>
       </div>
     </div>
@@ -1225,64 +1251,53 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 
   <!-- 配息轉換試算 -->
   <div class="card" style="margin-bottom:10px">
-    <div class="card-head"><div class="card-title">🔄 配息後轉換：淨值 &amp; 單位數影響</div></div>
+    <div class="card-head"><div class="card-title">🔄 配息後轉換：單位數影響試算</div></div>
     <div class="card-body">
-      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">
-        每月領到配息後，可選擇再投入原基金或轉換到其他基金。下表顯示每次配息對單位數的影響。
-      </div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:10px">每月領到配息後，可選擇提領、再投入同基金或轉換到其他基金。</div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
         <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;background:#f5f3ff;border-radius:8px;padding:6px 12px;border:1.5px solid #7c3aed">
-          <input type="radio" name="i2strat" value="cash" checked onchange="calcIncome2()"> 全部領現
+          <input type="radio" name="i2strat" value="cash" checked onchange="calcIncome2()"> 全部提領
         </label>
         <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;background:var(--bg);border-radius:8px;padding:6px 12px;border:1.5px solid var(--border)">
           <input type="radio" name="i2strat" value="reinvest" onchange="calcIncome2()"> 再投入原基金
         </label>
         <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;background:var(--bg);border-radius:8px;padding:6px 12px;border:1.5px solid var(--border)">
-          <input type="radio" name="i2strat" value="cross" onchange="calcIncome2()"> 互相轉換再投入
+          <input type="radio" name="i2strat" value="cross" onchange="calcIncome2()"> 互轉再投入
         </label>
       </div>
-      <!-- Per-fund conversion table -->
       <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
-        <div style="background:var(--border);display:grid;grid-template-columns:1fr 70px 1fr 1fr;padding:8px 10px;font-size:11px;font-weight:700;text-align:center">
-          <div style="text-align:left">基金</div><div>月配日</div><div>配息金額</div><div id="i2conv-hdr">投資影響</div>
+        <div style="background:var(--border);display:grid;grid-template-columns:1fr 55px 1fr 1fr;padding:7px 10px;font-size:11px;font-weight:700;text-align:center">
+          <div style="text-align:left">基金</div><div>入帳日</div><div>月配金額</div><div id="i2conv-hdr">說明</div>
         </div>
         <div id="i2-conv-rows"></div>
       </div>
     </div>
   </div>
 
-  <!-- 5/10/20年投影 -->
+  <!-- 5/10/20年 -->
   <div class="card">
     <div class="card-head"><div class="card-title">📈 長期預估（5／10／20年）</div></div>
     <div class="card-body">
-      <div style="font-size:11px;color:var(--sub);margin-bottom:10px">
-        「領現」：配息全部提領，帳戶依資本利得率變化｜「再投入」：配息全部複利滾入，帳戶依年化報酬成長
-      </div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:8px">「提領」：配息提出，帳戶依資本增值率變化　「再投入」：複利滾入，帳戶依年化報酬成長</div>
       <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
         <div style="background:var(--border);display:grid;grid-template-columns:70px 1fr 1fr 1fr;padding:8px 10px;font-size:11px;font-weight:700;text-align:center">
           <div></div><div>帳戶價值</div><div>已領配息</div><div>合計</div>
         </div>
         <div style="display:grid;grid-template-columns:70px 1fr 1fr 1fr;padding:10px;font-size:13px;border-bottom:1px solid var(--border);text-align:center">
           <div style="font-weight:800;color:#7c3aed;text-align:left">📌 5年</div>
-          <div id="inc2-acc-5" style="font-weight:700">—</div>
-          <div id="inc2-div-5" style="color:#16a34a;font-weight:700">—</div>
-          <div id="inc2-tot-5" style="font-weight:800;color:#1d4ed8">—</div>
+          <div id="inc2-acc-5" style="font-weight:700">—</div><div id="inc2-div-5" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-5" style="font-weight:800;color:#1d4ed8">—</div>
         </div>
         <div style="display:grid;grid-template-columns:70px 1fr 1fr 1fr;padding:10px;font-size:13px;border-bottom:1px solid var(--border);text-align:center;background:var(--bg)">
           <div style="font-weight:800;color:#7c3aed;text-align:left">📌 10年</div>
-          <div id="inc2-acc-10" style="font-weight:700">—</div>
-          <div id="inc2-div-10" style="color:#16a34a;font-weight:700">—</div>
-          <div id="inc2-tot-10" style="font-weight:800;color:#1d4ed8">—</div>
+          <div id="inc2-acc-10" style="font-weight:700">—</div><div id="inc2-div-10" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-10" style="font-weight:800;color:#1d4ed8">—</div>
         </div>
         <div style="display:grid;grid-template-columns:70px 1fr 1fr 1fr;padding:10px;font-size:13px;text-align:center">
           <div style="font-weight:800;color:#7c3aed;text-align:left">📌 20年</div>
-          <div id="inc2-acc-20" style="font-weight:700">—</div>
-          <div id="inc2-div-20" style="color:#16a34a;font-weight:700">—</div>
-          <div id="inc2-tot-20" style="font-weight:800;color:#1d4ed8">—</div>
+          <div id="inc2-acc-20" style="font-weight:700">—</div><div id="inc2-div-20" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-20" style="font-weight:800;color:#1d4ed8">—</div>
         </div>
       </div>
       <div style="background:#fef3c7;border-radius:8px;padding:10px 12px;margin-top:10px;font-size:11px;color:#92400e">
-        ⚠️ 預估為試算參考，不代表實際績效。匯率固定以 USD/TWD＝32 計算。
+        ⚠️ 預估為試算參考，不保證績效。配息率、資本變化以 MoneyDJ 近期數據估算。
       </div>
     </div>
   </div>
@@ -3702,151 +3717,164 @@ function switchWcMatch(n) {
 
 
 
+
 // ── 月配息2 ──
 var I2_FUNDS = {
-  aling:{ payDay:10, divRate:9.15,  capRate:-1.05, annReturn:8.1,  navTWD:8.9107,  divUTWD:0.068,  col:'#7c3aed', defChk:true,  defPct:50 },
-  mg:   { payDay:12, divRate:10.04, capRate:-5.14, annReturn:4.9,  navTWD:2501.76, divUTWD:20.928, col:'#0369a1', defChk:false, defPct:0  },
-  ab:   { payDay:13, divRate:13.82, capRate:-2.92, annReturn:10.9, navTWD:2311.36, divUTWD:26.624, col:'#dc2626', defChk:true,  defPct:50 },
-  jpm:  { payDay:14, divRate:10.98, capRate:-0.38, annReturn:10.6, navTWD:2412.48, divUTWD:22.08,  col:'#d97706', defChk:false, defPct:0  }
+  jpm:  { payDay:16, grp:'w3', divRate:11.0,  capRate:-1.0, annReturn:10.0, navUSD:75.42,  divUSD:0.690,   col:'#d97706', defChk:true,  defPct:40 },
+  aling:{ payDay:18, grp:'w3', divRate:9.09,  capRate:-2.0, annReturn:7.0,  navUSD:8.91,   divUSD:0.068,   col:'#7c3aed', defChk:false, defPct:0  },
+  mg:   { payDay:23, grp:'w4', divRate:10.05, capRate:-6.0, annReturn:4.0,  navUSD:78.07,  divUSD:0.654,   col:'#0369a1', defChk:false, defPct:0  },
+  ab:   { payDay:30, grp:'mb', divRate:12.95, capRate:-2.0, annReturn:11.0, navUSD:73.68,  divUSD:0.8322,  col:'#dc2626', defChk:true,  defPct:40 }
 };
-var I2_NAMES = { aling:'安聯 AMg7', mg:'M&G入息', ab:'聯博 AP', jpm:'摩根多重' };
-var I2_IDS   = ['aling','mg','ab','jpm'];
+var I2_NAMES = { jpm:'摩根多重收益', aling:'安聯AMg7', mg:'M&G入息', ab:'聯博AP' };
+var I2_IDS   = ['jpm','aling','mg','ab'];
+var I2_FX    = 32; // USD/TWD
 var _i2P = 5000000;
 var _i2Chk = {};
 var _i2Timer = null;
 
 function initIncome2Tab() {
   if (Object.keys(_i2Chk).length === 0) {
-    I2_IDS.forEach(function(id){
+    I2_IDS.forEach(function(id) {
       _i2Chk[id] = I2_FUNDS[id].defChk;
       _i2ApplyChk(id, _i2Chk[id]);
     });
-    var lbl=document.getElementById('inc2-p-lbl');
-    if(lbl) lbl.textContent = incFmtP(_i2P)+'元';
+    var lbl = document.getElementById('inc2-p-lbl');
+    if (lbl) lbl.textContent = incFmtP(_i2P) + '元';
   }
   calcIncome2();
 }
 
 function _i2ApplyChk(id, on) {
-  var f=I2_FUNDS[id], col=f.col;
-  var chk =document.getElementById('i2chk-'+id);
-  var det =document.getElementById('i2det-'+id);
-  var hdr =document.getElementById('i2hdr-'+id);
-  var card=document.getElementById('i2card-'+id);
-  var dot =document.getElementById('i2dot-'+id);
-  if(chk) { chk.style.background=on?col:'transparent'; chk.innerHTML=on?'✓':''; }
-  if(det) det.style.display=on?'block':'none';
-  if(hdr) hdr.style.background=on?col+'22':'transparent';
-  if(card) card.style.border='1px solid '+(on?col:'#e5e7eb');
-  if(dot) {
-    dot.style.background   = on ? col : 'transparent';
-    dot.style.border       = '2px solid '+(on?col:'#d1d5db');
-    dot.style.color        = on ? 'white' : '#9ca3af';
-    dot.style.fontWeight   = on ? '900' : '400';
-    dot.nextElementSibling && (dot.nextElementSibling.style.color = on?col:'#9ca3af');
-    dot.nextElementSibling && (dot.nextElementSibling.style.fontWeight = on?'600':'400');
+  var f = I2_FUNDS[id], col = f.col;
+  var chk  = document.getElementById('i2chk-'+id);
+  var det  = document.getElementById('i2det-'+id);
+  var hdr  = document.getElementById('i2hdr-'+id);
+  var card = document.getElementById('i2card-'+id);
+  var dot  = document.getElementById('i2dot-'+id);
+  var dlbl = document.getElementById('i2dotlbl-'+id);
+  if (chk)  { chk.style.background = on ? col : 'transparent'; chk.innerHTML = on ? '✓' : ''; }
+  if (det)  { det.style.display = on ? 'block' : 'none'; }
+  if (hdr)  { hdr.style.background = on ? col + '18' : 'transparent'; }
+  if (card) { card.style.border = '1px solid ' + (on ? col : '#e5e7eb'); }
+  if (dot) {
+    dot.style.background = on ? col : 'transparent';
+    dot.style.border = '2px solid ' + (on ? col : '#e5e7eb');
+    dot.style.color  = on ? 'white' : '#9ca3af';
+    dot.style.fontWeight = on ? '900' : '400';
+  }
+  if (dlbl) {
+    dlbl.style.color = on ? col : '#9ca3af';
+    dlbl.style.fontWeight = on ? '600' : '400';
   }
 }
 
 function i2Toggle(id) {
-  _i2Chk[id]=!_i2Chk[id];
+  _i2Chk[id] = !_i2Chk[id];
   _i2ApplyChk(id, _i2Chk[id]);
   calcIncome2();
 }
 
 function inc2UpdateP(val) {
-  _i2P=+val;
-  var lbl=document.getElementById('inc2-p-lbl');
-  if(lbl) lbl.textContent=incFmtP(+val)+'元';
+  _i2P = +val;
+  var lbl = document.getElementById('inc2-p-lbl');
+  if (lbl) lbl.textContent = incFmtP(+val) + '元';
   clearTimeout(_i2Timer);
-  _i2Timer=setTimeout(calcIncome2,300);
+  _i2Timer = setTimeout(calcIncome2, 300);
 }
 
 function calcIncome2() {
-  var p=_i2P, totMo=0, totAlloc=0;
+  var p = _i2P;
   function $t(i,v){var e=document.getElementById(i);if(e)e.textContent=v;}
 
-  // --- per-fund calc ---
-  var sel=[];
-  I2_IDS.forEach(function(id){
-    if(!_i2Chk[id]){ var m=document.getElementById('i2mo-'+id);if(m)m.textContent='';return; }
-    var pEl=document.getElementById('i2pct-'+id), pct=pEl?+pEl.value:0;
-    var ll=document.getElementById('i2pctlbl-'+id); if(ll&&_i2Chk[id]) ll.textContent=pct+'%';
-    totAlloc+=pct;
-    var fp=p*pct/100;
-    var mo=fp*I2_FUNDS[id].divRate/100/12;
-    totMo+=mo;
-    var units=fp/I2_FUNDS[id].navTWD;
-    var mEl=document.getElementById('i2mo-'+id);
-    if(mEl) mEl.textContent=incFmtP(mo)+'元';
-    sel.push({id:id,fp:fp,mo:mo,units:units,pct:pct});
+  var w3Mo=0, w4Mo=0, mbMo=0, totMo=0, totAlloc=0;
+  var sel = [];
+
+  I2_IDS.forEach(function(id) {
+    if (!_i2Chk[id]) { var m=document.getElementById('i2mo-'+id);if(m)m.textContent=''; return; }
+    var pEl = document.getElementById('i2pct-'+id), pct = pEl ? +pEl.value : 0;
+    var ll  = document.getElementById('i2pctlbl-'+id); if(ll) ll.textContent = pct + '%';
+    totAlloc += pct;
+    var fp = p * pct / 100;
+    var mo = fp * I2_FUNDS[id].divRate / 100 / 12; // TWD
+    var units = fp / (I2_FUNDS[id].navUSD * I2_FX);
+    totMo += mo;
+    if (I2_FUNDS[id].grp==='w3') w3Mo += mo;
+    else if (I2_FUNDS[id].grp==='w4') w4Mo += mo;
+    else mbMo += mo;
+    var mEl = document.getElementById('i2mo-'+id);
+    if (mEl) mEl.textContent = incFmtP(mo) + '元';
+    sel.push({id:id, fp:fp, mo:mo, units:units, pct:pct});
   });
+
   $t('inc2-totmo', incFmtP(totMo)+'元');
   $t('inc2-totyr', incFmtP(totMo*12)+'元');
   $t('inc2-alloc', totAlloc+'%');
-  var bar=document.getElementById('inc2-bar');
-  if(bar) bar.style.width=Math.min(totAlloc,100)+'%';
+  $t('inc2-w3lbl', w3Mo>0 ? incFmtP(w3Mo)+'元' : '—');
+  $t('inc2-w4lbl', w4Mo>0 ? incFmtP(w4Mo)+'元' : '—');
+  $t('inc2-mblbl', mbMo>0 ? incFmtP(mbMo)+'元' : '—');
+  var bar = document.getElementById('inc2-bar');
+  if (bar) bar.style.width = Math.min(totAlloc,100)+'%';
 
-  // --- result rows ---
-  var resRows='';
-  sel.forEach(function(s){
-    var f=I2_FUNDS[s.id];
-    resRows+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">';
-    resRows+='<div><span style="font-size:12px;font-weight:700;color:'+f.col+'">'+I2_NAMES[s.id]+'</span>';
-    resRows+='<span style="font-size:10px;color:var(--sub);margin-left:6px">每月'+f.payDay+'日</span></div>';
-    resRows+='<div style="font-size:14px;font-weight:700;color:'+f.col+'">'+incFmtP(s.mo)+'元</div>';
-    resRows+='</div>';
+  // result rows
+  var rr = '';
+  sel.forEach(function(s) {
+    var f = I2_FUNDS[s.id];
+    rr += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">';
+    rr += '<div><span style="font-size:12px;font-weight:700;color:'+f.col+'">'+I2_NAMES[s.id]+'</span>';
+    rr += '<span style="font-size:10px;color:var(--sub);margin-left:6px">約'+f.payDay+'日</span></div>';
+    rr += '<div style="font-size:14px;font-weight:700;color:'+f.col+'">'+incFmtP(s.mo)+'元</div></div>';
   });
-  var rEl=document.getElementById('i2-res-rows');
-  if(rEl) rEl.innerHTML=resRows||'<div style="padding:10px 0;text-align:center;color:var(--sub);font-size:12px">請勾選基金</div>';
+  var rEl = document.getElementById('i2-res-rows');
+  if (rEl) rEl.innerHTML = rr || '<div style="padding:10px;text-align:center;color:var(--sub);font-size:12px">請勾選基金</div>';
 
-  // --- conversion table ---
-  var strat=(document.querySelector('input[name="i2strat"]:checked')||{value:'cash'}).value;
-  var hdrTxt={'cash':'全部提領（不加單位）','reinvest':'再投入後新增單位數','cross':'互轉後新增單位數'};
-  $t('i2conv-hdr', hdrTxt[strat]||'');
-  var convRows='';
-  sel.forEach(function(s,idx){
-    var f=I2_FUNDS[s.id];
-    var newUnitsDesc='';
-    if(strat==='cash') {
-      newUnitsDesc='提領 '+incFmtP(s.mo)+'元';
-    } else if(strat==='reinvest') {
-      var nu=s.mo/f.navTWD;
-      newUnitsDesc='+'+nu.toFixed(s.id==='aling'?0:2)+' 單位（原基金）';
+  // conversion table
+  var strat = (document.querySelector('input[name="i2strat"]:checked')||{value:'cash'}).value;
+  var hdrTxt = {cash:'提領（不加碼）', reinvest:'再投入後+單位數', cross:'互轉後+單位數'};
+  $t('i2conv-hdr', hdrTxt[strat]);
+  var cr = '';
+  sel.forEach(function(s, idx) {
+    var f = I2_FUNDS[s.id];
+    var navTWD = f.navUSD * I2_FX;
+    var exNavUSD = f.navUSD - f.divUSD;
+    var desc = '';
+    if (strat==='cash') {
+      desc = '提領 '+incFmtP(s.mo)+'元';
+    } else if (strat==='reinvest') {
+      var nu = s.mo / navTWD;
+      desc = '+'+nu.toFixed(2)+' 單位（同基金）';
     } else {
-      // cross: each fund's div goes to next selected fund
-      var tgt=sel[(idx+1)%sel.length];
-      if(tgt){
-        var nu2=s.mo/I2_FUNDS[tgt.id].navTWD;
-        newUnitsDesc='+'+nu2.toFixed(tgt.id==='aling'?0:2)+' 單位→'+I2_NAMES[tgt.id];
+      var tgt = sel[(idx+1) % sel.length];
+      if (tgt) {
+        var tNav = I2_FUNDS[tgt.id].navUSD * I2_FX;
+        var nu2 = s.mo / tNav;
+        desc = '+'+nu2.toFixed(2)+' 單位→'+I2_NAMES[tgt.id];
       }
     }
-    var exNavTWD=f.navTWD-f.divUTWD;
-    convRows+='<div style="display:grid;grid-template-columns:1fr 70px 1fr 1fr;padding:8px 10px;font-size:11px;border-bottom:1px solid var(--border);align-items:center">';
-    convRows+='<div><span style="font-weight:700;color:'+f.col+'">'+I2_NAMES[s.id]+'</span><br><span style="color:var(--sub);font-size:10px">除息後淨值約 '+(f.id==='aling'?exNavTWD.toFixed(4):(exNavTWD/32).toFixed(2)+(f.id==='aling'?'TWD':'USD'))+'</span></div>';
-    convRows+='<div style="text-align:center;color:var(--sub)">'+f.payDay+'日</div>';
-    convRows+='<div style="text-align:center;color:#16a34a;font-weight:600">'+incFmtP(s.mo)+'元</div>';
-    convRows+='<div style="text-align:center;color:#7c3aed;font-weight:600;font-size:10px">'+newUnitsDesc+'</div>';
-    convRows+='</div>';
+    cr += '<div style="display:grid;grid-template-columns:1fr 55px 1fr 1fr;padding:8px 10px;font-size:11px;border-bottom:1px solid var(--border);align-items:center">';
+    cr += '<div><span style="font-weight:700;color:'+f.col+'">'+I2_NAMES[s.id]+'</span>';
+    cr += '<br><span style="font-size:10px;color:var(--sub)">除息後淨值≈$'+exNavUSD.toFixed(3)+'</span></div>';
+    cr += '<div style="text-align:center;color:var(--sub)">'+f.payDay+'日</div>';
+    cr += '<div style="text-align:center;color:#16a34a;font-weight:600">'+incFmtP(s.mo)+'元</div>';
+    cr += '<div style="text-align:center;color:#7c3aed;font-weight:600;font-size:10px">'+desc+'</div>';
+    cr += '</div>';
   });
-  var cEl=document.getElementById('i2-conv-rows');
-  if(cEl) cEl.innerHTML=convRows||'<div style="padding:12px;text-align:center;color:var(--sub);font-size:12px">請先勾選基金</div>';
+  var cEl = document.getElementById('i2-conv-rows');
+  if (cEl) cEl.innerHTML = cr || '<div style="padding:12px;text-align:center;color:var(--sub);font-size:12px">請先勾選基金</div>';
 
-  // --- 5/10/20 yr projection ---
-  [5,10,20].forEach(function(yr){
+  // 5/10/20 yr
+  [5,10,20].forEach(function(yr) {
     var accV=0, cumDiv=0;
-    sel.forEach(function(s){
-      var f=I2_FUNDS[s.id];
-      if(strat==='cash') {
-        accV  += s.fp*Math.pow(1+f.capRate/100,yr);
-        cumDiv+= s.fp*f.divRate/100*yr;
+    sel.forEach(function(s) {
+      var f = I2_FUNDS[s.id];
+      if (strat==='cash') {
+        accV   += s.fp * Math.pow(1+f.capRate/100, yr);
+        cumDiv += s.fp * f.divRate/100 * yr;
       } else {
-        accV  += s.fp*Math.pow(1+f.annReturn/100,yr);
-        cumDiv = 0;
+        accV += s.fp * Math.pow(1+f.annReturn/100, yr);
       }
     });
     $t('inc2-acc-'+yr, incFmtP(accV)+'元');
-    $t('inc2-div-'+yr, strat==='cash'?incFmtP(cumDiv)+'元':'(已複利滾入)');
+    $t('inc2-div-'+yr, strat==='cash' ? incFmtP(cumDiv)+'元' : '(已複利滾入)');
     $t('inc2-tot-'+yr, incFmtP(accV+cumDiv)+'元');
   });
 }
