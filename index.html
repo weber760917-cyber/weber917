@@ -700,6 +700,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <button id="rtab-retire" class="market-sub active" onclick="switchRetireSub('rview-retire','rtab-retire')">🏖️ 退休試算</button>
     <button id="rtab-loan"   class="market-sub"        onclick="switchRetireSub('rview-loan','rtab-loan')">🏦 貸款試算</button>
     <button id="rtab-income" class="market-sub"        onclick="switchRetireSub('rview-income','rtab-income');initIncomeTab()">💰 月配息</button>
+    <button id="rtab-income2" class="market-sub"       onclick="switchRetireSub('rview-income2','rtab-income2');initIncome2Tab()">📊 月配息2</button>
   </div>
 
   <div id="rview-retire">
@@ -983,6 +984,181 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       <div id="inc-price-note" style="font-size:11px;color:var(--sub);margin-top:8px;text-align:right"></div>
     </div>
   </div>
+
+<div id="rview-income2" style="display:none;padding:8px 0">
+
+  <!-- Banner -->
+  <div style="background:linear-gradient(135deg,#1e1b4b,#312e81,#4338ca);border-radius:14px;padding:16px 18px;margin-bottom:14px;color:white">
+    <div style="font-size:17px;font-weight:900;letter-spacing:0.5px">📊 雙週配息策略試算</div>
+    <div style="font-size:12px;opacity:0.85;margin-top:4px">同時持有第2週（10-14日）＋第4週（24-28日）配息基金，每月領兩次，穩定現金流</div>
+    <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+      <div style="background:rgba(255,255,255,0.15);border-radius:16px;padding:3px 12px;font-size:11px">🗓️ 第2週：每月10-14日入帳</div>
+      <div style="background:rgba(255,255,255,0.15);border-radius:16px;padding:3px 12px;font-size:11px">🗓️ 第4週：每月24-28日入帳</div>
+    </div>
+  </div>
+
+  <!-- 本金設定 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-head"><div class="card-title">💵 本金設定</div><div id="inc2-principal-lbl" style="font-weight:700;color:var(--blue);font-size:15px">500萬元</div></div>
+    <div class="card-body" style="padding-top:4px">
+      <input type="range" min="500000" max="20000000" step="100000" value="5000000"
+        style="width:100%;accent-color:#4338ca"
+        oninput="inc2SetPrincipal(this.value)">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-top:2px">
+        <span>50萬</span><span>500萬</span><span>1000萬</span><span>2000萬</span>
+      </div>
+      <div id="inc2-alloc-bar-wrap" style="margin-top:10px;background:var(--border);border-radius:6px;height:8px;overflow:hidden">
+        <div id="inc2-alloc-bar" style="height:100%;background:linear-gradient(90deg,#6366f1,#a855f7);width:0%;transition:width 0.3s"></div>
+      </div>
+      <div style="font-size:11px;color:var(--sub);margin-top:4px">已配置：<span id="inc2-alloc-used" style="color:#4338ca;font-weight:700">0%</span>（W2: <span id="inc2-w2-alloc-pct">0%</span>｜W4: <span id="inc2-w4-alloc-pct">0%</span>）</div>
+    </div>
+  </div>
+
+  <!-- 第2週配息基金 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-head">
+      <div class="card-title">🟣 第2週配息基金 <span style="font-size:11px;font-weight:400;color:var(--sub)">每月10-14日入帳</span></div>
+      <div style="font-size:12px;color:#6366f1;font-weight:700">每月約 <span id="inc2-w2-monthly-lbl">0元</span></div>
+    </div>
+    <div class="card-body" id="inc2-w2-funds" style="padding-top:4px;display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+
+  <!-- 第4週配息基金 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-head">
+      <div class="card-title">🟠 第4週配息基金 <span style="font-size:11px;font-weight:400;color:var(--sub)">每月24-28日入帳</span></div>
+      <div style="font-size:12px;color:#d97706;font-weight:700">每月約 <span id="inc2-w4-monthly-lbl">0元</span></div>
+    </div>
+    <div class="card-body" id="inc2-w4-funds" style="padding-top:4px;display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+
+  <!-- 試算結果 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-head"><div class="card-title">💰 配息試算結果</div></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div style="background:linear-gradient(135deg,#ede9fe,#ddd6fe);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:11px;color:#6d28d9;margin-bottom:4px">🟣 第2週配息（月）</div>
+          <div id="inc2-w2-monthly" style="font-size:20px;font-weight:900;color:#4c1d95">0元</div>
+          <div style="font-size:10px;color:#7c3aed;margin-top:2px">每月10-14日</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:11px;color:#92400e;margin-bottom:4px">🟠 第4週配息（月）</div>
+          <div id="inc2-w4-monthly" style="font-size:20px;font-weight:900;color:#78350f">0元</div>
+          <div style="font-size:10px;color:#d97706;margin-top:2px">每月24-28日</div>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div>
+          <div style="font-size:12px;color:#065f46;font-weight:600">💵 合計每月配息（兩次入帳）</div>
+          <div style="font-size:10px;color:#6ee7b7;margin-top:2px">10-14日 + 24-28日</div>
+        </div>
+        <div id="inc2-total-monthly" style="font-size:24px;font-weight:900;color:#064e3b">0元</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:12px;color:#1e40af;font-weight:600">📅 預估年度總配息</div>
+          <div style="font-size:10px;color:#93c5fd;margin-top:2px">= 每月 × 12</div>
+        </div>
+        <div id="inc2-total-annual" style="font-size:24px;font-weight:900;color:#1e3a8a">0元</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 轉換策略分析 -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-head"><div class="card-title">🔄 轉換策略風險分析</div></div>
+    <div class="card-body">
+      <div style="font-size:12px;line-height:1.7;color:var(--text);margin-bottom:10px">
+        部分投資人採「滾動轉換」策略：只持有一組資金，在配息日前後輪流切換兩週基金。<br>
+        優點：所需本金只需雙軌持有的一半。缺點：轉換期間（2-3個工作日）存在NAV波動風險，長期摩擦成本可能侵蝕配息。
+      </div>
+
+      <!-- 策略比較表 -->
+      <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px">
+        <div style="background:var(--border);padding:8px 12px;font-size:12px;font-weight:700;display:grid;grid-template-columns:1fr 1fr 1fr">
+          <div>比較項目</div><div style="text-align:center;color:#4338ca">🟦 雙軌持有</div><div style="text-align:center;color:#d97706">🟧 滾動轉換</div>
+        </div>
+        <div style="font-size:12px">
+          <div style="padding:8px 12px;display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border)">
+            <div>所需本金</div>
+            <div style="text-align:center;font-weight:700;color:#4338ca" id="inc2-cmp-principal-a">—</div>
+            <div style="text-align:center;font-weight:700;color:#d97706" id="inc2-cmp-principal-b">—</div>
+          </div>
+          <div style="padding:8px 12px;display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border);background:var(--bg)">
+            <div>每月配息</div>
+            <div style="text-align:center;font-weight:700;color:#4338ca" id="inc2-cmp-div-a">—</div>
+            <div style="text-align:center;font-weight:700;color:#d97706" id="inc2-cmp-div-b">—</div>
+          </div>
+          <div style="padding:8px 12px;display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border)">
+            <div>年轉換次數</div>
+            <div style="text-align:center;color:#4338ca">0次</div>
+            <div style="text-align:center;color:#d97706">~24次</div>
+          </div>
+          <div style="padding:8px 12px;display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border);background:var(--bg)">
+            <div>轉換風險損失/年</div>
+            <div style="text-align:center;color:#16a34a;font-weight:700">0元</div>
+            <div style="text-align:center;color:#dc2626;font-weight:700" id="inc2-cmp-loss-b">—</div>
+          </div>
+          <div style="padding:8px 12px;display:grid;grid-template-columns:1fr 1fr 1fr">
+            <div>淨年收益（配息-損失）</div>
+            <div style="text-align:center;font-weight:700;color:#4338ca" id="inc2-cmp-net-a">—</div>
+            <div style="text-align:center;font-weight:700;color:#d97706" id="inc2-cmp-net-b">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 轉換風險參數 -->
+      <div style="background:var(--bg);border-radius:10px;padding:12px">
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--sub)">轉換風險假設（可調整）</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span style="font-size:12px;flex-shrink:0">每次NAV波動</span>
+          <input type="range" min="0" max="5" step="0.5" value="1"
+            style="flex:1;accent-color:#ef4444"
+            oninput="inc2SetConvRisk(this.value)">
+          <span id="inc2-conv-risk-lbl" style="font-size:12px;font-weight:700;color:#dc2626;width:40px;text-align:right">1.0%</span>
+        </div>
+        <div style="font-size:11px;color:var(--sub)">歷史均值約0.5-1.5%；市場震盪時可達3-5%。轉換損失 = 本金 × 波動率 × 年轉換次數</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 長期投影 -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">📈 長期帳戶投影</div></div>
+    <div class="card-body">
+      <div style="font-size:11px;color:var(--sub);margin-bottom:10px">假設：配息持續領出，本金依各基金資本增值率成長</div>
+      <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
+        <div style="background:var(--border);display:grid;grid-template-columns:80px 1fr 1fr 1fr;padding:8px 10px;font-size:12px;font-weight:700">
+          <div></div><div style="text-align:center">帳戶價值</div><div style="text-align:center">已領配息</div><div style="text-align:center">合計</div>
+        </div>
+        <div style="display:grid;grid-template-columns:80px 1fr 1fr 1fr;padding:10px;font-size:13px;border-bottom:1px solid var(--border);align-items:center">
+          <div style="font-weight:800;color:#7c3aed">📌 5年</div>
+          <div style="text-align:center;font-weight:700" id="inc2-proj-acc-5">—</div>
+          <div style="text-align:center;color:#16a34a;font-weight:700" id="inc2-proj-div-5">—</div>
+          <div style="text-align:center;font-weight:800;color:#1d4ed8" id="inc2-proj-total-5">—</div>
+        </div>
+        <div style="display:grid;grid-template-columns:80px 1fr 1fr 1fr;padding:10px;font-size:13px;border-bottom:1px solid var(--border);align-items:center;background:var(--bg)">
+          <div style="font-weight:800;color:#7c3aed">📌 10年</div>
+          <div style="text-align:center;font-weight:700" id="inc2-proj-acc-10">—</div>
+          <div style="text-align:center;color:#16a34a;font-weight:700" id="inc2-proj-div-10">—</div>
+          <div style="text-align:center;font-weight:800;color:#1d4ed8" id="inc2-proj-total-10">—</div>
+        </div>
+        <div style="display:grid;grid-template-columns:80px 1fr 1fr 1fr;padding:10px;font-size:13px;align-items:center">
+          <div style="font-weight:800;color:#7c3aed">📌 20年</div>
+          <div style="text-align:center;font-weight:700" id="inc2-proj-acc-20">—</div>
+          <div style="text-align:center;color:#16a34a;font-weight:700" id="inc2-proj-div-20">—</div>
+          <div style="text-align:center;font-weight:800;color:#1d4ed8" id="inc2-proj-total-20">—</div>
+        </div>
+      </div>
+      <div style="background:#fef3c7;border-radius:8px;padding:10px 12px;margin-top:10px;font-size:11px;color:#92400e">
+        ⚠️ 投影為試算參考，實際配息率與淨值成長會依市場變化。建議每年評估再平衡。
+      </div>
+    </div>
+  </div>
+
+</div><!-- end rview-income2 -->
+
 </div>
 
 </div>
@@ -1585,7 +1761,7 @@ const NOW = new Date();
 
 
 function switchRetireSub(view, btnId) {
-  ['rview-retire','rview-loan','rview-income'].forEach(id => {
+  ['rview-retire','rview-loan','rview-income','rview-income2'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = id === view ? '' : 'none';
   });
@@ -1594,7 +1770,7 @@ function switchRetireSub(view, btnId) {
   if (btn) btn.classList.add('active');
   if (view === 'rview-loan') { calcLoan(); }
   // URL deep link
-  const hm = {'rview-income':'#income','rview-loan':'#loan','rview-retire':'#retire'};
+  const hm = {'rview-income':'#income','rview-loan':'#loan','rview-retire':'#retire','rview-income2':'#income2'};
   if (hm[view]) history.replaceState(null, '', hm[view]);
 }
 
@@ -3393,6 +3569,169 @@ function switchWcMatch(n) {
       b.style.borderColor = i===n ? '#065f46' : '';
       b.style.fontWeight = i===n ? '700' : '';
     }
+  });
+}
+
+// ── 月配息2: 雙週配息策略 ──
+var INC2_W2_FUNDS = [
+  { id:'i2_jpm',   name:'摩根多重收益',    payDay:14, divRate:10.98, capRate:-0.38, annReturn:10.6,  defAlloc:25 },
+  { id:'i2_mg',    name:'M&G 入息基金',    payDay:12, divRate:10.04, capRate:-5.14, annReturn:4.9,   defAlloc:0  },
+  { id:'i2_ab',    name:'聯博美國成長 AP', payDay:13, divRate:13.82, capRate:-2.92, annReturn:10.9,  defAlloc:25 },
+  { id:'i2_aling', name:'安聯收益成長 AMg7',payDay:10, divRate:9.15,  capRate:-1.05, annReturn:8.1,  defAlloc:0  }
+];
+var INC2_W4_FUNDS = [
+  { id:'i2_aiai',  name:'安聯AI收益成長',       payDay:28, divRate:6.27,  capRate:9.13,  annReturn:15.4, defAlloc:25 },
+  { id:'i2_brwt',  name:'貝萊德世界科技 A10',   payDay:26, divRate:7.47,  capRate:27.73, annReturn:35.2, defAlloc:0  },
+  { id:'i2_tlz64', name:'安聯收益成長 AM',       payDay:25, divRate:7.56,  capRate:0.24,  annReturn:7.8,  defAlloc:25 },
+  { id:'i2_fk',    name:'富蘭克林美國機會 AH',   payDay:24, divRate:8.50,  capRate:0.70,  annReturn:9.2,  defAlloc:0  }
+];
+
+var _inc2Principal = 5000000;
+var _inc2State = {};
+var _inc2CalcTimer = null;
+var _inc2ConvRisk = 1.0;
+var _inc2Init = false;
+
+function initIncome2Tab() {
+  if (_inc2Init) { calcIncome2(); return; }
+  _inc2Init = true;
+  // init state
+  INC2_W2_FUNDS.concat(INC2_W4_FUNDS).forEach(function(f) {
+    _inc2State[f.id] = { checked: f.defAlloc > 0, alloc: f.defAlloc };
+  });
+  renderIncome2W2();
+  renderIncome2W4();
+  calcIncome2();
+}
+
+function renderIncome2FundCard(f, grpColor) {
+  var s = _inc2State[f.id];
+  var checked = s.checked;
+  var alloc = s.alloc;
+  var divMonthly = Math.round(_inc2Principal * alloc / 100 * f.divRate / 100 / 12);
+  return '<div style="border:1px solid ' + (checked ? grpColor : 'var(--border)') + ';border-radius:10px;overflow:hidden;opacity:' + (checked ? '1' : '0.55') + '">' +
+    '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:' + (checked ? 'rgba(99,102,241,0.06)' : 'transparent') + ';cursor:pointer" onclick="inc2Toggle(\'' + f.id + '\')">' +
+    '<div style="width:20px;height:20px;border-radius:5px;border:2px solid ' + grpColor + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;background:' + (checked ? grpColor : 'transparent') + '">' +
+    (checked ? '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg>' : '') + '</div>' +
+    '<div style="flex:1"><div style="font-weight:700;font-size:13px">' + f.name + '</div>' +
+    '<div style="font-size:11px;color:var(--sub)">每月' + f.payDay + '日配息｜年化配息' + f.divRate + '%｜資本增值' + (f.capRate >= 0 ? '+' : '') + f.capRate + '%</div></div>' +
+    '<div style="font-size:12px;font-weight:700;color:' + grpColor + '">' + (checked ? incFmtP(divMonthly) + '元/月' : '') + '</div></div>' +
+    (checked ? '<div style="padding:0 12px 10px;display:flex;align-items:center;gap:8px">' +
+      '<span style="font-size:11px;color:var(--sub);flex-shrink:0">配置</span>' +
+      '<input type="range" min="0" max="50" step="5" value="' + alloc + '" style="flex:1;accent-color:' + grpColor + '" oninput="inc2SetAlloc(\'' + f.id + '\',this.value)">' +
+      '<span id="inc2-alloc-lbl-' + f.id + '" style="font-size:12px;font-weight:700;color:' + grpColor + ';width:38px;text-align:right">' + alloc + '%</span>' +
+      '</div>' : '') + '</div>';
+}
+
+function renderIncome2W2() {
+  var el = document.getElementById('inc2-w2-funds');
+  if (!el) return;
+  el.innerHTML = INC2_W2_FUNDS.map(function(f) { return renderIncome2FundCard(f, '#6366f1'); }).join('');
+}
+function renderIncome2W4() {
+  var el = document.getElementById('inc2-w4-funds');
+  if (!el) return;
+  el.innerHTML = INC2_W4_FUNDS.map(function(f) { return renderIncome2FundCard(f, '#d97706'); }).join('');
+}
+
+function inc2Toggle(id) {
+  _inc2State[id].checked = !_inc2State[id].checked;
+  var isW2 = INC2_W2_FUNDS.some(function(f){ return f.id === id; });
+  if (isW2) renderIncome2W2(); else renderIncome2W4();
+  calcIncome2();
+}
+
+function inc2SetPrincipal(val) {
+  _inc2Principal = +val;
+  var lbl = document.getElementById('inc2-principal-lbl');
+  if (lbl) lbl.textContent = incFmtP(+val) + '元';
+  clearTimeout(_inc2CalcTimer);
+  _inc2CalcTimer = setTimeout(function(){ renderIncome2W2(); renderIncome2W4(); calcIncome2(); }, 350);
+}
+
+function inc2SetAlloc(id, val) {
+  _inc2State[id].alloc = +val;
+  var lbl = document.getElementById('inc2-alloc-lbl-'+id);
+  if (lbl) lbl.textContent = val + '%';
+  clearTimeout(_inc2CalcTimer);
+  _inc2CalcTimer = setTimeout(calcIncome2, 350);
+}
+
+function inc2SetConvRisk(val) {
+  _inc2ConvRisk = +val;
+  var lbl = document.getElementById('inc2-conv-risk-lbl');
+  if (lbl) lbl.textContent = (+val).toFixed(1) + '%';
+  calcIncome2();
+}
+
+function calcIncome2() {
+  var p = _inc2Principal;
+  var w2Mo = 0, w4Mo = 0, w2Alloc = 0, w4Alloc = 0;
+
+  INC2_W2_FUNDS.forEach(function(f) {
+    var s = _inc2State[f.id];
+    if (!s || !s.checked) return;
+    var fp = p * s.alloc / 100;
+    w2Mo += fp * f.divRate / 100 / 12;
+    w2Alloc += s.alloc;
+  });
+  INC2_W4_FUNDS.forEach(function(f) {
+    var s = _inc2State[f.id];
+    if (!s || !s.checked) return;
+    var fp = p * s.alloc / 100;
+    w4Mo += fp * f.divRate / 100 / 12;
+    w4Alloc += s.alloc;
+  });
+
+  var totalAlloc = w2Alloc + w4Alloc;
+  var totalMo = w2Mo + w4Mo;
+  var totalAnn = totalMo * 12;
+
+  function setT(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
+
+  setT('inc2-w2-monthly', incFmtP(w2Mo) + '元');
+  setT('inc2-w4-monthly', incFmtP(w4Mo) + '元');
+  setT('inc2-total-monthly', incFmtP(totalMo) + '元');
+  setT('inc2-total-annual', incFmtP(totalAnn) + '元');
+  setT('inc2-w2-monthly-lbl', incFmtP(w2Mo) + '元');
+  setT('inc2-w4-monthly-lbl', incFmtP(w4Mo) + '元');
+  setT('inc2-alloc-used', totalAlloc.toFixed(0) + '%');
+  setT('inc2-w2-alloc-pct', w2Alloc.toFixed(0) + '%');
+  setT('inc2-w4-alloc-pct', w4Alloc.toFixed(0) + '%');
+
+  var bar = document.getElementById('inc2-alloc-bar');
+  if (bar) bar.style.width = Math.min(totalAlloc, 100) + '%';
+
+  // 轉換策略比較
+  var convRisk = _inc2ConvRisk / 100;
+  var convTimes = 24; // biweekly switches
+  var halfP = p / 2;
+  // 滾動轉換: 用一半本金輪流持有，配息約等於雙軌持有（因為交替持有同樣金額）
+  var rollMo = totalMo; // same monthly dividend assuming same allocation ratio
+  var convLossAnn = p * totalAlloc / 100 / 2 * convRisk * convTimes;
+  var rollNetAnn = totalAnn - convLossAnn;
+
+  setT('inc2-cmp-principal-a', incFmtP(p * totalAlloc / 100) + '元');
+  setT('inc2-cmp-principal-b', incFmtP(p * totalAlloc / 200) + '元');
+  setT('inc2-cmp-div-a', incFmtP(totalMo) + '元');
+  setT('inc2-cmp-div-b', incFmtP(totalMo / 2) + '元');
+  setT('inc2-cmp-loss-b', '-' + incFmtP(convLossAnn) + '元/年');
+  setT('inc2-cmp-net-a', incFmtP(totalAnn) + '元/年');
+  setT('inc2-cmp-net-b', incFmtP(rollNetAnn / 2) + '元/年');
+
+  // 長期投影
+  [5,10,20].forEach(function(yr) {
+    var accVal = 0, totalDiv = 0;
+    INC2_W2_FUNDS.concat(INC2_W4_FUNDS).forEach(function(f) {
+      var s = _inc2State[f.id];
+      if (!s || !s.checked) return;
+      var fp = p * s.alloc / 100;
+      accVal += fp * Math.pow(1 + f.capRate / 100, yr);
+      totalDiv += fp * f.divRate / 100 * yr;
+    });
+    setT('inc2-proj-acc-' + yr,   incFmtP(accVal) + '元');
+    setT('inc2-proj-div-' + yr,   incFmtP(totalDiv) + '元');
+    setT('inc2-proj-total-' + yr, incFmtP(accVal + totalDiv) + '元');
   });
 }
 </script>
