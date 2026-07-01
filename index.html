@@ -998,6 +998,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🟣 第3週 安聯（基準日約15日）</div>
       <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🔵 第3週 M&amp;G（基準日約19日）</div>
       <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🔴 月底 聯博（基準日約29日）</div>
+      <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🟣 月底 貝萊德（基準日約30日）</div>
     </div>
   </div>
 
@@ -1028,7 +1029,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <div class="card-body">
       <div style="position:relative;margin:8px 0 4px">
         <div style="height:4px;background:var(--border);border-radius:2px;margin:24px 0 8px"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;text-align:center;margin-top:-4px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;text-align:center;margin-top:-4px">
           <div>
             <div id="i2dot-jpm" style="width:36px;height:36px;border-radius:50%;border:2px solid #e5e7eb;background:transparent;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px;font-weight:400;margin:0 auto -18px">9</div>
             <div style="padding-top:24px;font-size:10px;color:#9ca3af" id="i2dotlbl-jpm">🟡 摩根</div>
@@ -1044,6 +1045,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
           <div>
             <div id="i2dot-ab" style="width:36px;height:36px;border-radius:50%;border:2px solid #dc2626;background:#dc2626;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:900;margin:0 auto -18px">29</div>
             <div style="padding-top:24px;font-size:10px;color:#dc2626;font-weight:600" id="i2dotlbl-ab">🔴 聯博</div>
+          </div>
+          <div>
+            <div id="i2dot-blk" style="width:36px;height:36px;border-radius:50%;border:2px solid #e5e7eb;background:transparent;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:12px;font-weight:400;margin:0 auto -18px">30</div>
+            <div style="padding-top:24px;font-size:10px;color:#9ca3af" id="i2dotlbl-blk">🟣 貝萊德</div>
           </div>
         </div>
       </div>
@@ -1228,6 +1233,32 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 </div>
     </div>
   </div>
+<div id="i2card-blk" style="border:1px solid #e5e7eb;border-radius:12px;margin-bottom:8px;overflow:hidden">
+  <div id="i2hdr-blk" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:transparent" onclick="i2Toggle('blk')">
+    <div id="i2chk-blk" style="width:20px;height:20px;border-radius:5px;border:2px solid #6366f1;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:900"></div>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        貝萊德環球資產配置 A10
+        <a href="https://www.moneydj.com/funddj/yp/wb05.djhtm?a=SHZW8" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#6366f1;border:1px solid #6366f1;border-radius:4px;padding:1px 6px;text-decoration:none">MoneyDJ ↗</a>
+      </div>
+      <div style="font-size:11px;color:var(--sub);margin-top:3px">配息基準日約每月<b style="color:#6366f1">30日</b>（月底）　年化配息率 <b>7.65%</b></div>
+    </div>
+    <div id="i2mo-blk" style="font-size:12px;font-weight:700;color:#6366f1;white-space:nowrap;text-align:right"></div>
+  </div>
+  <div id="i2det-blk" style="display:none;padding:10px 14px 12px;background:#eef2ff">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">
+      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px"><div style="color:var(--sub);font-size:10px">最新淨值</div><div style="font-weight:700;color:#1f2937">$11.52 USD</div></div>
+      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px"><div style="color:var(--sub);font-size:10px">每單位配息</div><div style="font-weight:700;color:#6366f1">$0.0735</div></div>
+      <div style="background:white;border-radius:7px;padding:7px 8px;font-size:11px"><div style="color:var(--sub);font-size:10px">每萬元月配</div><div style="font-weight:700;color:#6366f1">≈64元</div></div>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">近4月配息：$0.0735 ▸ $0.0735 ▸ $0.069 ▸ $0.069（USD）</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:11px;color:var(--sub);flex-shrink:0">配置</span>
+      <input type="range" id="i2pct-blk" min="0" max="100" step="5" value="0" style="flex:1;accent-color:#6366f1" oninput="calcIncome2()">
+      <span id="i2pctlbl-blk" style="font-size:13px;font-weight:700;color:#6366f1;width:40px;text-align:right">0%</span>
+    </div>
+  </div>
+</div>
 
   <!-- 試算結果 -->
   <div class="card" style="margin-bottom:10px">
@@ -2944,6 +2975,7 @@ const FUND_DB = {
   aiai:   { name:'安聯AI收益成長', cat:'fund',   rate:15.4, color:'#d97706' },
   brwt:   { name:'貝萊德世界科技A10', cat:'fund', rate:35.2, color:'#d97706' },
   tlz64:  { name:'安聯收益成長 AM', cat:'fund',   rate:7.8, color:'#d97706' },
+  blk:    { name:'貝萊德環球資產配置 A10', cat:'fund', rate:5.7, color:'#6366f1' },
 };
 // portfolio: [{id, alloc}]
 let _port = [];
@@ -3724,10 +3756,11 @@ var I2_FUNDS = {
   jpm:  { payDay:9,  grp:'w2', divRate:11.0,  capRate:-1.0, navUSD:75.42, divUSD:0.690,  col:'#d97706', defChk:false, defPct:0  },
   aling:{ payDay:15, grp:'w3', divRate:9.09,  capRate:-2.0, navUSD:8.91,  divUSD:0.068,  col:'#7c3aed', defChk:true,  defPct:50 },
   mg:   { payDay:19, grp:'w3', divRate:10.05, capRate:-6.0, navUSD:78.07, divUSD:0.654,  col:'#0369a1', defChk:false, defPct:0  },
-  ab:   { payDay:29, grp:'mb', divRate:12.95, capRate:-2.0, navUSD:73.68, divUSD:0.8322, col:'#dc2626', defChk:true,  defPct:50 }
+  ab:   { payDay:29, grp:'mb', divRate:12.95, capRate:-2.0, navUSD:73.68, divUSD:0.8322, col:'#dc2626', defChk:true,  defPct:50 },
+  blk:  { payDay:30, grp:'mb', divRate:7.65,  capRate:-2.0, navUSD:11.52,  divUSD:0.0735, col:'#6366f1', defChk:false, defPct:0  }
 };
-var I2_NAMES = { jpm:'摩根多重收益', aling:'安聯AMg7', mg:'M&G入息', ab:'聯博AP' };
-var I2_IDS   = ['jpm','aling','mg','ab'];
+var I2_NAMES = { jpm:'摩根多重收益', aling:'安聯AMg7', mg:'M&G入息', ab:'聯博AP', blk:'貝萊德環球A10' };
+var I2_IDS   = ['jpm','aling','mg','ab','blk'];
 var I2_FX    = 32;
 var _i2P = 5000000;
 var _i2Chk = {};
@@ -4200,6 +4233,7 @@ const FUND_DIST = {
   tlzl7: { name:'安聯AI收益成長 AM',  nav:27.9532, dist:0.14619, annRate:15.4, color:'#f97316', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZL7' },
   shzv9: { name:'貝萊德世界科技 A10', nav:22.09,   dist:0.1375,  annRate:35.2, color:'#ec4899', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=SHZV9' },
   tlz64: { name:'安聯收益成長 AM',   nav:8.7281,  dist:0.055,   annRate:7.8,  color:'#06b6d4', week:'第二週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZ64' },
+  shzw8: { name:'貝萊德環球資產配置 A10', nav:11.52, dist:0.0735, annRate:7.65, color:'#6366f1', week:'月底', url:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=SHZW8' },
 };
 var _selFund = null;
 
@@ -4383,6 +4417,12 @@ var INCOME_FUNDS = [
     note:'季配', freq:'季配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/ETF/X/Basic/Basic0004.xdjhtm?etfid=VT',
     divHist:[{d:'2026/06',a:'$0.563'},{d:'2026/03',a:'$0.327'},{d:'2025/12',a:'$1.115'},{d:'2025/09',a:'$0.478'}] },
+  { id:'blk',    name:'貝萊德環球資產配置 A10',
+    nav:11.52,  navCur:'USD', navKey:'shzw8',  distMo:0.0735,
+    divRate:7.65,  capRate:-2.0, annReturn:5.7,
+    note:'月配', freq:'月配', defMode:'div',
+    mdjUrl:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=SHZW8',
+    divHist:[{d:'2026/06',a:'$0.0735'},{d:'2026/05',a:'$0.0735'},{d:'2026/04',a:'$0.069'},{d:'2026/03',a:'$0.069'}] },
   { id:'vwra',   name:'VWRA 全世界（累積型）',
     nav:186.84, navCur:'USD', distMo:0,
     divRate:0,     capRate:13.7,  annReturn:13.7,
