@@ -997,8 +997,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🟡 第2週 摩根（基準日約9日）</div>
       <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🟣 第3週 安聯（基準日約15日）</div>
       <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🔵 第3週 M&amp;G（基準日約19日）</div>
-      <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🔴 月底 聯博（基準日約29日）</div>
-      <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🟣 月底 貝萊德（基準日約30日）</div>
+      <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🔴 第4週 聯博（基準日約29日）</div>
+      <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:3px 12px;font-size:11px">🟣 第4週 貝萊德（基準日約30日）</div>
     </div>
   </div>
 
@@ -1187,11 +1187,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     </div>
   </div>
 
-  <!-- 月底基金 -->
+  <!-- 第4週基金 -->
   <div class="card" style="margin-bottom:10px">
     <div class="card-head">
-      <div class="card-title">🔴 月底配息基金 <span style="font-size:11px;font-weight:400;color:var(--sub)">基準日約每月22-31日</span></div>
-      <div style="font-size:12px;font-weight:700;color:#dc2626">月配：<span id="inc2-mblbl">—</span></div>
+      <div class="card-title">🔴 第4週配息基金 <span style="font-size:11px;font-weight:400;color:var(--sub)">基準日約每月22-31日</span></div>
+      <div style="font-size:12px;font-weight:700;color:#dc2626">月配：<span id="inc2-w4lbl">—</span></div>
     </div>
     <div class="card-body" style="padding-top:4px">
 <div id="i2card-ab" style="border:1px solid #dc2626;border-radius:12px;margin-bottom:8px;overflow:hidden">
@@ -1203,7 +1203,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
         <a href="https://www.moneydj.com/funddj/yp/wb05.djhtm?a=ALBT8" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#dc2626;border:1px solid #dc2626;border-radius:4px;padding:1px 6px;text-decoration:none">MoneyDJ ↗</a>
       </div>
       <div style="font-size:11px;color:var(--sub);margin-top:3px">
-        配息基準日約每月<b style="color:#dc2626">29日</b>（月底）　年化配息率 <b>12.95%</b>
+        配息基準日約每月<b style="color:#dc2626">29日</b>（第4週）　年化配息率 <b>12.95%</b>
       </div>
     </div>
     <div id="i2mo-ab" style="font-size:12px;font-weight:700;color:#dc2626;white-space:nowrap;text-align:right"></div>
@@ -1241,7 +1241,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
         貝萊德環球資產配置 A10
         <a href="https://www.moneydj.com/funddj/yp/wb05.djhtm?a=SHZW8" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#6366f1;border:1px solid #6366f1;border-radius:4px;padding:1px 6px;text-decoration:none">MoneyDJ ↗</a>
       </div>
-      <div style="font-size:11px;color:var(--sub);margin-top:3px">配息基準日約每月<b style="color:#6366f1">30日</b>（月底）　年化配息率 <b>7.65%</b></div>
+      <div style="font-size:11px;color:var(--sub);margin-top:3px">配息基準日約每月<b style="color:#6366f1">30日</b>（第4週）　年化配息率 <b>7.65%</b></div>
     </div>
     <div id="i2mo-blk" style="font-size:12px;font-weight:700;color:#6366f1;white-space:nowrap;text-align:right"></div>
   </div>
@@ -3756,8 +3756,8 @@ var I2_FUNDS = {
   jpm:  { payDay:9,  grp:'w2', divRate:11.0,  capRate:-1.0, navUSD:75.42, divUSD:0.690,  col:'#d97706', defChk:false, defPct:0  },
   aling:{ payDay:15, grp:'w3', divRate:9.09,  capRate:-2.0, navUSD:8.91,  divUSD:0.068,  col:'#7c3aed', defChk:true,  defPct:50 },
   mg:   { payDay:19, grp:'w3', divRate:10.05, capRate:-6.0, navUSD:78.07, divUSD:0.654,  col:'#0369a1', defChk:false, defPct:0  },
-  ab:   { payDay:29, grp:'mb', divRate:12.95, capRate:-2.0, navUSD:73.68, divUSD:0.8322, col:'#dc2626', defChk:true,  defPct:50 },
-  blk:  { payDay:30, grp:'mb', divRate:7.65,  capRate:-2.0, navUSD:11.52,  divUSD:0.0735, col:'#6366f1', defChk:false, defPct:0  }
+  ab:   { payDay:29, grp:'w4', divRate:12.95, capRate:-2.0, navUSD:73.68, divUSD:0.8322, col:'#dc2626', defChk:true,  defPct:50 },
+  blk:  { payDay:30, grp:'w4', divRate:7.65,  capRate:-2.0, navUSD:11.52,  divUSD:0.0735, col:'#6366f1', defChk:false, defPct:0  }
 };
 var I2_NAMES = { jpm:'摩根多重收益', aling:'安聯AMg7', mg:'M&G入息', ab:'聯博AP', blk:'貝萊德環球A10' };
 var I2_IDS   = ['jpm','aling','mg','ab','blk'];
@@ -3839,7 +3839,7 @@ function calcIncome2() {
   var p = _i2P;
   function $t(i,v){var e=document.getElementById(i);if(e)e.textContent=v;}
 
-  var w2Mo=0, w3Mo=0, mbMo=0, stdTotMo=0, totAlloc=0;
+  var w2Mo=0, w3Mo=0, w4Mo=0, stdTotMo=0, totAlloc=0;
   var sel = [];
 
   I2_IDS.forEach(function(id) {
@@ -3853,7 +3853,7 @@ function calcIncome2() {
     var f = I2_FUNDS[id];
     if (f.grp==='w2') w2Mo += mo;
     else if (f.grp==='w3') w3Mo += mo;
-    else mbMo += mo;
+    else if (f.grp==='w4') w4Mo += mo;
     var mEl = document.getElementById('i2mo-'+id);
     if (mEl) mEl.textContent = incFmtP(mo) + '元';
     sel.push({id:id, fp:fp, mo:mo, pct:pct});
@@ -3862,7 +3862,7 @@ function calcIncome2() {
   $t('inc2-alloc', totAlloc+'%');
   $t('inc2-w2lbl', w2Mo>0 ? incFmtP(w2Mo)+'元' : '—');
   $t('inc2-w3lbl', w3Mo>0 ? incFmtP(w3Mo)+'元' : '—');
-  $t('inc2-mblbl', mbMo>0 ? incFmtP(mbMo)+'元' : '—');
+  $t('inc2-w4lbl', w4Mo>0 ? incFmtP(w4Mo)+'元' : '—');
   var bar = document.getElementById('inc2-bar');
   if (bar) bar.style.width = Math.min(totAlloc,100)+'%';
 
@@ -4233,7 +4233,7 @@ const FUND_DIST = {
   tlzl7: { name:'安聯AI收益成長 AM',  nav:27.9532, dist:0.14619, annRate:15.4, color:'#f97316', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZL7' },
   shzv9: { name:'貝萊德世界科技 A10', nav:22.09,   dist:0.1375,  annRate:35.2, color:'#ec4899', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=SHZV9' },
   tlz64: { name:'安聯收益成長 AM',   nav:8.7281,  dist:0.055,   annRate:7.8,  color:'#06b6d4', week:'第二週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZ64' },
-  shzw8: { name:'貝萊德環球資產配置 A10', nav:11.52, dist:0.0735, annRate:7.65, color:'#6366f1', week:'月底', url:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=SHZW8' },
+  shzw8: { name:'貝萊德環球資產配置 A10', nav:11.52, dist:0.0735, annRate:7.65, color:'#6366f1', week:'第4週', url:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=SHZW8' },
 };
 var _selFund = null;
 
