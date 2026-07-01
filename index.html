@@ -1278,30 +1278,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
           <input type="radio" name="i2mode" value="rot" onchange="calcIncome2()"> 🔄 輪轉提領
         </label>
       </div>
-      <!-- IRR 摘要 -->
-      <div id="inc2-irr-box" style="background:linear-gradient(135deg,#1e1b4b,#4c1d95);border-radius:10px;padding:10px 14px;margin-bottom:10px;color:white;display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="font-size:11px;opacity:0.8">年化 IRR（此策略恆定回報率）</div>
-          <div style="font-size:10px;opacity:0.6;margin-top:2px">IRR = 配息率＋資本增值率，與持有年期無關</div>
-        </div>
-        <div id="inc2-irr-val" style="font-size:26px;font-weight:900">—</div>
-      </div>
-      <div style="font-size:11px;color:var(--sub);margin-bottom:8px">每月配息全部提領；累計報酬率隨年期成長。</div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:8px">每月配息全部提領；IRR以「年均配息÷年數」簡化公式估算，反映長期配息遞減的現實感。</div>
       <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
         <div style="background:var(--border);display:grid;grid-template-columns:60px 1fr 1fr 1fr 72px;padding:8px 10px;font-size:11px;font-weight:700;text-align:center">
-          <div></div><div>帳戶價值</div><div>已領配息</div><div>合計</div><div>累計報酬</div>
+          <div></div><div>帳戶價值</div><div>已領配息</div><div>合計</div><div>年化IRR</div>
         </div>
         <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 72px;padding:10px;font-size:12px;border-bottom:1px solid var(--border);text-align:center">
           <div style="font-weight:800;color:#7c3aed;text-align:left">📌 5年</div>
-          <div id="inc2-acc-5" style="font-weight:700">—</div><div id="inc2-div-5" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-5" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2-ret-5" style="font-weight:800;color:#dc2626">—</div>
+          <div id="inc2-acc-5" style="font-weight:700">—</div><div id="inc2-div-5" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-5" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2-irr-5" style="font-weight:800;color:#dc2626">—</div>
         </div>
         <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 72px;padding:10px;font-size:12px;border-bottom:1px solid var(--border);text-align:center;background:var(--bg)">
           <div style="font-weight:800;color:#7c3aed;text-align:left">📌 10年</div>
-          <div id="inc2-acc-10" style="font-weight:700">—</div><div id="inc2-div-10" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-10" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2-ret-10" style="font-weight:800;color:#dc2626">—</div>
+          <div id="inc2-acc-10" style="font-weight:700">—</div><div id="inc2-div-10" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-10" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2-irr-10" style="font-weight:800;color:#dc2626">—</div>
         </div>
         <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 72px;padding:10px;font-size:12px;text-align:center">
           <div style="font-weight:800;color:#7c3aed;text-align:left">📌 20年</div>
-          <div id="inc2-acc-20" style="font-weight:700">—</div><div id="inc2-div-20" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-20" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2-ret-20" style="font-weight:800;color:#dc2626">—</div>
+          <div id="inc2-acc-20" style="font-weight:700">—</div><div id="inc2-div-20" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-20" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2-irr-20" style="font-weight:800;color:#dc2626">—</div>
         </div>
       </div>
       <div style="background:#fef3c7;border-radius:8px;padding:10px 12px;margin-top:10px;font-size:11px;color:#92400e">
@@ -3904,33 +3896,44 @@ function calcIncome2() {
   var cEl = document.getElementById('i2-conv-rows');
   if (cEl) cEl.innerHTML = cr || '<div style="padding:12px;text-align:center;color:var(--sub);font-size:12px">請先勾選基金</div>';
 
-  // 5/10/20 yr + IRR
+  // 5/10/20 yr + IRR（用「年均配息」法估算，反映長期配息遞減，IRR隨年期遞減）
   if (sel.length === 0) return;
   var mode = (document.querySelector('input[name="i2mode"]:checked')||{value:'std'}).value;
   var avgCapRate = sel.reduce(function(s,x){return s+I2_FUNDS[x.id].capRate;},0)/sel.length;
   var monthlyCapFactor = Math.pow(1 + avgCapRate/100, 1/12);
   var effDivRate = (mode==='rot') ? totalDivRate : totalDivRate/sel.length;
 
-  // IRR 只需算一次（與持有年期無關，是策略的恆定年化報酬率）
-  // IRR ≈ effDivRate + avgCapRate（連續複利近似）
-  var irrApprox = (effDivRate + avgCapRate).toFixed(1);
-  var irrEl = document.getElementById('inc2-irr-val');
-  if (irrEl) irrEl.textContent = (effDivRate + avgCapRate > 0 ? '+' : '') + irrApprox + '%';
-
   [5,10,20].forEach(function(yr) {
     var n = yr * 12;
-    var cap = rotP;
-    var cumDiv = 0;
+    var cap = rotP, cumDiv = 0;
     for (var m = 1; m <= n; m++) {
-      var monthDiv = cap * effDivRate / 100 / 12;
-      cumDiv += monthDiv;
-      cap = cap * monthlyCapFactor;
+      cumDiv += cap * effDivRate / 100 / 12;
+      cap *= monthlyCapFactor;
     }
-    var cumRet = (cap + cumDiv - rotP) / rotP * 100;
+    // 年均配息法 IRR：0 = -P + Σ(annAvg/(1+r)^t) + terminal/(1+r)^n
+    var annAvg = cumDiv / yr;
+    var terminal = cap;
+    var r = 0.10; // 初始猜值
+    for (var i = 0; i < 200; i++) {
+      var f = -rotP, df = 0;
+      for (var t = 1; t <= yr; t++) {
+        var v = Math.pow(1+r, t);
+        f  += annAvg / v;
+        df -= t * annAvg / (v * (1+r));
+      }
+      var vn = Math.pow(1+r, yr);
+      f  += terminal / vn;
+      df -= yr * terminal / (vn * (1+r));
+      if (Math.abs(df) < 1e-15) break;
+      var delta = f / df;
+      r -= delta;
+      if (Math.abs(delta) < 1e-10) break;
+      if (r < -0.5) r = 0.01;
+    }
     $t('inc2-acc-'+yr, incFmtP(cap)+'元');
     $t('inc2-div-'+yr, incFmtP(cumDiv)+'元');
     $t('inc2-tot-'+yr, incFmtP(cap+cumDiv)+'元');
-    $t('inc2-ret-'+yr, '+'+cumRet.toFixed(1)+'%');
+    $t('inc2-irr-'+yr, (r*100).toFixed(2)+'%');
   });
 }
 </script>
