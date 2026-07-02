@@ -3563,82 +3563,119 @@ async function loadWorldCup() {
 var _bracketLoaded = false;
 async function loadWCBracket() {
   if (_bracketLoaded) return;
-  const box = document.getElementById('wc-bracket-rows');
+  var box = document.getElementById('wc-bracket-rows');
   if (!box) return;
-  box.innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入淘汰賽…</div>';
-  try {
-    const rounds = await fetch('/api/worldcup?mode=bracket').then(r => r.ok ? r.json() : Promise.reject(r.status));
-    if (!Array.isArray(rounds) || !rounds.length) { box.innerHTML = '<div class="error-note">暫無淘汰賽資料</div>'; return; }
-    const roundColors = {'32強':'#3b82f6','16強':'#8b5cf6','八強':'#f59e0b','四強':'#ef4444','季軍賽':'#10b981','決賽':'#f43f5e'};
 
-    function matchCard(m, compact) {
-      var home = m.home||{}, away = m.away||{};
-      var isDone = m.status==='post', isLive = m.status==='in';
-      var twTime = new Date(new Date(m.date).toLocaleString('en-US',{timeZone:'Asia/Taipei'}));
-      var dateStr = (twTime.getMonth()+1)+'/'+(twTime.getDate());
-      var timeStr = ('0'+twTime.getHours()).slice(-2)+':'+('0'+twTime.getMinutes()).slice(-2);
-      var hl = home.logo ? '<img src="'+home.logo+'" style="width:20px;height:15px;object-fit:contain;flex-shrink:0;border-radius:1px" onerror="this.style.display=\'none\'">' : '';
-      var al = away.logo ? '<img src="'+away.logo+'" style="width:20px;height:15px;object-fit:contain;flex-shrink:0;border-radius:1px" onerror="this.style.display=\'none\'">' : '';
-      var winH = isDone && parseInt(home.score||0) > parseInt(away.score||0);
-      var winA = isDone && parseInt(away.score||0) > parseInt(home.score||0);
-      var accent = isLive ? '#e53935' : (isDone ? 'var(--text)' : 'var(--sub)');
-      var topRow = '<div style="display:flex;align-items:center;gap:5px;padding:6px 8px;'+(winH?'font-weight:900;color:var(--text)':'color:var(--sub)')+'">'
-        + hl + '<span style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (home.name||'TBD') + '</span>'
-        + (isDone||isLive ? '<span style="font-size:15px;font-weight:800;color:'+accent+';margin-left:4px">'+(home.score||0)+'</span>' : '')
-        + '</div>';
-      var botRow = '<div style="display:flex;align-items:center;gap:5px;padding:6px 8px;border-top:1px solid var(--border);'+(winA?'font-weight:900;color:var(--text)':'color:var(--sub)')+'">'
-        + al + '<span style="flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (away.name||'TBD') + '</span>'
-        + (isDone||isLive ? '<span style="font-size:15px;font-weight:800;color:'+accent+';margin-left:4px">'+(away.score||0)+'</span>' : '')
-        + '</div>';
-      var badge = '';
-      if (isDone) badge = '<div style="font-size:11px;color:var(--sub);text-align:center;padding:2px 0">'+(m.statusDesc||'FT')+'</div>';
-      else if (isLive) badge = '<div style="font-size:11px;color:#e53935;text-align:center;padding:2px 0">'+m.statusDesc+'</div>';
-      else badge = '<div style="font-size:11px;color:var(--sub);text-align:center;padding:2px 0">'+dateStr+' '+timeStr+'</div>';
-      return '<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:2px 0">'
-        + topRow + botRow + badge + '</div>';
-    }
+  var SH = 62; // slot height px per R32 match
 
-    // Column-based bracket: pad each round to its expected slot count
-    var roundOrder = rounds.filter(function(r){return r.round!=='季軍賽';});
-    var third = rounds.find(function(r){return r.round==='季軍賽';});
-    var baseH = 85; // px per R32 slot (bigger cards)
-    // Determine column index for slot height calculation (R32=0, R16=1, ...)
-    var colIdx = {'32強':0,'16強':1,'八強':2,'四強':3,'決賽':4};
-    var cols = roundOrder.map(function(rnd) {
-      var ri = colIdx[rnd.round] !== undefined ? colIdx[rnd.round] : 0;
-      var totalSlots = rnd.slots || rnd.matches.length;
-      var slotH = baseH * Math.pow(2, ri);
-      var color = roundColors[rnd.round]||'var(--sub)';
-      // Pad with empty slots if fewer matches than expected
-      var cells = '';
-      for (var si = 0; si < totalSlots; si++) {
-        var m = rnd.matches[si];
-        cells += '<div style="height:'+slotH+'px;box-sizing:border-box;padding:2px 3px;display:flex;align-items:center">'
-          + (m ? '<div style="width:100%">' + matchCard(m) + '</div>'
-               : '<div style="width:100%;background:var(--bg);border:1px dashed var(--border);border-radius:6px;height:52px;opacity:.4"></div>')
-          + '</div>';
-      }
-      return '<div style="display:inline-flex;flex-direction:column;vertical-align:top;width:170px;flex-shrink:0">'
-        + '<div style="font-size:12px;font-weight:800;color:'+color+';text-align:center;padding:4px 0;border-bottom:1.5px solid '+color+';margin-bottom:0">'+rnd.round+'</div>'
-        + cells
-        + '</div>';
-    }).join('<div style="display:inline-flex;flex-direction:column;vertical-align:top;width:10px;flex-shrink:0"><div style="height:16px"></div>'
-      + '<div style="flex:1;border-right:none"></div></div>');
-
-    var thirdHtml = third ? '<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;padding-left:2px">'
-      + '<div style="font-size:10px;font-weight:800;color:'+roundColors['季軍賽']+';margin-bottom:4px">🥉 季軍賽</div>'
-      + third.matches.map(function(m){return matchCard(m);}).join('') + '</div>' : '';
-
-    box.innerHTML = '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px">'
-      + '<div style="display:inline-flex;gap:0;min-width:max-content;padding:4px 2px">' + cols + '</div>'
-      + '</div>' + thirdHtml;
-    _bracketLoaded = true;
-  } catch(e) {
-    console.error(e);
-    box.innerHTML = '<div class="error-note">淘汰賽載入失敗</div>';
+  function bcard(a, b, opts) {
+    var o = opts || {};
+    var done = !!o.done;
+    var sa = o.sa !== undefined ? o.sa : null;
+    var sb = o.sb !== undefined ? o.sb : null;
+    var pen = o.pen || '';
+    var dt = o.dt || '';
+    var venue = o.venue || '';
+    var winA = done && (o.win === 'a' || (sa !== null && sb !== null && sa > sb));
+    var winB = done && (o.win === 'b' || (sa !== null && sb !== null && sb > sa));
+    var tbd = !a || a.indexOf('?') >= 0 || a.indexOf('勝') >= 0 || a === 'TBD';
+    var rowSt = 'display:flex;align-items:center;gap:4px;padding:4px 7px;min-height:0;';
+    var rA = '<div style="' + rowSt + (winA ? 'font-weight:800;color:var(--text)' : 'color:var(--sub)') + '">'
+           + '<span style="flex:1;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (a||'TBD') + '</span>'
+           + (done && sa !== null ? '<span style="font-size:13px;font-weight:800;min-width:14px;text-align:right">' + sa + '</span>' : '')
+           + '</div>';
+    var rB = '<div style="' + rowSt + 'border-top:1px solid var(--border);' + (winB ? 'font-weight:800;color:var(--text)' : 'color:var(--sub)') + '">'
+           + '<span style="flex:1;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (b||'TBD') + '</span>'
+           + (done && sb !== null ? '<span style="font-size:13px;font-weight:800;min-width:14px;text-align:right">' + sb + '</span>' : '')
+           + '</div>';
+    var badge = '';
+    if (done) badge = '<div style="font-size:10px;color:var(--sub);text-align:center;padding:1px 4px">' + (pen ? 'FT (PK ' + pen + ')' : 'FT') + '</div>';
+    else if (dt) badge = '<div style="font-size:10px;color:var(--sub);text-align:center;padding:1px 4px">' + dt + (venue ? ' · ' + venue : '') + '</div>';
+    return '<div style="background:var(--card);border:1px solid var(--border);border-radius:7px;overflow:hidden;height:' + SH + 'px;box-sizing:border-box' + (tbd ? ';opacity:0.55' : '') + '">'
+      + rA + rB + badge + '</div>';
   }
-}
 
+  // ─── 2026 World Cup bracket (ESPN data) ───
+  var ROUNDS = [
+    { label:'32強', color:'#3b82f6', count:16, matches:[
+      // Slots 1-2 → R16: France vs Paraguay
+      {a:'🇫🇷 法國',      b:'🇸🇪 瑞典',         sa:3, sb:0, done:true},
+      {a:'🇩🇪 德國',      b:'🇵🇾 巴拉圭',       sa:1, sb:1, done:true, pen:'3-4', win:'b'},
+      // Slots 3-4 → R16: Morocco vs Canada
+      {a:'🇿🇦 南非',      b:'🇨🇦 加拿大',       sa:0, sb:1, done:true},
+      {a:'🇳🇱 荷蘭',      b:'🇲🇦 摩洛哥',       sa:1, sb:1, done:true, pen:'2-3', win:'b'},
+      // Slots 5-6 → R16: Brazil vs Norway
+      {a:'🇧🇷 巴西',      b:'🇯🇵 日本',         sa:2, sb:1, done:true},
+      {a:'🇨🇮 象牙海岸',  b:'🇳🇴 挪威',         sa:1, sb:2, done:true},
+      // Slots 7-8 → R16: Mexico vs England/Congo
+      {a:'🇲🇽 墨西哥',   b:'🇪🇨 厄瓜多',       sa:2, sb:0, done:true},
+      {a:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格蘭',  b:'🇨🇩 剛果DR',      dt:'7/2 00:00'},
+      // Slots 9-10 → R16: USA/Bosnia vs Belgium/Senegal
+      {a:'🇺🇸 美國',      b:'🇧🇦 波士尼亞',     dt:'7/2 08:00'},
+      {a:'🇧🇪 比利時',    b:'🇸🇳 塞內加爾',     dt:'7/2 04:00'},
+      // Slots 11-12 → R16: Portugal/Croatia vs Spain/Austria
+      {a:'🇵🇹 葡萄牙',    b:'🇭🇷 克羅埃西亞',   dt:'7/3 07:00'},
+      {a:'🇪🇸 西班牙',    b:'🇦🇹 奧地利',       dt:'7/3 03:00'},
+      // Slots 13-14 → R16: Argentina/CV vs Switzerland/Algeria
+      {a:'🇦🇷 阿根廷',    b:'🇨🇻 維德角',       dt:'7/4 06:00'},
+      {a:'🇨🇭 瑞士',      b:'🇩🇿 阿爾及利亞',   dt:'7/3 11:00'},
+      // Slots 15-16 → R16: Australia/Egypt vs Colombia/Ghana
+      {a:'🇦🇺 澳洲',      b:'🇪🇬 埃及',         dt:'7/4 02:00'},
+      {a:'🇨🇴 哥倫比亞',  b:'🇬🇭 迦納',         dt:'7/4 09:30'},
+    ]},
+    { label:'16強', color:'#8b5cf6', count:8, matches:[
+      {a:'🇫🇷 法國',    b:'🇵🇾 巴拉圭',  dt:'7/5 05:00'},
+      {a:'🇲🇦 摩洛哥',  b:'🇨🇦 加拿大',  dt:'7/5 01:00'},
+      {a:'🇧🇷 巴西',    b:'🇳🇴 挪威',    dt:'7/6 04:00'},
+      {a:'🇲🇽 墨西哥',  b:'英格蘭勝者',   dt:'7/6 08:00'},
+      {a:'美國勝者',     b:'比利時勝者',   dt:'7/7 08:00'},
+      {a:'葡萄牙勝者',   b:'西班牙勝者',   dt:'7/7 03:00'},
+      {a:'阿根廷勝者',   b:'瑞士勝者',     dt:'7/8 04:00'},
+      {a:'澳洲勝者',     b:'哥倫比亞勝者', dt:'7/8 00:00'},
+    ]},
+    { label:'八強', color:'#f59e0b', count:4, matches:[
+      {a:'R16 M1 勝', b:'R16 M2 勝', dt:'7/10 04:00'},
+      {a:'R16 M5 勝', b:'R16 M6 勝', dt:'7/11 03:00'},
+      {a:'R16 M3 勝', b:'R16 M4 勝', dt:'7/12 05:00'},
+      {a:'R16 M7 勝', b:'R16 M8 勝', dt:'7/12 09:00'},
+    ]},
+    { label:'四強', color:'#ef4444', count:2, matches:[
+      {a:'QF W1 勝', b:'QF W2 勝', dt:'7/15 03:00'},
+      {a:'QF W3 勝', b:'QF W4 勝', dt:'7/16 03:00'},
+    ]},
+    { label:'決賽 🏆', color:'#f43f5e', count:1, matches:[
+      {a:'準決賽 W1', b:'準決賽 W2', dt:'7/20 03:00', venue:'MetLife'},
+    ]},
+  ];
+
+  var totalH = 16 * SH; // 992px
+
+  var cols = ROUNDS.map(function(rnd) {
+    var slotH = totalH / rnd.count;
+    var topPad = (slotH - SH) / 2;
+    var items = '';
+    for (var i = 0; i < rnd.count; i++) {
+      var m = rnd.matches[i];
+      var inner = m ? bcard(m.a, m.b, m)
+                    : '<div style="height:' + SH + 'px;border:1px dashed var(--border);border-radius:7px;opacity:0.25"></div>';
+      items += '<div style="height:' + slotH + 'px;padding:' + topPad.toFixed(1) + 'px 0;box-sizing:border-box">' + inner + '</div>';
+    }
+    return '<div style="width:152px;flex-shrink:0">'
+      + '<div style="font-size:11px;font-weight:800;color:' + rnd.color + ';text-align:center;padding:3px 0;border-bottom:2px solid ' + rnd.color + ';margin-bottom:2px">' + rnd.label + '</div>'
+      + '<div>' + items + '</div></div>';
+  }).join('<div style="width:6px;flex-shrink:0"></div>');
+
+  var thirdHtml = '<div style="margin-top:14px;border-top:1px solid var(--border);padding-top:10px">'
+    + '<div style="font-size:11px;font-weight:800;color:#10b981;margin-bottom:6px">🥉 季軍賽 <span style="font-weight:400;color:var(--sub);font-size:10px">7/19 05:00 台灣時間 · 邁阿密花園</span></div>'
+    + '<div style="max-width:200px">' + bcard('準決賽敗者1', '準決賽敗者2', {dt:'7/19 05:00', venue:'邁阿密'}) + '</div>'
+    + '</div>';
+
+  box.innerHTML = '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px">'
+    + '<div style="display:flex;gap:6px;min-width:max-content;padding:4px 2px;align-items:flex-start">'
+    + cols + '</div></div>' + thirdHtml;
+
+  _bracketLoaded = true;
+}
 async function loadWCStandings() {
   const box = document.getElementById('wc-stand-rows');
   if (!box) return;
