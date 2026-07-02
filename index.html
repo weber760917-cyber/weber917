@@ -1360,6 +1360,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       <div style="background:#fef3c7;border-radius:8px;padding:10px 12px;margin-top:10px;font-size:11px;color:#92400e">
         ⚠️ 假設：每月配息如期提領、本金依資本增值率估算（輪轉模式兩檔各持半月）。實際績效視市場而異，僅供參考。
       </div>
+
+      <!-- 列印報表按鈕 -->
+      <div style="margin-top:16px;text-align:center">
+        <button onclick="printIncome2Report()" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1e3a5f,#2563eb);color:white;border:none;border-radius:12px;padding:14px 28px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(37,99,235,0.3)">
+          🖨️ 產生客戶報表（列印 / 儲存PDF）
+        </button>
+        <div style="font-size:11px;color:var(--sub);margin-top:8px">包含策略說明、試算結果、基金介紹與持股分析</div>
+      </div>
     </div>
   </div>
 
@@ -3902,6 +3910,211 @@ function _i2IRR(flows) {
     if (r < -0.999) r = 0.001;
   }
   return Math.pow(1 + r, 12) - 1; // → annual
+}
+
+// ── 基金詳情資料庫（供報表使用）──
+var I2_PROFILES = {
+  jpm: {
+    full:'摩根多重收益基金（JPM Multi-Asset Income）',
+    cat:'多重資產・全球',
+    mgr:'摩根資產管理（J.P. Morgan Asset Management）',
+    aum:'約2,000億美元',
+    intro:'由全球最大資產管理機構之一的摩根集團管理，採多重資產策略廣泛配置全球股債，目標提供穩定月配息同時維持資本保值。',
+    pros:['多元分散：同時持有股票、投資等級債、高收益債、MBS、REITs等20+類資產','摩根品牌：全球頂尖機構，擁有嚴格風控與龐大研究團隊','月配穩定：每月固定配息，年化配息率約11%','流動性佳：UCITS架構，每日可申購贖回'],
+    holdings:'高收益公司債 ~35% ｜ 投資等級公司債 ~25% ｜ 全球股票 ~20% ｜ MBS抵押債 ~10% ｜ 其他 ~10%',
+    perf:'近3年年化報酬約6–8%，穿越2022升息周期後持續回升',
+    risk:'中高',
+  },
+  aling: {
+    full:'安聯收益成長基金 AMg7（Allianz Income and Growth AMg7）',
+    cat:'多重資產・美國',
+    mgr:'安聯環球投資（Allianz Global Investors）',
+    aum:'約300億美元',
+    intro:'聚焦美國市場三大資產：成長股、可轉換債、高收益債，三角策略兼顧資本增值與穩定配息，為台灣最暢銷境外基金之一。',
+    pros:['三角策略：成長股（增值）＋可轉債（攻守兼備）＋高收益債（配息）','美國聚焦：深度布局全球最大、流動性最佳市場','台灣熱門：長期位居境外基金銷售前5名','月配穩定：年化約9%，幣別費用已從配息中扣除'],
+    holdings:'美國高收益公司債 ~35% ｜ 美國可轉換債 ~33% ｜ 美國成長股 ~32%',
+    perf:'近5年累積報酬約40–60%，科技股多頭期間表現尤佳',
+    risk:'中高',
+  },
+  mg: {
+    full:'M&G全球入息基金（M&G Global Dividend Fund）',
+    cat:'股票型・全球高息',
+    mgr:'M&G Investments（英國，百年資產管理機構）',
+    aum:'約100億美元',
+    intro:'由英國百年資管機構M&G管理，專注全球高股息企業，追求長期穩定配息與資本增值，適合追求股息成長的長線投資人。',
+    pros:['股息導向：持有全球優質高股息公司，注重配息成長率','百年管理：M&G Investments資歷逾85年','全球分散：跨北美、歐洲、亞太，降低單一市場風險','股票增值空間：具NAV長期成長潛力'],
+    holdings:'北美 ~45% ｜ 歐洲 ~35% ｜ 亞太 ~15% ｜ 其他 ~5%；聚焦銀行、能源、醫藥、消費等高息產業',
+    perf:'近3年年化報酬約5–10%，股利再投入後長期複利效果顯著',
+    risk:'中高',
+  },
+  ab: {
+    full:'聯博美國成長基金 AP（AB American Growth Portfolio AP）',
+    cat:'多重資產・美元固定收益',
+    mgr:'聯博（AllianceBernstein），全球頂尖固定收益管理機構',
+    aum:'約500億美元',
+    intro:'聯博為全球知名固定收益投資機構，本基金主要投資美元計價固定收益工具，以高配息率著稱，長期深受台灣投資人信賴。',
+    pros:['美元計價：受益於強勢美元，匯率風險相對可控','高配息：年化配息率約13%，為同類型基金頂端','聯博品牌：固定收益領域30年深厚研究與管理資歷','信用研究嚴格：全球最大信用研究團隊之一'],
+    holdings:'美元高收益公司債 ~60% ｜ 投資等級公司債 ~25% ｜ 新興市場美元債 ~15%',
+    perf:'近3年年化報酬約7–10%，高息策略在利率高峰期尤為突出',
+    risk:'中高',
+  },
+  blk: {
+    full:'貝萊德環球資產配置基金 A10（BlackRock Global Allocation Fund A10）',
+    cat:'多重資產・全球',
+    mgr:'貝萊德（BlackRock），全球最大資產管理公司，管理資產逾10兆美元',
+    aum:'約500億美元',
+    intro:'貝萊德旗艦多重資產基金，成立逾30年、穿越多次市場危機，靈活配置全球股債，以穩健著稱。搭載Aladdin®全球最先進風控平台。',
+    pros:['全球最大：貝萊德管理資產超過10兆美元，規模優勢顯著','Aladdin®平台：全球最先進的風控系統支撐投資決策','30年歷史：穿越亞洲金融危機、網路泡沫、金融海嘯、疫情','靈活配置：不受地區與資產類別限制，動態調整'],
+    holdings:'全球股票 ~35% ｜ 美國投資等級債 ~25% ｜ 全球高收益債 ~20% ｜ 其他固收 ~20%',
+    perf:'近3年年化報酬約5–8%，追求穩健資本保全兼顧配息',
+    risk:'中',
+  },
+  pima2: {
+    full:'PIMCO品浩全球平衡收益基金 M（PIMCO Balanced Income and Growth M）',
+    cat:'多重資產・全球固定收益',
+    mgr:'PIMCO品浩（Pacific Investment Management Company），全球最大固定收益管理機構，管理資產逾1.7兆美元',
+    aum:'約30億美元',
+    intro:'PIMCO為全球固定收益投資最頂尖機構，本基金採平衡收益策略，以高品質固定收益為核心，搭配高股息股票，追求穩定月配息與資本保值。',
+    pros:['固收王者：PIMCO固定收益管理資產全球第一','信用品質：以投資等級資產為主，信用風險較低','月配穩定：近期每月固定$0.087/單位，年化約9%','均衡策略：固收配息為主、股息為輔，波動相對小'],
+    holdings:'投資等級公司債 ~40% ｜ 政府公債 ~25% ｜ 高股息股票 ~20% ｜ 高收益債 ~15%',
+    perf:'近3年年化報酬約5–8%，升息環境中信用品質優勢顯現',
+    risk:'中',
+  },
+};
+
+function printIncome2Report() {
+  // ── 讀取目前狀態 ──
+  var sel = I2_IDS.filter(function(id){ return _i2Chk[id]; });
+  if (!sel.length) { alert('請先勾選基金後再產生報表'); return; }
+
+  var principal = _i2P || 5000000;
+  var isRot = document.querySelector('#i2-mode-rot') && document.querySelector('#i2-mode-rot').checked;
+  var mode = isRot ? 'rot' : 'std';
+
+  // 讀試算結果
+  function txt(id) { var el = document.getElementById(id); return el ? el.textContent : '—'; }
+  var res5  = { acc: txt('inc2-acc-5'),  div: txt('inc2-div-5'),  tot: txt('inc2-tot-5'),  irr: txt('inc2-irr-5')  };
+  var res10 = { acc: txt('inc2-acc-10'), div: txt('inc2-div-10'), tot: txt('inc2-tot-10'), irr: txt('inc2-irr-10') };
+  var res20 = { acc: txt('inc2-acc-20'), div: txt('inc2-div-20'), tot: txt('inc2-tot-20'), irr: txt('inc2-irr-20') };
+
+  // 月收益
+  var moIncome = '';
+  var rows = document.querySelectorAll('#i2-res-rows > div');
+  if (rows && rows.length) {
+    var last = rows[rows.length-1];
+    moIncome = last ? (last.textContent||'').replace(/\s+/g,' ').trim() : '';
+  }
+
+  // 配置比例
+  var allocMap = {};
+  sel.forEach(function(id){
+    var el = document.getElementById('i2pct-'+id);
+    allocMap[id] = el ? el.value+'%' : '—';
+  });
+
+  var today = new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'long',day:'numeric'});
+  var pTw = Math.round(principal/10000);
+
+  // ── 基金介紹 HTML ──
+  var fundSections = sel.map(function(id) {
+    var p = I2_PROFILES[id]; if (!p) return '';
+    var f = I2_FUNDS[id];
+    var prosHtml = (p.pros||[]).map(function(t){ return '<li style="margin-bottom:5px">'+t+'</li>'; }).join('');
+    return '<div style="page-break-inside:avoid;border:1.5px solid #e2e8f0;border-radius:12px;padding:20px;margin-bottom:18px">'
+      + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+      + '<div style="width:10px;height:36px;background:'+(f&&f.col?f.col:'#64748b')+';border-radius:3px;flex-shrink:0"></div>'
+      + '<div><div style="font-size:15px;font-weight:800;color:#1e293b">'+I2_NAMES[id]+'</div>'
+      + '<div style="font-size:11px;color:#64748b;margin-top:1px">'+p.full+'</div></div></div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;font-size:11px">'
+      + '<div style="background:#f8fafc;border-radius:7px;padding:8px"><div style="color:#64748b;margin-bottom:2px">資產類別</div><div style="font-weight:700;color:#1e293b">'+p.cat+'</div></div>'
+      + '<div style="background:#f8fafc;border-radius:7px;padding:8px"><div style="color:#64748b;margin-bottom:2px">風險等級</div><div style="font-weight:700;color:'+(p.risk==='中'?'#0891b2':'#d97706')+'">'+p.risk+'</div></div>'
+      + '<div style="background:#f8fafc;border-radius:7px;padding:8px"><div style="color:#64748b;margin-bottom:2px">年化配息率</div><div style="font-weight:700;color:#16a34a">'+(f?f.divRate+'%':'—')+'</div></div>'
+      + '</div>'
+      + '<div style="font-size:12px;color:#475569;margin-bottom:10px;line-height:1.6">'+p.intro+'</div>'
+      + '<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:#1e293b;margin-bottom:5px">✅ 核心優點</div>'
+      + '<ul style="margin:0;padding-left:18px;font-size:11px;color:#334155;line-height:1.7">'+prosHtml+'</ul></div>'
+      + '<div style="background:#f1f5f9;border-radius:7px;padding:9px;font-size:11px"><div style="font-weight:700;color:#1e293b;margin-bottom:3px">📊 持股配置</div><div style="color:#475569">'+p.holdings+'</div></div>'
+      + '<div style="background:#f0fdf4;border-radius:7px;padding:8px;margin-top:8px;font-size:11px"><div style="font-weight:700;color:#15803d;margin-bottom:2px">📈 歷史績效概覽</div><div style="color:#166534">'+p.perf+'</div></div>'
+      + '<div style="margin-top:10px;font-size:11px;color:#64748b"><b>管理機構：</b>'+p.mgr+'</div>'
+      + '</div>';
+  }).join('');
+
+  // ── 產生報告 HTML ──
+  var html = '<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8">'
+    + '<title>月配息策略投資規劃報告 – Weber理財顧問</title>'
+    + '<style>*{box-sizing:border-box;margin:0;padding:0} body{font-family:"Helvetica Neue",Arial,"Microsoft JhengHei",sans-serif;font-size:13px;color:#1e293b;background:#fff;padding:32px 40px}'
+    + 'h1{font-size:22px;font-weight:900;color:#1e3a5f} h2{font-size:14px;font-weight:800;color:#1e3a5f;margin-bottom:10px;padding-bottom:4px;border-bottom:2px solid #1e3a5f}'
+    + 'table{width:100%;border-collapse:collapse;font-size:12px} th{background:#1e3a5f;color:white;padding:9px 12px;text-align:left} td{padding:8px 12px;border-bottom:1px solid #e2e8f0}'
+    + 'tr:nth-child(even) td{background:#f8fafc}'
+    + '@media print{body{padding:15px 20px} @page{size:A4 portrait;margin:15mm} .no-print{display:none}}'
+    + '.section{margin-bottom:24px} .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}'
+    + '</style></head><body>'
+
+    // Header
+    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #1e3a5f">'
+    + '<div><h1>📊 月配息策略投資規劃報告</h1><div style="font-size:12px;color:#64748b;margin-top:4px">Weber 理財顧問｜為您量身打造的配息策略</div></div>'
+    + '<div style="text-align:right;font-size:11px;color:#94a3b8"><div>報告日期：'+today+'</div><div style="margin-top:2px">weber760917@gmail.com</div></div>'
+    + '</div>'
+
+    // Strategy summary
+    + '<div class="section">'
+    + '<h2>一、投資策略配置</h2>'
+    + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">'
+    + '<div style="background:#eff6ff;border-radius:9px;padding:12px"><div style="font-size:11px;color:#1e40af;font-weight:700">投入本金</div><div style="font-size:18px;font-weight:900;color:#1e3a5f;margin-top:3px">'+pTw+'萬元</div></div>'
+    + '<div style="background:#f0fdf4;border-radius:9px;padding:12px"><div style="font-size:11px;color:#15803d;font-weight:700">策略模式</div><div style="font-size:15px;font-weight:900;color:#15803d;margin-top:3px">'+(mode==='rot'?'🔄 安聯↔聯博輪轉':'📊 標準加權')+'</div></div>'
+    + '<div style="background:#fdf4ff;border-radius:9px;padding:12px"><div style="font-size:11px;color:#7e22ce;font-weight:700">選取基金</div><div style="font-size:13px;font-weight:700;color:#7e22ce;margin-top:3px">'+sel.map(function(id){return I2_NAMES[id];}).join('、')+'</div></div>'
+    + '</div>'
+    // Allocation table
+    + '<table><tr><th>基金</th><th>配置比例</th><th>年化配息率</th><th>每月配息/單位 (USD)</th><th>最新NAV</th></tr>'
+    + sel.map(function(id){
+        var f = I2_FUNDS[id];
+        return '<tr><td style="font-weight:700">'+I2_NAMES[id]+'</td>'
+          +'<td>'+allocMap[id]+'</td>'
+          +'<td style="color:#16a34a;font-weight:700">'+(f?f.divRate+'%':'—')+'</td>'
+          +'<td>'+(f?'$'+f.divUSD:'—')+'</td>'
+          +'<td>'+(f?'$'+f.navUSD:'—')+'</td></tr>';
+      }).join('')
+    + '</table></div>'
+
+    // Monthly income
+    + '<div class="section"><h2>二、月配息試算結果</h2>'
+    + '<div style="background:linear-gradient(135deg,#1e3a5f,#2563eb);border-radius:12px;padding:18px;color:white;margin-bottom:12px">'
+    + '<div style="font-size:11px;color:rgba(255,255,255,0.7);margin-bottom:4px">依目前配置試算（本金 '+pTw+'萬 · '+I2_FX+' TWD/USD）</div>'
+    + '<div id="rpt-mo" style="font-size:13px;color:rgba(255,255,255,0.9)">'+(moIncome||'請先完成試算後再列印')+'</div>'
+    + '</div></div>'
+
+    // Long-term table
+    + '<div class="section" style="page-break-inside:avoid"><h2>三、長期複利預估（年均平均法 IRR）</h2>'
+    + '<table><tr><th>期間</th><th>期末帳戶價值</th><th>累計已領配息</th><th>總資產合計</th><th>年化內部報酬率（IRR）</th></tr>'
+    + '<tr><td style="font-weight:800;color:#7c3aed">📌 5年</td><td>'+res5.acc+'</td><td style="color:#16a34a;font-weight:700">'+res5.div+'</td><td style="color:#1d4ed8;font-weight:800">'+res5.tot+'</td><td style="color:#dc2626;font-weight:800">'+res5.irr+'</td></tr>'
+    + '<tr><td style="font-weight:800;color:#7c3aed">📌 10年</td><td>'+res10.acc+'</td><td style="color:#16a34a;font-weight:700">'+res10.div+'</td><td style="color:#1d4ed8;font-weight:800">'+res10.tot+'</td><td style="color:#dc2626;font-weight:800">'+res10.irr+'</td></tr>'
+    + '<tr><td style="font-weight:800;color:#7c3aed">📌 20年</td><td>'+res20.acc+'</td><td style="color:#16a34a;font-weight:700">'+res20.div+'</td><td style="color:#1d4ed8;font-weight:800">'+res20.tot+'</td><td style="color:#dc2626;font-weight:800">'+res20.irr+'</td></tr>'
+    + '</table>'
+    + '<div style="background:#fef3c7;border-radius:7px;padding:8px 12px;margin-top:10px;font-size:11px;color:#92400e">⚠️ 假設：每月配息如期提領、本金依資本增值率估算。IRR使用年均平均法計算。實際績效視市場而異，僅供參考。</div>'
+    + '</div>'
+
+    // Fund profiles
+    + '<div class="section"><h2>四、基金介紹與持股分析</h2>'
+    + fundSections
+    + '</div>'
+
+    // Risk disclosure
+    + '<div style="background:#f8fafc;border-radius:10px;padding:14px;font-size:11px;color:#64748b;page-break-inside:avoid;border:1px solid #e2e8f0">'
+    + '<div style="font-weight:700;color:#334155;margin-bottom:6px">⚠️ 風險揭示與免責聲明</div>'
+    + '本報告由Weber理財顧問提供，僅供參考，不構成投資建議或保證。境外基金投資涉及市場風險、匯率風險、信用風險及流動性風險。基金過去績效不代表未來表現。配息可能來自本金，配息率可能隨市場波動。投資人申購前應詳閱公開說明書，並自行評估風險承受能力。'
+    + '</div>'
+
+    // Print button (hidden in print)
+    + '<div class="no-print" style="text-align:center;margin-top:24px">'
+    + '<button onclick="window.print()" style="background:#1e3a5f;color:white;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-right:8px">🖨️ 列印 / 儲存PDF</button>'
+    + '<button onclick="window.close()" style="background:#e2e8f0;color:#334155;border:none;padding:12px 24px;border-radius:8px;font-size:14px;cursor:pointer">✕ 關閉</button>'
+    + '</div>'
+    + '</body></html>';
+
+  var w = window.open('', '_blank', 'width=880,height=900,scrollbars=yes');
+  if (!w) { alert('請允許彈出視窗後再試'); return; }
+  w.document.write(html);
+  w.document.close();
 }
 
 function calcIncome2() {
