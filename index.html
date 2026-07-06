@@ -3574,7 +3574,7 @@ async function loadWCBracket() {
   var box = document.getElementById('wc-bracket-rows');
   if (!box) return;
 
-  var SH = 62; // slot height px per R32 match
+  var SH = 62;
 
   function bcard(a, b, opts) {
     var o = opts || {};
@@ -3582,70 +3582,72 @@ async function loadWCBracket() {
     var sa = o.sa !== undefined ? o.sa : null;
     var sb = o.sb !== undefined ? o.sb : null;
     var pen = o.pen || '';
+    var aet = o.aet || false;
     var dt = o.dt || '';
     var venue = o.venue || '';
     var winA = done && (o.win === 'a' || (sa !== null && sb !== null && sa > sb));
     var winB = done && (o.win === 'b' || (sa !== null && sb !== null && sb > sa));
-    var tbd = !a || a.indexOf('?') >= 0 || a.indexOf('勝') >= 0 || a === 'TBD';
-    var rowSt = 'display:flex;align-items:center;gap:4px;padding:4px 7px;min-height:0;';
-    var rA = '<div style="' + rowSt + (winA ? 'font-weight:800;color:var(--text)' : 'color:var(--sub)') + '">'
-           + '<span style="flex:1;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (a||'TBD') + '</span>'
+    var tbd = !a || a.indexOf('勝') >= 0 || a === 'TBD';
+    var rs = 'display:flex;align-items:center;gap:4px;padding:4px 7px;';
+    var rA = '<div style="' + rs + (winA ? 'font-weight:800;color:var(--text)' : 'color:var(--sub)') + '">'
+           + '<span style="flex:1;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (a || 'TBD') + '</span>'
            + (done && sa !== null ? '<span style="font-size:13px;font-weight:800;min-width:14px;text-align:right">' + sa + '</span>' : '')
            + '</div>';
-    var rB = '<div style="' + rowSt + 'border-top:1px solid var(--border);' + (winB ? 'font-weight:800;color:var(--text)' : 'color:var(--sub)') + '">'
-           + '<span style="flex:1;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (b||'TBD') + '</span>'
+    var rB = '<div style="' + rs + 'border-top:1px solid var(--border);' + (winB ? 'font-weight:800;color:var(--text)' : 'color:var(--sub)') + '">'
+           + '<span style="flex:1;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (b || 'TBD') + '</span>'
            + (done && sb !== null ? '<span style="font-size:13px;font-weight:800;min-width:14px;text-align:right">' + sb + '</span>' : '')
            + '</div>';
-    var badge = '';
-    if (done) badge = '<div style="font-size:10px;color:var(--sub);text-align:center;padding:1px 4px">' + (pen ? 'FT (PK ' + pen + ')' : 'FT') + '</div>';
-    else if (dt) badge = '<div style="font-size:10px;color:var(--sub);text-align:center;padding:1px 4px">' + dt + (venue ? ' · ' + venue : '') + '</div>';
-    return '<div style="background:var(--card);border:1px solid var(--border);border-radius:7px;overflow:hidden;height:' + SH + 'px;box-sizing:border-box' + (tbd ? ';opacity:0.55' : '') + '">'
+    var suffix = pen ? ' PK(' + pen + ')' : (aet ? ' AET' : '');
+    var badge = done
+      ? '<div style="font-size:9.5px;color:var(--sub);text-align:center;padding:1px 4px">FT' + suffix + '</div>'
+      : (dt ? '<div style="font-size:9.5px;color:var(--sub);text-align:center;padding:1px 4px">' + dt + (venue ? ' ' + venue : '') + '</div>' : '');
+    return '<div style="background:var(--card);border:1px solid var(--border);border-radius:7px;overflow:hidden;height:' + SH + 'px;box-sizing:border-box' + (tbd ? ';opacity:0.5' : '') + '">'
       + rA + rB + badge + '</div>';
   }
 
-  // ─── 2026 World Cup bracket (ESPN data) ───
+  // ── 2026 World Cup – ESPN 即時資料 ──
   var ROUNDS = [
     { label:'32強', color:'#3b82f6', count:16, matches:[
-      // Slots 1-2 → R16: France vs Paraguay
-      {a:'🇫🇷 法國',      b:'🇸🇪 瑞典',         sa:3, sb:0, done:true},
-      {a:'🇩🇪 德國',      b:'🇵🇾 巴拉圭',       sa:1, sb:1, done:true, pen:'3-4', win:'b'},
-      // Slots 3-4 → R16: Morocco vs Canada
-      {a:'🇿🇦 南非',      b:'🇨🇦 加拿大',       sa:0, sb:1, done:true},
-      {a:'🇳🇱 荷蘭',      b:'🇲🇦 摩洛哥',       sa:1, sb:1, done:true, pen:'2-3', win:'b'},
-      // Slots 5-6 → R16: Brazil vs Norway
-      {a:'🇧🇷 巴西',      b:'🇯🇵 日本',         sa:2, sb:1, done:true},
-      {a:'🇨🇮 象牙海岸',  b:'🇳🇴 挪威',         sa:1, sb:2, done:true},
-      // Slots 7-8 → R16: Mexico vs England/Congo
-      {a:'🇲🇽 墨西哥',   b:'🇪🇨 厄瓜多',       sa:2, sb:0, done:true},
-      {a:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格蘭',  b:'🇨🇩 剛果DR',      dt:'7/2 00:00'},
-      // Slots 9-10 → R16: USA/Bosnia vs Belgium/Senegal
-      {a:'🇺🇸 美國',      b:'🇧🇦 波士尼亞',     dt:'7/2 08:00'},
-      {a:'🇧🇪 比利時',    b:'🇸🇳 塞內加爾',     dt:'7/2 04:00'},
-      // Slots 11-12 → R16: Portugal/Croatia vs Spain/Austria
-      {a:'🇵🇹 葡萄牙',    b:'🇭🇷 克羅埃西亞',   dt:'7/3 07:00'},
-      {a:'🇪🇸 西班牙',    b:'🇦🇹 奧地利',       dt:'7/3 03:00'},
-      // Slots 13-14 → R16: Argentina/CV vs Switzerland/Algeria
-      {a:'🇦🇷 阿根廷',    b:'🇨🇻 維德角',       dt:'7/4 06:00'},
-      {a:'🇨🇭 瑞士',      b:'🇩🇿 阿爾及利亞',   dt:'7/3 11:00'},
-      // Slots 15-16 → R16: Australia/Egypt vs Colombia/Ghana
-      {a:'🇦🇺 澳洲',      b:'🇪🇬 埃及',         dt:'7/4 02:00'},
-      {a:'🇨🇴 哥倫比亞',  b:'🇬🇭 迦納',         dt:'7/4 09:30'},
+      // Pair 1→R16M1(法國vs巴拉圭→法國1-0)
+      {a:'🇫🇷 法國',      b:'🇸🇪 瑞典',         sa:3,  sb:0, done:true},
+      {a:'🇩🇪 德國',      b:'🇵🇾 巴拉圭',       sa:1,  sb:1, done:true, pen:'3-4', win:'b'},
+      // Pair 2→R16M2(摩洛哥vs加拿大→摩洛哥3-0)
+      {a:'🇿🇦 南非',      b:'🇨🇦 加拿大',       sa:0,  sb:1, done:true},
+      {a:'🇳🇱 荷蘭',      b:'🇲🇦 摩洛哥',       sa:1,  sb:1, done:true, pen:'2-3', win:'b'},
+      // Pair 3→R16M3(巴西vs挪威)
+      {a:'🇧🇷 巴西',      b:'🇯🇵 日本',         sa:2,  sb:1, done:true},
+      {a:'🇨🇮 象牙海岸',  b:'🇳🇴 挪威',         sa:1,  sb:2, done:true},
+      // Pair 4→R16M4(墨西哥vs英格蘭)
+      {a:'🇲🇽 墨西哥',   b:'🇪🇨 厄瓜多',       sa:2,  sb:0, done:true},
+      {a:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格蘭',  b:'🇨🇩 剛果DR',      sa:2,  sb:1, done:true},
+      // Pair 5→R16M5(美國vs比利時)
+      {a:'🇺🇸 美國',      b:'🇧🇦 波士尼亞',     sa:2,  sb:0, done:true},
+      {a:'🇧🇪 比利時',    b:'🇸🇳 塞內加爾',     sa:3,  sb:2, done:true, aet:true},
+      // Pair 6→R16M6(葡萄牙vs西班牙)
+      {a:'🇵🇹 葡萄牙',    b:'🇭🇷 克羅埃西亞',   sa:2,  sb:1, done:true},
+      {a:'🇪🇸 西班牙',    b:'🇦🇹 奧地利',       sa:3,  sb:0, done:true},
+      // Pair 7→R16M7(阿根廷vs埃及)：重排 slot13=阿根廷, slot14=埃及
+      {a:'🇦🇷 阿根廷',    b:'🇨🇻 維德角',       sa:3,  sb:2, done:true, aet:true},
+      {a:'🇦🇺 澳洲',      b:'🇪🇬 埃及',         sa:1,  sb:1, done:true, pen:'2-4', win:'b'},
+      // Pair 8→R16M8(瑞士vs哥倫比亞)
+      {a:'🇨🇭 瑞士',      b:'🇩🇿 阿爾及利亞',   sa:2,  sb:0, done:true},
+      {a:'🇨🇴 哥倫比亞',  b:'🇬🇭 迦納',         sa:1,  sb:0, done:true},
     ]},
     { label:'16強', color:'#8b5cf6', count:8, matches:[
-      {a:'🇫🇷 法國',    b:'🇵🇾 巴拉圭',  dt:'7/5 05:00'},
-      {a:'🇲🇦 摩洛哥',  b:'🇨🇦 加拿大',  dt:'7/5 01:00'},
+      {a:'🇫🇷 法國',    b:'🇵🇾 巴拉圭',  sa:1, sb:0, done:true},
+      {a:'🇲🇦 摩洛哥',  b:'🇨🇦 加拿大',  sa:3, sb:0, done:true},
       {a:'🇧🇷 巴西',    b:'🇳🇴 挪威',    dt:'7/6 04:00'},
-      {a:'🇲🇽 墨西哥',  b:'英格蘭勝者',   dt:'7/6 08:00'},
-      {a:'美國勝者',     b:'比利時勝者',   dt:'7/7 08:00'},
-      {a:'葡萄牙勝者',   b:'西班牙勝者',   dt:'7/7 03:00'},
-      {a:'阿根廷勝者',   b:'瑞士勝者',     dt:'7/8 04:00'},
-      {a:'澳洲勝者',     b:'哥倫比亞勝者', dt:'7/8 00:00'},
+      {a:'🇲🇽 墨西哥',  b:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格蘭',  dt:'7/6 08:00'},
+      {a:'🇺🇸 美國',    b:'🇧🇪 比利時',  dt:'7/7 08:00'},
+      {a:'🇵🇹 葡萄牙',  b:'🇪🇸 西班牙',  dt:'7/7 03:00'},
+      {a:'🇦🇷 阿根廷',  b:'🇪🇬 埃及',    dt:'7/8 00:00'},
+      {a:'🇨🇭 瑞士',    b:'🇨🇴 哥倫比亞', dt:'7/8 04:00'},
     ]},
     { label:'八強', color:'#f59e0b', count:4, matches:[
-      {a:'R16 M1 勝', b:'R16 M2 勝', dt:'7/10 04:00'},
-      {a:'R16 M5 勝', b:'R16 M6 勝', dt:'7/11 03:00'},
-      {a:'R16 M3 勝', b:'R16 M4 勝', dt:'7/12 05:00'},
-      {a:'R16 M7 勝', b:'R16 M8 勝', dt:'7/12 09:00'},
+      {a:'🇫🇷 法國',   b:'🇲🇦 摩洛哥',  dt:'7/10 04:00'},
+      {a:'美國/比利時勝', b:'葡萄牙/西班牙勝', dt:'7/11 03:00'},
+      {a:'巴西/挪威勝',  b:'墨西哥/英格蘭勝', dt:'7/12 05:00'},
+      {a:'阿根廷/埃及勝', b:'瑞士/哥倫比亞勝', dt:'7/12 09:00'},
     ]},
     { label:'四強', color:'#ef4444', count:2, matches:[
       {a:'QF W1 勝', b:'QF W2 勝', dt:'7/15 03:00'},
@@ -3656,7 +3658,7 @@ async function loadWCBracket() {
     ]},
   ];
 
-  var totalH = 16 * SH; // 992px
+  var totalH = 16 * SH;
 
   var cols = ROUNDS.map(function(rnd) {
     var slotH = totalH / rnd.count;
