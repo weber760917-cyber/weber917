@@ -3574,91 +3574,88 @@ async function loadWCBracket() {
   var box = document.getElementById('wc-bracket-rows');
   if (!box) return;
 
-  var SH = 62;
+  var SH = 70; // card height px
 
+  // ── dark-theme match card ──
   function bcard(a, b, opts) {
     var o = opts || {};
-    var done = !!o.done;
+    var done = !!o.done, live = !!o.live;
     var sa = o.sa !== undefined ? o.sa : null;
     var sb = o.sb !== undefined ? o.sb : null;
-    var pen = o.pen || '';
-    var aet = o.aet || false;
-    var dt = o.dt || '';
-    var venue = o.venue || '';
-    var winA = done && (o.win === 'a' || (sa !== null && sb !== null && sa > sb));
-    var winB = done && (o.win === 'b' || (sa !== null && sb !== null && sb > sa));
-    var tbd = !a || a.indexOf('勝') >= 0 || a === 'TBD';
-    var rs = 'display:flex;align-items:center;gap:4px;padding:4px 7px;';
-    var rA = '<div style="' + rs + (winA ? 'font-weight:800;color:var(--text)' : 'color:var(--sub)') + '">'
-           + '<span style="flex:1;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (a || 'TBD') + '</span>'
-           + (done && sa !== null ? '<span style="font-size:13px;font-weight:800;min-width:14px;text-align:right">' + sa + '</span>' : '')
-           + '</div>';
-    var rB = '<div style="' + rs + 'border-top:1px solid var(--border);' + (winB ? 'font-weight:800;color:var(--text)' : 'color:var(--sub)') + '">'
-           + '<span style="flex:1;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (b || 'TBD') + '</span>'
-           + (done && sb !== null ? '<span style="font-size:13px;font-weight:800;min-width:14px;text-align:right">' + sb + '</span>' : '')
-           + '</div>';
-    var suffix = pen ? ' PK(' + pen + ')' : (aet ? ' AET' : '');
+    var pen = o.pen||'', aet = !!o.aet, dt = o.dt||'';
+    var winA = done && (o.win==='a' || (sa!==null && sb!==null && sa>sb));
+    var winB = done && (o.win==='b' || (sa!==null && sb!==null && sb>sa));
+    var tbd  = !a || a.indexOf('勝')>=0 || a==='TBD' || a.indexOf('者')>=0;
+    var showSc = done || live;
+    function row(nm, sc, win) {
+      return '<div style="display:flex;align-items:center;gap:5px;padding:5px 9px;'
+        + (win ? 'background:rgba(251,191,36,0.08)' : '') + '">'
+        + '<span style="flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'
+        + (win ? 'color:#fbbf24;font-weight:800' : (tbd?'color:#475569':(done?'color:#64748b':'color:#cbd5e1'))) + '">'
+        + (nm||'TBD') + '</span>'
+        + (showSc && sc!==null ? '<span style="font-size:14px;font-weight:900;min-width:18px;text-align:right;color:'+(win?'#fbbf24':'#475569')+'">'+sc+'</span>' : '')
+        + '</div>';
+    }
+    var suffix = pen ? ' PK('+pen+')' : (aet ? ' AET' : '');
     var badge = done
-      ? '<div style="font-size:9.5px;color:var(--sub);text-align:center;padding:1px 4px">FT' + suffix + '</div>'
-      : (dt ? '<div style="font-size:9.5px;color:var(--sub);text-align:center;padding:1px 4px">' + dt + (venue ? ' ' + venue : '') + '</div>' : '');
-    return '<div style="background:var(--card);border:1px solid var(--border);border-radius:7px;overflow:hidden;height:' + SH + 'px;box-sizing:border-box' + (tbd ? ';opacity:0.5' : '') + '">'
-      + rA + rB + badge + '</div>';
+      ? '<div style="font-size:9px;color:#475569;text-align:center;padding:1px 4px">FT'+suffix+'</div>'
+      : live
+        ? '<div style="font-size:9px;font-weight:700;color:#f87171;text-align:center;padding:1px 4px">⬤ LIVE '+(o.min||'')+'</div>'
+        : (dt ? '<div style="font-size:9px;color:#475569;text-align:center;padding:1px 4px">'+dt+'</div>' : '');
+    var bdr = live ? '#f87171' : '#1e3a5f';
+    return '<div style="background:#0f172a;border:1px solid '+bdr+';border-radius:8px;overflow:hidden;height:'+SH+'px;box-sizing:border-box'+(tbd?';opacity:0.4':'')+'">'
+      + row(a, sa, winA)
+      + '<div style="height:1px;background:#1e3a5f"></div>'
+      + row(b, sb, winB)
+      + badge + '</div>';
   }
 
-  // ── 2026 World Cup – ESPN 即時資料 ──
+  // ── 2026 World Cup – ESPN 即時資料 (截至 7/8) ──
   var ROUNDS = [
     { label:'32強', color:'#3b82f6', count:16, matches:[
-      // Pair 1→R16M1(法國vs巴拉圭→法國1-0)
-      {a:'🇫🇷 法國',      b:'🇸🇪 瑞典',         sa:3,  sb:0, done:true},
-      {a:'🇩🇪 德國',      b:'🇵🇾 巴拉圭',       sa:1,  sb:1, done:true, pen:'3-4', win:'b'},
-      // Pair 2→R16M2(摩洛哥vs加拿大→摩洛哥3-0)
-      {a:'🇿🇦 南非',      b:'🇨🇦 加拿大',       sa:0,  sb:1, done:true},
-      {a:'🇳🇱 荷蘭',      b:'🇲🇦 摩洛哥',       sa:1,  sb:1, done:true, pen:'2-3', win:'b'},
-      // Pair 3→R16M3(巴西vs挪威)
-      {a:'🇧🇷 巴西',      b:'🇯🇵 日本',         sa:2,  sb:1, done:true},
-      {a:'🇨🇮 象牙海岸',  b:'🇳🇴 挪威',         sa:1,  sb:2, done:true},
-      // Pair 4→R16M4(墨西哥vs英格蘭)
-      {a:'🇲🇽 墨西哥',   b:'🇪🇨 厄瓜多',       sa:2,  sb:0, done:true},
-      {a:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格蘭',  b:'🇨🇩 剛果DR',      sa:2,  sb:1, done:true},
-      // Pair 5→R16M5(美國vs比利時)
-      {a:'🇺🇸 美國',      b:'🇧🇦 波士尼亞',     sa:2,  sb:0, done:true},
-      {a:'🇧🇪 比利時',    b:'🇸🇳 塞內加爾',     sa:3,  sb:2, done:true, aet:true},
-      // Pair 6→R16M6(葡萄牙vs西班牙)
-      {a:'🇵🇹 葡萄牙',    b:'🇭🇷 克羅埃西亞',   sa:2,  sb:1, done:true},
-      {a:'🇪🇸 西班牙',    b:'🇦🇹 奧地利',       sa:3,  sb:0, done:true},
-      // Pair 7→R16M7(阿根廷vs埃及)：重排 slot13=阿根廷, slot14=埃及
-      {a:'🇦🇷 阿根廷',    b:'🇨🇻 維德角',       sa:3,  sb:2, done:true, aet:true},
-      {a:'🇦🇺 澳洲',      b:'🇪🇬 埃及',         sa:1,  sb:1, done:true, pen:'2-4', win:'b'},
-      // Pair 8→R16M8(瑞士vs哥倫比亞)
-      {a:'🇨🇭 瑞士',      b:'🇩🇿 阿爾及利亞',   sa:2,  sb:0, done:true},
-      {a:'🇨🇴 哥倫比亞',  b:'🇬🇭 迦納',         sa:1,  sb:0, done:true},
+      {a:'🇫🇷 法國',      b:'🇸🇪 瑞典',       sa:3, sb:0, done:true},
+      {a:'🇩🇪 德國',      b:'🇵🇾 巴拉圭',     sa:1, sb:1, done:true, pen:'3-4', win:'b'},
+      {a:'🇿🇦 南非',      b:'🇨🇦 加拿大',     sa:0, sb:1, done:true},
+      {a:'🇳🇱 荷蘭',      b:'🇲🇦 摩洛哥',     sa:1, sb:1, done:true, pen:'2-3', win:'b'},
+      {a:'🇧🇷 巴西',      b:'🇯🇵 日本',       sa:2, sb:1, done:true},
+      {a:'🇨🇮 象牙海岸',  b:'🇳🇴 挪威',       sa:1, sb:2, done:true},
+      {a:'🇲🇽 墨西哥',    b:'🇪🇨 厄瓜多',     sa:2, sb:0, done:true},
+      {a:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格蘭',  b:'🇨🇩 剛果DR',    sa:2, sb:1, done:true},
+      {a:'🇺🇸 美國',      b:'🇧🇦 波士尼亞',   sa:2, sb:0, done:true},
+      {a:'🇧🇪 比利時',    b:'🇸🇳 塞內加爾',   sa:3, sb:2, done:true, aet:true},
+      {a:'🇵🇹 葡萄牙',    b:'🇭🇷 克羅埃西亞', sa:2, sb:1, done:true},
+      {a:'🇪🇸 西班牙',    b:'🇦🇹 奧地利',     sa:3, sb:0, done:true},
+      {a:'🇦🇷 阿根廷',    b:'🇨🇻 維德角',     sa:3, sb:2, done:true, aet:true},
+      {a:'🇦🇺 澳洲',      b:'🇪🇬 埃及',       sa:1, sb:1, done:true, pen:'2-4', win:'b'},
+      {a:'🇨🇭 瑞士',      b:'🇩🇿 阿爾及利亞', sa:2, sb:0, done:true},
+      {a:'🇨🇴 哥倫比亞',  b:'🇬🇭 迦納',       sa:1, sb:0, done:true},
     ]},
-    { label:'16強', color:'#8b5cf6', count:8, matches:[
+    { label:'16強', color:'#7c3aed', count:8, matches:[
       {a:'🇫🇷 法國',    b:'🇵🇾 巴拉圭',  sa:1, sb:0, done:true},
       {a:'🇲🇦 摩洛哥',  b:'🇨🇦 加拿大',  sa:3, sb:0, done:true},
-      {a:'🇧🇷 巴西',    b:'🇳🇴 挪威',    dt:'7/6 04:00'},
-      {a:'🇲🇽 墨西哥',  b:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格蘭',  dt:'7/6 08:00'},
-      {a:'🇺🇸 美國',    b:'🇧🇪 比利時',  dt:'7/7 08:00'},
-      {a:'🇵🇹 葡萄牙',  b:'🇪🇸 西班牙',  dt:'7/7 03:00'},
-      {a:'🇦🇷 阿根廷',  b:'🇪🇬 埃及',    dt:'7/8 00:00'},
-      {a:'🇨🇭 瑞士',    b:'🇨🇴 哥倫比亞', dt:'7/8 04:00'},
+      {a:'🇧🇷 巴西',    b:'🇳🇴 挪威',    sa:1, sb:2, done:true},
+      {a:'🇲🇽 墨西哥',  b:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格蘭',  sa:2, sb:3, done:true},
+      {a:'🇺🇸 美國',    b:'🇧🇪 比利時',  sa:1, sb:4, done:true},
+      {a:'🇵🇹 葡萄牙',  b:'🇪🇸 西班牙',  sa:0, sb:1, done:true},
+      {a:'🇦🇷 阿根廷',  b:'🇪🇬 埃及',    sa:3, sb:2, done:true},
+      {a:'🇨🇭 瑞士',    b:'🇨🇴 哥倫比亞', sa:0, sb:0, live:true, min:"19'"},
     ]},
-    { label:'八強', color:'#f59e0b', count:4, matches:[
+    { label:'八強', color:'#b45309', count:4, matches:[
       {a:'🇫🇷 法國',   b:'🇲🇦 摩洛哥',  dt:'7/10 04:00'},
-      {a:'美國/比利時勝', b:'葡萄牙/西班牙勝', dt:'7/11 03:00'},
-      {a:'巴西/挪威勝',  b:'墨西哥/英格蘭勝', dt:'7/12 05:00'},
-      {a:'阿根廷/埃及勝', b:'瑞士/哥倫比亞勝', dt:'7/12 09:00'},
+      {a:'🇪🇸 西班牙', b:'🇧🇪 比利時',  dt:'7/11 03:00'},
+      {a:'🇳🇴 挪威',   b:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格蘭',  dt:'7/12 05:00'},
+      {a:'🇦🇷 阿根廷', b:'瑞士/哥倫比亞', dt:'7/12 09:00'},
     ]},
-    { label:'四強', color:'#ef4444', count:2, matches:[
+    { label:'四強', color:'#be123c', count:2, matches:[
       {a:'QF W1 勝', b:'QF W2 勝', dt:'7/15 03:00'},
       {a:'QF W3 勝', b:'QF W4 勝', dt:'7/16 03:00'},
     ]},
-    { label:'決賽 🏆', color:'#f43f5e', count:1, matches:[
-      {a:'準決賽 W1', b:'準決賽 W2', dt:'7/20 03:00', venue:'MetLife'},
+    { label:'🏆 決賽', color:'#d97706', count:1, matches:[
+      {a:'準決賽 W1', b:'準決賽 W2', dt:'7/20 03:00'},
     ]},
   ];
 
-  var totalH = 16 * SH;
+  var totalH = 16 * SH; // 1120 px
 
   var cols = ROUNDS.map(function(rnd) {
     var slotH = totalH / rnd.count;
@@ -3666,23 +3663,25 @@ async function loadWCBracket() {
     var items = '';
     for (var i = 0; i < rnd.count; i++) {
       var m = rnd.matches[i];
-      var inner = m ? bcard(m.a, m.b, m)
-                    : '<div style="height:' + SH + 'px;border:1px dashed var(--border);border-radius:7px;opacity:0.25"></div>';
-      items += '<div style="height:' + slotH + 'px;padding:' + topPad.toFixed(1) + 'px 0;box-sizing:border-box">' + inner + '</div>';
+      items += '<div style="height:'+slotH+'px;padding:'+topPad.toFixed(1)+'px 0;box-sizing:border-box">'
+        + (m ? bcard(m.a, m.b, m)
+             : '<div style="height:'+SH+'px;border:1px dashed #1e3a5f;border-radius:8px;opacity:0.3"></div>')
+        + '</div>';
     }
-    return '<div style="width:152px;flex-shrink:0">'
-      + '<div style="font-size:11px;font-weight:800;color:' + rnd.color + ';text-align:center;padding:3px 0;border-bottom:2px solid ' + rnd.color + ';margin-bottom:2px">' + rnd.label + '</div>'
-      + '<div>' + items + '</div></div>';
-  }).join('<div style="width:6px;flex-shrink:0"></div>');
+    return '<div style="width:160px;flex-shrink:0">'
+      + '<div style="font-size:11px;font-weight:900;letter-spacing:.5px;color:'+rnd.color+';text-align:center;padding:4px 0;border-bottom:2px solid '+rnd.color+';margin-bottom:2px">'+rnd.label+'</div>'
+      + '<div>'+items+'</div></div>';
+  }).join('<div style="width:8px;flex-shrink:0"></div>');
 
-  var thirdHtml = '<div style="margin-top:14px;border-top:1px solid var(--border);padding-top:10px">'
-    + '<div style="font-size:11px;font-weight:800;color:#10b981;margin-bottom:6px">🥉 季軍賽 <span style="font-weight:400;color:var(--sub);font-size:10px">7/19 05:00 台灣時間 · 邁阿密花園</span></div>'
-    + '<div style="max-width:200px">' + bcard('準決賽敗者1', '準決賽敗者2', {dt:'7/19 05:00', venue:'邁阿密'}) + '</div>'
-    + '</div>';
-
-  box.innerHTML = '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px">'
-    + '<div style="display:flex;gap:6px;min-width:max-content;padding:4px 2px;align-items:flex-start">'
-    + cols + '</div></div>' + thirdHtml;
+  box.innerHTML =
+    '<div style="background:linear-gradient(160deg,#0a0f1e 0%,#0d1b2a 100%);border-radius:16px;padding:14px;margin:0 -2px">'
+    + '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px">'
+    + '<div style="display:flex;gap:0;min-width:max-content;padding:2px;align-items:flex-start">'+cols+'</div>'
+    + '</div>'
+    + '<div style="margin-top:14px;border-top:1px solid #1e3a5f;padding-top:10px;display:flex;align-items:center;gap:12px">'
+    + '<div><div style="font-size:11px;font-weight:800;color:#10b981;margin-bottom:5px">🥉 季軍賽<span style="font-size:9px;font-weight:400;color:#475569;margin-left:6px">7/19 05:00 台灣 · 邁阿密花園</span></div>'
+    + '<div style="width:200px">'+bcard('準決賽敗者1','準決賽敗者2',{dt:'7/19 05:00'})+'</div></div>'
+    + '</div></div>';
 
   _bracketLoaded = true;
 }
