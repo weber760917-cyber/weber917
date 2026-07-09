@@ -1,0 +1,19 @@
+name: Weekly LINE Broadcast
+
+on:
+  schedule:
+    # 每週一 09:00 台灣時間 (UTC+8 = UTC 01:00)
+    - cron: '0 1 * * 1'
+  workflow_dispatch:   # 也可在 GitHub UI 手動觸發
+
+jobs:
+  broadcast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Run LINE broadcast
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: python3 broadcast_line.py
