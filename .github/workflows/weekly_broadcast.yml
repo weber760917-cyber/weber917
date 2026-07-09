@@ -1,10 +1,7 @@
 name: Weekly LINE Broadcast
 
 on:
-  schedule:
-    # 每週一 09:00 台灣時間 (UTC+8 = UTC 01:00)
-    - cron: '0 1 * * 1'
-  workflow_dispatch:   # 也可在 GitHub UI 手動觸發
+  workflow_dispatch:   # 手動觸發（排程已暫停）
 
 jobs:
   broadcast:
