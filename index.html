@@ -4631,6 +4631,8 @@ function calcFund() {
       } else if (h === '#loan') {
         switchTab('retire');
         switchRetireSub('rview-loan','rtab-loan');
+      } else if (['#stories','#news','#retire','#about','#market','#copy','#wc'].indexOf(h) >= 0) {
+        switchTab(h.slice(1));
       }
     })();
   };
