@@ -2008,7 +2008,7 @@ function switchMSub(view, btnId) {
 }
 
 function switchTab(name) {
-  const names = ['stories','news','retire','about','market','copy','loan','wc'];
+  const names = ['stories','news','retire','about','market','copy','wc'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
