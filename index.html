@@ -291,7 +291,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <div class="tab" onclick="switchTab('about')">👤 關於我</div>
     <div class="tab" onclick="switchTab('market')">📈 今日行情</div>
     <div class="tab" onclick="switchTab('copy')">✍️ 社群文案</div>
-    <div class="tab" onclick="switchTab('wc')">⚽ 世界盃</div>
+    <div class="tab" onclick="switchTab('wc')">🏆 體育</div>
   </div>
 </div>
 
@@ -1607,357 +1607,52 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 
 <!-- ===== TAB: 世界盃 ===== -->
 <div id="panel-wc" class="panel">
-<div style="max-width:700px;margin:0 auto;padding:0 0 24px">
 
-  <!-- Header -->
-  <div style="background:linear-gradient(135deg,#064e3b,#065f46,#047857);border-radius:14px;padding:18px 20px;margin-bottom:16px;color:white;text-align:center">
-    <div style="font-size:22px;font-weight:900;letter-spacing:1px">🌍 2026 世界盃 32強</div>
-    <div style="font-size:13px;opacity:0.85;margin-top:4px">三場完整分析報告｜台灣時間 06/30（一）</div>
-    <div style="display:flex;justify-content:center;gap:10px;margin-top:12px;flex-wrap:wrap">
-      <div style="background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 14px;font-size:12px">🕐 01:00 巴西 vs 日本</div>
-      <div style="background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 14px;font-size:12px">🕓 04:30 德國 vs 巴拉圭</div>
-      <div style="background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 14px;font-size:12px">🕘 09:00 荷蘭 vs 摩洛哥</div>
-    </div>
-  </div>
-
-  <!-- Match selector -->
-  <div style="display:flex;gap:8px;margin-bottom:14px">
-    <button id="wc-btn-1" onclick="switchWcMatch(1)" class="copy-ptab" style="flex:1;background:#065f46;color:white;border-color:#065f46;font-weight:700">🇧🇷 巴西 vs 日本 🇯🇵</button>
-    <button id="wc-btn-2" onclick="switchWcMatch(2)" class="copy-ptab" style="flex:1">🇩🇪 德國 vs 巴拉圭 🇵🇾</button>
-    <button id="wc-btn-3" onclick="switchWcMatch(3)" class="copy-ptab" style="flex:1">🇳🇱 荷蘭 vs 摩洛哥 🇲🇦</button>
-  </div>
-
-  <!-- ── 場一：巴西 vs 日本 ── -->
-  <div id="wc-match-1">
-
-    <!-- 場次 header -->
-    <div style="background:linear-gradient(135deg,#1e3a5f,#1d4ed8);border-radius:12px;padding:14px 18px;margin-bottom:12px;color:white">
-      <div style="font-size:11px;opacity:0.75;margin-bottom:4px">場一｜台灣時間 01:00｜NRG Stadium, 休士頓</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:16px">
-        <div style="text-align:center"><div style="font-size:32px">🇧🇷</div><div style="font-weight:800;font-size:15px">巴西</div><div style="font-size:10px;opacity:0.75">FIFA #5</div></div>
-        <div style="font-size:22px;font-weight:900;opacity:0.9">VS</div>
-        <div style="text-align:center"><div style="font-size:32px">🇯🇵</div><div style="font-weight:800;font-size:15px">日本</div><div style="font-size:10px;opacity:0.75">FIFA #17</div></div>
-      </div>
-    </div>
-
-    <!-- 預測比分 -->
-    <div class="card" style="margin-bottom:10px">
-      <div class="card-head"><div class="card-title">🎯 預測比分</div></div>
-      <div class="card-body" style="padding-top:6px">
-        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;margin-bottom:10px">
-          <div style="font-size:18px">🥇</div>
-          <div><div style="font-weight:700;font-size:13px">巴西 1:0</div><div style="font-size:11px;color:var(--sub)">最大概率</div></div>
-          <div style="font-size:18px;font-weight:800;color:#16a34a">~30%</div>
-        </div>
-        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;margin-bottom:10px">
-          <div style="font-size:18px">🥈</div>
-          <div><div style="font-weight:700;font-size:13px">1:1 加時，巴西PK晉級</div><div style="font-size:11px;color:var(--sub)">次概率</div></div>
-          <div style="font-size:18px;font-weight:800;color:#0891b2">~25%</div>
-        </div>
-        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;margin-bottom:12px">
-          <div style="font-size:18px">🥉</div>
-          <div><div style="font-weight:700;font-size:13px">巴西 2:1</div><div style="font-size:11px;color:var(--sub)">第三情境</div></div>
-          <div style="font-size:18px;font-weight:800;color:#d97706">~18%</div>
-        </div>
-        <div style="background:#f0fdf4;border-radius:8px;padding:10px 12px;font-size:12px;color:#065f46;border-left:3px solid #16a34a">
-          📊 <b>盤口確認：</b>小(2.5)被壓到0.69，是三場中最強的小分信號。預測低分、緊湊、巴西最終晉級但不輕鬆。
-        </div>
-      </div>
-    </div>
-
-    <!-- 球隊分析 -->
-    <div class="card" style="margin-bottom:10px">
-      <div class="card-head"><div class="card-title">⚔️ 球隊分析</div></div>
-      <div class="card-body">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <!-- 巴西 -->
-          <div style="background:#fef9c3;border-radius:10px;padding:12px">
-            <div style="font-weight:800;font-size:14px;margin-bottom:2px">🇧🇷 巴西（五星桑巴軍團）</div>
-            <div style="font-size:11px;color:var(--sub);margin-bottom:8px">FIFA #5｜4-2-3-1｜教練：Ancelotti</div>
-            <div style="font-size:12px;line-height:1.7">
-              <div style="font-weight:700;color:#92400e;margin-bottom:3px">小組賽</div>
-              <div>平摩洛哥1:1 → 勝海地3:0 → 勝蘇格蘭3:0，C組第一</div>
-              <div style="margin-top:6px;font-weight:700;color:#92400e">亮點</div>
-              <div>Vinicius 小組賽3場全進球，繼承1970/94/2002奪冠先例</div>
-              <div style="margin-top:6px;font-weight:700;color:#dc2626">⚠️ 傷兵/警告</div>
-              <div>Raphinha傷缺；Neymar替補待命；Casemiro、Danilo各持1黃</div>
-            </div>
-          </div>
-          <!-- 日本 -->
-          <div style="background:#dbeafe;border-radius:10px;padding:12px">
-            <div style="font-weight:800;font-size:14px;margin-bottom:2px">🇯🇵 日本（武士藍）</div>
-            <div style="font-size:11px;color:var(--sub);margin-bottom:8px">FIFA #17｜3-4-2-1｜教練：森保一</div>
-            <div style="font-size:12px;line-height:1.7">
-              <div style="font-weight:700;color:#1d4ed8;margin-bottom:3px">小組賽</div>
-              <div>2:2平荷蘭 → 4:0勝突尼西亞 → 1:1平瑞典，5分第二出線</div>
-              <div style="margin-top:6px;font-weight:700;color:#1d4ed8">心理優勢</div>
-              <div>去年10月曾3:2逆轉擊敗巴西（曾0:2落後），Ueda打進制勝球</div>
-              <div style="margin-top:6px;font-weight:700;color:#dc2626">⚠️ 傷兵</div>
-              <div>Kubo膝傷幾乎確定缺席；Endo傷前未入選名單</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 走向分析 -->
-    <div class="card" style="margin-bottom:10px">
-      <div class="card-head"><div class="card-title">📈 比賽走向分析</div></div>
-      <div class="card-body">
-        <div style="background:#fef3c7;border-radius:8px;padding:10px;margin-bottom:10px;font-size:12px;color:#92400e;font-weight:600">
-          核心矛盾：雙方反擊時最危險——巴西靠個人技術，日本靠整體壓搶。前段很可能是試探性開局。
-        </div>
-        <div style="display:flex;flex-direction:column;gap:7px;font-size:12px">
-          <div style="display:flex;gap:10px;align-items:flex-start"><div style="background:#1d4ed8;color:white;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">0-30'</div><div>巴西控球試探日本3後衛防線，Vinicius找左路空間；日本後腰吸球後快速直傳找Ueda</div></div>
-          <div style="display:flex;gap:10px;align-items:flex-start"><div style="background:#0891b2;color:white;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">30-60'</div><div>巴西若未能破門，進攻耐心受考驗；日本靠Kamada在第二檔位製造威脅</div></div>
-          <div style="display:flex;gap:10px;align-items:flex-start"><div style="background:#7c3aed;color:white;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">60-90'</div><div>若比數持平，巴西換上Neymar製造亂局；日本若落後，展開殊死反攻</div></div>
-        </div>
-        <div style="background:#f0fdf4;border-radius:8px;padding:8px 12px;margin-top:10px;font-size:12px;color:#065f46">
-          🔑 <b>關鍵變數：</b>Kubo缺陣令日本進攻選擇減少；定位球進球概率比配合球更高
-        </div>
-      </div>
-    </div>
-
-    <!-- 焦點球星 -->
-    <div class="card">
-      <div class="card-head"><div class="card-title">⭐ 焦點球星</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
-          <div style="background:linear-gradient(90deg,#16a34a,#15803d);padding:8px 12px;color:white;font-weight:800;font-size:13px">🇧🇷 比尼修斯·朱尼奧 Vinícius Júnior <span style="font-size:10px;opacity:0.8;font-weight:400">左翼｜皇家馬德里｜25歲</span></div>
-          <div style="padding:10px 12px;font-size:12px;line-height:1.7;color:var(--text)">出身里約貧民區，2024年榮獲FIFA最佳球員獎。本屆小組賽3場全部進球，在Ancelotti體系下不只邊路突破，也能中路殺入和頭球得分，是巴西本屆最完整的進攻武器。</div>
-        </div>
-        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
-          <div style="background:linear-gradient(90deg,#16a34a,#15803d);padding:8px 12px;color:white;font-weight:800;font-size:13px">🇧🇷 馬特烏斯·庫尼亞 Matheus Cunha <span style="font-size:10px;opacity:0.8;font-weight:400">中鋒｜曼聯｜26歲</span></div>
-          <div style="padding:10px 12px;font-size:12px;line-height:1.7;color:var(--text)">後兩場先發合計進3球，是Ancelotti最信賴的首發中鋒。本屆成為繼2018年Coutinho後首位在世界盃前兩次先發均進球的巴西球員，禁區嗅球能力出色。</div>
-        </div>
-        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
-          <div style="background:linear-gradient(90deg,#dc2626,#b91c1c);padding:8px 12px;color:white;font-weight:800;font-size:13px">🇯🇵 鎌田大地 Daichi Kamada <span style="font-size:10px;opacity:0.8;font-weight:400">前腰｜水晶宮｜28歲</span></div>
-          <div style="padding:10px 12px;font-size:12px;line-height:1.7;color:var(--text)">日本本屆進攻大腦，小組賽對荷蘭88分鐘打進扳平球，展現大場面冷靜。能在密集空間持球轉身、分球、射門，是日本抗衡巴西後腰防線的最大希望。</div>
-        </div>
-        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
-          <div style="background:linear-gradient(90deg,#dc2626,#b91c1c);padding:8px 12px;color:white;font-weight:800;font-size:13px">🇯🇵 植田直通 Ayase Ueda <span style="font-size:10px;opacity:0.8;font-weight:400">中鋒｜費耶諾德｜26歲</span></div>
-          <div style="padding:10px 12px;font-size:12px;line-height:1.7;color:var(--text)">去年10月逆轉巴西的制勝球得主，本屆對突尼西亞已連進兩球，是日本最鋒利的終結者。身體對抗強、搶點能力出色，若日本要創造歷史，他的進球不可或缺。</div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- end wc-match-1 -->
-
-  <!-- ── 場二：德國 vs 巴拉圭 ── -->
-  <div id="wc-match-2" style="display:none">
-
-    <div style="background:linear-gradient(135deg,#1c1917,#292524);border-radius:12px;padding:14px 18px;margin-bottom:12px;color:white">
-      <div style="font-size:11px;opacity:0.75;margin-bottom:4px">場二｜台灣時間 04:30｜Gillette Stadium, 波士頓</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:16px">
-        <div style="text-align:center"><div style="font-size:32px">🇩🇪</div><div style="font-weight:800;font-size:15px">德國</div><div style="font-size:10px;opacity:0.75">FIFA #4</div></div>
-        <div style="font-size:22px;font-weight:900;opacity:0.9">VS</div>
-        <div style="text-align:center"><div style="font-size:32px">🇵🇾</div><div style="font-weight:800;font-size:15px">巴拉圭</div><div style="font-size:10px;opacity:0.75">FIFA #57</div></div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom:10px">
-      <div class="card-head"><div class="card-title">🎯 預測比分</div></div>
-      <div class="card-body" style="padding-top:6px">
-        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;margin-bottom:10px">
-          <div style="font-size:18px">🥇</div>
-          <div><div style="font-weight:700;font-size:13px">德國 2:0</div><div style="font-size:11px;color:var(--sub)">最大概率</div></div>
-          <div style="font-size:18px;font-weight:800;color:#16a34a">~35%</div>
-        </div>
-        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;margin-bottom:10px">
-          <div style="font-size:18px">🥈</div>
-          <div><div style="font-weight:700;font-size:13px">德國 1:0</div><div style="font-size:11px;color:var(--sub)">次概率</div></div>
-          <div style="font-size:18px;font-weight:800;color:#0891b2">~25%</div>
-        </div>
-        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;margin-bottom:12px">
-          <div style="font-size:18px">🥉</div>
-          <div><div style="font-weight:700;font-size:13px">德國 2:1</div><div style="font-size:11px;color:var(--sub)">第三情境</div></div>
-          <div style="font-size:18px;font-weight:800;color:#d97706">~15%</div>
-        </div>
-        <div style="background:#fff7ed;border-radius:8px;padding:10px 12px;font-size:12px;color:#9a3412;border-left:3px solid #f97316">
-          ⚠️ <b>盤口陷阱：</b>德國讓-1.75球，德國只贏1球→巴拉圭亞盤全贏。預測德國贏2球，但讓-1.75仍是陷阱。
-        </div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom:10px">
-      <div class="card-head"><div class="card-title">⚔️ 球隊分析</div></div>
-      <div class="card-body">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div style="background:#f1f5f9;border-radius:10px;padding:12px">
-            <div style="font-weight:800;font-size:14px;margin-bottom:2px">🇩🇪 德國（日耳曼戰車）</div>
-            <div style="font-size:11px;color:var(--sub);margin-bottom:8px">FIFA #4｜4-2-3-1｜教練：Nagelsmann</div>
-            <div style="font-size:12px;line-height:1.7">
-              <div style="font-weight:700;color:#475569;margin-bottom:3px">小組賽</div>
-              <div>7:1大勝庫拉索 → 2:1逆轉科特迪瓦 → 1:2負厄瓜多（已提前晉級）</div>
-              <div style="margin-top:6px;font-weight:700;color:#475569">核心武器</div>
-              <div>Wirtz+Musiala+Sané三人組合，本屆最令人期待的中場</div>
-              <div style="margin-top:6px;font-weight:700;color:#dc2626">⚠️ 傷兵</div>
-              <div>主力中衛Schlotterbeck傷退；Brown輕傷待確認</div>
-            </div>
-          </div>
-          <div style="background:#fce7f3;border-radius:10px;padding:12px">
-            <div style="font-weight:800;font-size:14px;margin-bottom:2px">🇵🇾 巴拉圭（白紅軍）</div>
-            <div style="font-size:11px;color:var(--sub);margin-bottom:8px">FIFA #57｜4-4-2｜教練：Alfaro</div>
-            <div style="font-size:12px;line-height:1.7">
-              <div style="font-weight:700;color:#9d174d;margin-bottom:3px">小組賽</div>
-              <div>1:4慘敗美國 → 1:0勝土耳其（10人守住）→ 0:0平澳洲，4分第三驚險出線</div>
-              <div style="margin-top:6px;font-weight:700;color:#9d174d">戰術</div>
-              <div>極端縮後烏龜流，對土耳其讓對方32次射門仍守住1:0</div>
-              <div style="margin-top:6px;font-weight:700;color:#16a34a">利多</div>
-              <div>Almiron解禁復歸</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom:10px">
-      <div class="card-head"><div class="card-title">📈 比賽走向分析</div></div>
-      <div class="card-body">
-        <div style="background:#f1f5f9;border-radius:8px;padding:10px;margin-bottom:10px;font-size:12px;color:#334155;font-weight:600">
-          本日強弱最鮮明場次。巴拉圭毫無懸念縮後，讓德國控球進攻。Wirtz和Musiala的半空間連動是最有效的拆解武器。
-        </div>
-        <div style="display:flex;flex-direction:column;gap:7px;font-size:12px">
-          <div style="display:flex;gap:10px;align-items:flex-start"><div style="background:#374151;color:white;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">上半場</div><div>德國大量傳切，Musiala持球突破試探；巴拉圭整體不動搖，等待反擊</div></div>
-          <div style="display:flex;gap:10px;align-items:flex-start"><div style="background:#374151;color:white;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">破門點</div><div>定位球（Musiala、Wirtz主罰）、Havertz禁區內轉身、Sané右路傳中</div></div>
-          <div style="display:flex;gap:10px;align-items:flex-start"><div style="background:#374151;color:white;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">警告</div><div>Almiron復歸帶來速度威脅，若德國過度壓上，偷一個反擊球完全可能</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-head"><div class="card-title">⭐ 焦點球星</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
-          <div style="background:linear-gradient(90deg,#374151,#1f2937);padding:8px 12px;color:white;font-weight:800;font-size:13px">🇩🇪 弗洛里安·維爾茨 Florian Wirtz <span style="font-size:10px;opacity:0.8;font-weight:400">左翼/前腰｜利物浦｜23歲</span></div>
-          <div style="padding:10px 12px;font-size:12px;line-height:1.7">與Musiala前場連動被視為德國最大武器，兩人擅長在密集防守中找半空間滲透。利物浦首季紮實，小組賽尚未完全爆發，本場是展現真正能量的時刻。</div>
-        </div>
-        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
-          <div style="background:linear-gradient(90deg,#374151,#1f2937);padding:8px 12px;color:white;font-weight:800;font-size:13px">🇩🇪 雅馬爾·穆西亞拉 Jamal Musiala <span style="font-size:10px;opacity:0.8;font-weight:400">前腰｜拜仁｜22歲</span></div>
-          <div style="padding:10px 12px;font-size:12px;line-height:1.7">從骨折完全恢復，Nagelsmann稱他即使95%狀態仍是世界頂級。帶球突破和狹窄空間技術處理是本場對付巴拉圭縮後防守的最有效武器。</div>
-        </div>
-        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
-          <div style="background:linear-gradient(90deg,#be123c,#9f1239);padding:8px 12px;color:white;font-weight:800;font-size:13px">🇵🇾 米格爾·阿爾米隆 Miguel Almirón <span style="font-size:10px;opacity:0.8;font-weight:400">右翼｜自由球員｜32歲</span></div>
-          <div style="padding:10px 12px;font-size:12px;line-height:1.7">巴拉圭絕對核心，因對土耳其衝突紅牌停賽一場後本場復歸。他的速度與突破是巴拉圭唯一真正的進攻威脅，也是能否意外搶分的最大關鍵。</div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- end wc-match-2 -->
-
-  <!-- ── 場三：荷蘭 vs 摩洛哥 ── -->
-  <div id="wc-match-3" style="display:none">
-
-    <div style="background:linear-gradient(135deg,#7c2d12,#9a3412);border-radius:12px;padding:14px 18px;margin-bottom:12px;color:white">
-      <div style="font-size:11px;opacity:0.75;margin-bottom:4px">場三｜台灣時間 09:00｜Estadio BBVA, 蒙特雷（墨西哥）</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:16px">
-        <div style="text-align:center"><div style="font-size:32px">🇳🇱</div><div style="font-weight:800;font-size:15px">荷蘭</div><div style="font-size:10px;opacity:0.75">FIFA #8</div></div>
-        <div style="font-size:22px;font-weight:900;opacity:0.9">VS</div>
-        <div style="text-align:center"><div style="font-size:32px">🇲🇦</div><div style="font-weight:800;font-size:15px">摩洛哥</div><div style="font-size:10px;opacity:0.75">FIFA #6</div></div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom:10px">
-      <div class="card-head"><div class="card-title">🎯 預測比分</div></div>
-      <div class="card-body" style="padding-top:6px">
-        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;margin-bottom:10px">
-          <div style="font-size:18px">🥇</div>
-          <div><div style="font-weight:700;font-size:13px">1:1 加時決勝</div><div style="font-size:11px;color:var(--sub)">最大概率</div></div>
-          <div style="font-size:18px;font-weight:800;color:#16a34a">~30%</div>
-        </div>
-        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;margin-bottom:10px">
-          <div style="font-size:18px">🥈</div>
-          <div><div style="font-weight:700;font-size:13px">荷蘭 1:0</div><div style="font-size:11px;color:var(--sub)">次概率</div></div>
-          <div style="font-size:18px;font-weight:800;color:#0891b2">~22%</div>
-        </div>
-        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;margin-bottom:12px">
-          <div style="font-size:18px">🥉</div>
-          <div><div style="font-weight:700;font-size:13px">摩洛哥 1:0</div><div style="font-size:11px;color:var(--sub)">第三情境</div></div>
-          <div style="font-size:18px;font-weight:800;color:#d97706">~18%</div>
-        </div>
-        <div style="background:#fdf2f8;border-radius:8px;padding:10px 12px;font-size:12px;color:#9d174d;border-left:3px solid #ec4899">
-          💡 <b>盤口信號：</b>大(2平)壓低@0.660，小(2.5)@0.73——三場中小分信號最清晰。摩洛哥賠率從2.60降到2.50，聰明錢流入。
-        </div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom:10px">
-      <div class="card-head"><div class="card-title">⚔️ 球隊分析</div></div>
-      <div class="card-body">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div style="background:#fff7ed;border-radius:10px;padding:12px">
-            <div style="font-weight:800;font-size:14px;margin-bottom:2px">🇳🇱 荷蘭（橙色軍團）</div>
-            <div style="font-size:11px;color:var(--sub);margin-bottom:8px">FIFA #8｜4-3-3｜教練：Koeman</div>
-            <div style="font-size:12px;line-height:1.7">
-              <div style="font-weight:700;color:#c2410c;margin-bottom:3px">小組賽</div>
-              <div>2:2平日本 → 5:1大勝瑞典 → 3:1勝突尼西亞，9分F組第一</div>
-              <div style="margin-top:6px;font-weight:700;color:#c2410c">亮點</div>
-              <div>10球來自僅5.24的xG，臨床效率驚人；Brobbey 3球領銜</div>
-              <div style="margin-top:6px;font-weight:700;color:#dc2626">⚠️ 隱憂</div>
-              <div>近7場無法保持零失球，防線結構不穩定</div>
-            </div>
-          </div>
-          <div style="background:#f0fdf4;border-radius:10px;padding:12px">
-            <div style="font-weight:800;font-size:14px;margin-bottom:2px">🇲🇦 摩洛哥（阿特拉斯雄獅）</div>
-            <div style="font-size:11px;color:var(--sub);margin-bottom:8px">FIFA #6｜4-2-3-1｜教練：Ouahbi</div>
-            <div style="font-size:12px;line-height:1.7">
-              <div style="font-weight:700;color:#065f46;margin-bottom:3px">小組賽</div>
-              <div>1:1平巴西 → 1:0勝蘇格蘭 → 4:2勝海地（兩度落後逆轉），7分C組第二</div>
-              <div style="margin-top:6px;font-weight:700;color:#065f46">里程碑</div>
-              <div>Hakimi本場第100帽；Saibari三場全進球；不敗紀錄延伸至32場</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-bottom:10px">
-      <div class="card-head"><div class="card-title">📈 比賽走向分析</div></div>
-      <div class="card-body">
-        <div style="background:#fdf4ff;border-radius:8px;padding:10px;margin-bottom:10px;font-size:12px;color:#6b21a8;font-weight:600">
-          核心對決：Hakimi右路前插 vs Gakpo防守工作——誰在這條邊路勝出，誰很可能贏得全場。
-        </div>
-        <div style="display:flex;flex-direction:column;gap:7px;font-size:12px">
-          <div style="display:flex;gap:10px;align-items:flex-start"><div style="background:#ea580c;color:white;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">上半場</div><div>雙方謹慎開局，互相試探。荷蘭控球，摩洛哥中低位防守等機會</div></div>
-          <div style="display:flex;gap:10px;align-items:flex-start"><div style="background:#ea580c;color:white;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">下半場</div><div>Brobbey爭頂製造混亂，Gakpo和Malen輪流插上；摩洛哥Saibari找空間跑位反擊</div></div>
-          <div style="display:flex;gap:10px;align-items:flex-start"><div style="background:#7c3aed;color:white;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">加時</div><div>市場共識1:1進加時比例最高；摩洛哥門將Bounou是PK戰關鍵，大場面表現極出色</div></div>
-        </div>
-        <div style="background:#fef3c7;border-radius:8px;padding:8px 12px;margin-top:10px;font-size:12px;color:#92400e">
-          📊 <b>最終判斷：</b>這場比荷蘭-0.5讓球顯示的更接近，任何結果都不奇怪
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-head"><div class="card-title">⭐ 焦點球星</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
-          <div style="background:linear-gradient(90deg,#ea580c,#c2410c);padding:8px 12px;color:white;font-weight:800;font-size:13px">🇳🇱 維吉爾·范戴克 Virgil van Dijk <span style="font-size:10px;opacity:0.8;font-weight:400">中衛隊長｜利物浦｜33歲</span></div>
-          <div style="padding:10px 12px;font-size:12px;line-height:1.7">荷蘭防線靈魂人物，制空能力和組織防線的領袖氣質是荷蘭能否守住摩洛哥快攻的關鍵。面對Saibari跑位和Hakimi前插，指揮調度比個人對抗更為重要。</div>
-        </div>
-        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
-          <div style="background:linear-gradient(90deg,#ea580c,#c2410c);padding:8px 12px;color:white;font-weight:800;font-size:13px">🇳🇱 科迪·加克波 Cody Gakpo <span style="font-size:10px;opacity:0.8;font-weight:400">左翼｜利物浦｜25歲</span></div>
-          <div style="padding:10px 12px;font-size:12px;line-height:1.7">本屆最穩定進攻威脅，小組賽2球1助攻。本場最關鍵的雙向球員——進攻需找Bounou漏洞，防守需盯死Hakimi前插，任一失守都可能改變全場走向。</div>
-        </div>
-        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
-          <div style="background:linear-gradient(90deg,#15803d,#166534);padding:8px 12px;color:white;font-weight:800;font-size:13px">🇲🇦 阿什拉夫·哈基米 Achraf Hakimi <span style="font-size:10px;opacity:0.8;font-weight:400">右後衛隊長｜巴黎聖日耳曼｜27歲</span></div>
-          <div style="padding:10px 12px;font-size:12px;line-height:1.7">本場迎來第100帽里程碑，是摩洛哥連結防守與進攻最核心的角色。本屆已創造21次進攻機會，是1966年以來非洲球員在世界盃創造機會最多的第二名。</div>
-        </div>
-        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
-          <div style="background:linear-gradient(90deg,#15803d,#166534);padding:8px 12px;color:white;font-weight:800;font-size:13px">🇲🇦 以斯馬艾·薩巴里 Ismael Saibari <span style="font-size:10px;opacity:0.8;font-weight:400">前鋒｜PSV→拜仁｜24歲</span></div>
-          <div style="padding:10px 12px;font-size:12px;line-height:1.7">三場小組賽場場進球，已是摩洛哥單屆世界盃進球最多紀錄保持者。在荷蘭效力的他對荷甲風格知根知底。本場再進一球，將追平非洲球員單屆世界盃進球歷史紀錄。</div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- end wc-match-3 -->
-
+<!-- Sport sub-tabs -->
+<div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px">
+  <button id="stab-soccer" class="market-sub active" onclick="switchSportTab('soccer')">⚽ 世足</button>
+  <button id="stab-nba"    class="market-sub"        onclick="switchSportTab('nba')">🏀 NBA</button>
+  <button id="stab-mlb"    class="market-sub"        onclick="switchSportTab('mlb')">⚾ MLB</button>
+  <button id="stab-nfl"    class="market-sub"        onclick="switchSportTab('nfl')">🏈 NFL</button>
 </div>
+
+<!-- ⚽ 世足 -->
+<div id="svw-soccer">
+  <div style="font-size:11px;color:var(--sub);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+    <span>⚽ 世界盃 · ESPN Soccer</span>
+    <button onclick="reloadSportNews('soccer')" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer">↺ 重新整理</button>
+  </div>
+  <div id="sport-news-soccer"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+</div>
+
+<!-- 🏀 NBA -->
+<div id="svw-nba" style="display:none">
+  <div style="font-size:11px;color:var(--sub);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+    <span>🏀 NBA · ESPN</span>
+    <button onclick="reloadSportNews('nba')" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer">↺ 重新整理</button>
+  </div>
+  <div id="sport-news-nba"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+</div>
+
+<!-- ⚾ MLB -->
+<div id="svw-mlb" style="display:none">
+  <div style="font-size:11px;color:var(--sub);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+    <span>⚾ MLB · ESPN</span>
+    <button onclick="reloadSportNews('mlb')" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer">↺ 重新整理</button>
+  </div>
+  <div id="sport-news-mlb"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+</div>
+
+<!-- 🏈 NFL -->
+<div id="svw-nfl" style="display:none">
+  <div style="font-size:11px;color:var(--sub);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+    <span>🏈 NFL · ESPN</span>
+    <button onclick="reloadSportNews('nfl')" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer">↺ 重新整理</button>
+  </div>
+  <div id="sport-news-nfl"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+</div>
+
 </div><!-- end panel-wc -->
-
-</div>
-
-</div>
 <script>
 // ── DATE ──
 const NOW = new Date();
@@ -2022,6 +1717,59 @@ function switchTab(name) {
   if (name === 'retire') { try { retPlan(); } catch(e){} }
   try { localStorage.setItem('activeTab', name); } catch(e) {}
   history.replaceState(null, '', '#' + name);
+  if (name === 'wc' && !_sportNewsLoaded['soccer']) loadSportNews('soccer');
+}
+
+// ── 體育新聞 ──
+var _sportNewsLoaded = {};
+var _sportNewsCache  = {};
+
+var SPORT_RSS = {
+  soccer: 'https://www.espn.com/espn/rss/soccer/news',
+  nba:    'https://www.espn.com/espn/rss/nba/news',
+  mlb:    'https://www.espn.com/espn/rss/mlb/news',
+  nfl:    'https://www.espn.com/espn/rss/nfl/news',
+};
+var SPORT_LABELS = { soccer:'⚽ 世足', nba:'🏀 NBA', mlb:'⚾ MLB', nfl:'🏈 NFL' };
+
+function switchSportTab(sport) {
+  ['soccer','nba','mlb','nfl'].forEach(s => {
+    document.getElementById('svw-'+s).style.display = s===sport ? '' : 'none';
+    document.getElementById('stab-'+s).classList.toggle('active', s===sport);
+  });
+  if (!_sportNewsLoaded[sport]) loadSportNews(sport);
+}
+
+function reloadSportNews(sport) {
+  _sportNewsLoaded[sport] = false;
+  loadSportNews(sport);
+}
+
+async function loadSportNews(sport) {
+  var el = document.getElementById('sport-news-'+sport);
+  if (!el) return;
+  el.innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
+  try {
+    var proxy = 'https://api.rss2json.com/v1/api.json?count=12&rss_url=';
+    var url   = proxy + encodeURIComponent(SPORT_RSS[sport]);
+    var res   = await fetch(url);
+    var data  = await res.json();
+    if (data.status !== 'ok' || !data.items || !data.items.length) throw new Error('empty');
+    el.innerHTML = data.items.map(function(item) {
+      var d = item.pubDate ? new Date(item.pubDate) : null;
+      var dt = d ? (d.getMonth()+1)+'/'+ d.getDate()+' '+ String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0') : '';
+      var desc = (item.description||'').replace(/<[^>]+>/g,'').slice(0,80);
+      return '<div style="background:var(--card);border-radius:12px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
+        +'<div style="padding:12px 14px">'
+        +'<a href="'+(item.link||'#')+'" target="_blank" rel="noopener" style="font-size:14px;font-weight:700;color:var(--text);text-decoration:none;line-height:1.5;display:block;margin-bottom:4px">'+item.title+'</a>'
+        +(desc ? '<div style="font-size:12px;color:var(--sub);line-height:1.6;margin-bottom:6px">'+desc+'…</div>' : '')
+        +'<div style="font-size:11px;color:var(--sub)">'+dt+'</div>'
+        +'</div></div>';
+    }).join('');
+    _sportNewsLoaded[sport] = true;
+  } catch(e) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--sub);font-size:13px">新聞載入失敗，請點↺重新整理</div>';
+  }
 }
 
 // ── COPY UTILS ──
