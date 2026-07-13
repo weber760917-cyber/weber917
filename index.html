@@ -300,7 +300,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 
   <!-- ── 新聞子分頁 ── -->
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-    <button id="ntab-wc"     class="market-sub active" onclick="switchNSub('nview-wc','ntab-wc')">⚽ 世界盃</button>
+    
     <button id="ntab-tw"     class="market-sub"        onclick="switchNSub('nview-tw','ntab-tw')">🇹🇼 台股新聞</button>
     <button id="ntab-us"     class="market-sub"        onclick="switchNSub('nview-us','ntab-us')">🇺🇸 美股新聞</button>
   </div>
@@ -3394,7 +3394,7 @@ async function loadWCBracket() {
     { label:'八強', color:'#b45309', count:4, matches:[
       {a:'🇫🇷 法國',   b:'🇲🇦 摩洛哥',  dt:'7/10 04:00'},
       {a:'🇪🇸 西班牙', b:'🇧🇪 比利時',  dt:'7/11 03:00'},
-      {a:'🇳🇴 挪威',   b:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格蘭',  dt:'7/12 05:00'},
+      {a:'🇳🇴 挪威',   b:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格蘭',  sa:1, sb:2, done:true, aet:true},
       {a:'🇦🇷 阿根廷', b:'🇨🇭 瑞士',       sa:3, sb:1, done:true, aet:true},
     ]},
     { label:'四強', color:'#be123c', count:2, matches:[
