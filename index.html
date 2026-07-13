@@ -291,7 +291,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <div class="tab" onclick="switchTab('about')">👤 關於我</div>
     <div class="tab" onclick="switchTab('market')">📈 今日行情</div>
     <div class="tab" onclick="switchTab('copy')">✍️ 社群文案</div>
-    <div class="tab" onclick="switchTab('wc')">🏆 體育</div>
   </div>
 </div>
 
@@ -357,6 +356,38 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       <div class="card-body" id="us-news-tab"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
     </div>
   </div><!-- /nview-us -->
+
+  <div id="nview-soccer" style="display:none">
+    <div style="font-size:11px;color:var(--sub);margin:8px 0 10px;display:flex;justify-content:space-between">
+      <span>⚽ 世足 · ESPN Soccer</span>
+      <button onclick="reloadSportNews('soccer')" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer">↺ 重整</button>
+    </div>
+    <div id="sport-news-soccer"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+  </div>
+
+  <div id="nview-nba" style="display:none">
+    <div style="font-size:11px;color:var(--sub);margin:8px 0 10px;display:flex;justify-content:space-between">
+      <span>🏀 NBA · ESPN</span>
+      <button onclick="reloadSportNews('nba')" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer">↺ 重整</button>
+    </div>
+    <div id="sport-news-nba"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+  </div>
+
+  <div id="nview-mlb" style="display:none">
+    <div style="font-size:11px;color:var(--sub);margin:8px 0 10px;display:flex;justify-content:space-between">
+      <span>⚾ MLB · ESPN</span>
+      <button onclick="reloadSportNews('mlb')" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer">↺ 重整</button>
+    </div>
+    <div id="sport-news-mlb"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+  </div>
+
+  <div id="nview-nfl" style="display:none">
+    <div style="font-size:11px;color:var(--sub);margin:8px 0 10px;display:flex;justify-content:space-between">
+      <span>🏈 NFL · ESPN</span>
+      <button onclick="reloadSportNews('nfl')" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer">↺ 重整</button>
+    </div>
+    <div id="sport-news-nfl"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
+  </div>
 
 
 
@@ -1606,53 +1637,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 </div>
 
 <!-- ===== TAB: 世界盃 ===== -->
-<div id="panel-wc" class="panel">
 
-<!-- Sport sub-tabs -->
-<div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px">
-  <button id="stab-soccer" class="market-sub active" onclick="switchSportTab('soccer')">⚽ 世足</button>
-  <button id="stab-nba"    class="market-sub"        onclick="switchSportTab('nba')">🏀 NBA</button>
-  <button id="stab-mlb"    class="market-sub"        onclick="switchSportTab('mlb')">⚾ MLB</button>
-  <button id="stab-nfl"    class="market-sub"        onclick="switchSportTab('nfl')">🏈 NFL</button>
-</div>
-
-<!-- ⚽ 世足 -->
-<div id="svw-soccer">
-  <div style="font-size:11px;color:var(--sub);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
-    <span>⚽ 世界盃 · ESPN Soccer</span>
-    <button onclick="reloadSportNews('soccer')" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer">↺ 重新整理</button>
-  </div>
-  <div id="sport-news-soccer"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
-</div>
-
-<!-- 🏀 NBA -->
-<div id="svw-nba" style="display:none">
-  <div style="font-size:11px;color:var(--sub);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
-    <span>🏀 NBA · ESPN</span>
-    <button onclick="reloadSportNews('nba')" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer">↺ 重新整理</button>
-  </div>
-  <div id="sport-news-nba"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
-</div>
-
-<!-- ⚾ MLB -->
-<div id="svw-mlb" style="display:none">
-  <div style="font-size:11px;color:var(--sub);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
-    <span>⚾ MLB · ESPN</span>
-    <button onclick="reloadSportNews('mlb')" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer">↺ 重新整理</button>
-  </div>
-  <div id="sport-news-mlb"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
-</div>
-
-<!-- 🏈 NFL -->
-<div id="svw-nfl" style="display:none">
-  <div style="font-size:11px;color:var(--sub);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
-    <span>🏈 NFL · ESPN</span>
-    <button onclick="reloadSportNews('nfl')" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer">↺ 重新整理</button>
-  </div>
-  <div id="sport-news-nfl"><div class="loading-row"><span class="spin">⟳</span> 載入中…</div></div>
-</div>
-
-</div><!-- end panel-wc -->
 <script>
 // ── DATE ──
 const NOW = new Date();
@@ -1706,7 +1691,7 @@ function switchMSub(view, btnId) {
 }
 
 function switchTab(name) {
-  const names = ['stories','news','retire','about','market','copy','wc'];
+  const names = ['stories','news','retire','about','market','copy'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
@@ -1717,7 +1702,6 @@ function switchTab(name) {
   if (name === 'retire') { try { retPlan(); } catch(e){} }
   try { localStorage.setItem('activeTab', name); } catch(e) {}
   history.replaceState(null, '', '#' + name);
-  if (name === 'wc' && !_sportNewsLoaded['soccer']) loadSportNews('soccer');
 }
 
 // ── 體育新聞 ──
@@ -4379,7 +4363,7 @@ function calcFund() {
       } else if (h === '#loan') {
         switchTab('retire');
         switchRetireSub('rview-loan','rtab-loan');
-      } else if (['#stories','#news','#retire','#about','#market','#copy','#wc'].indexOf(h) >= 0) {
+      } else if (['#stories','#news','#retire','#about','#market','#copy'].indexOf(h) >= 0) {
         switchTab(h.slice(1));
       }
     })();
