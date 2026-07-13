@@ -1674,9 +1674,8 @@ function switchRetireSub(view, btnId) {
 }
 
 function switchNSub(view, btnId) {
-  ['nview-wc','nview-tw','nview-us'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = id === view ? '' : 'none';
+  document.querySelectorAll('[id^="nview-"]').forEach(el => {
+    el.style.display = el.id === view ? '' : 'none';
   });
   document.querySelectorAll('[id^="ntab-"]').forEach(b => b.classList.remove('active'));
   const btn = document.getElementById(btnId);
@@ -3483,6 +3482,14 @@ async function fetchUDNNews(cate, count) {
   } catch(e) { console.error('fetchUDNNews error:', e); return []; }
 }
 
+async function fetchCteeNews(n) {
+  try {
+    const r = await fetch('/api/ctee?count=' + n);
+    if (!r.ok) throw new Error('ctee ' + r.status);
+    return await r.json();
+  } catch(e) { console.error('fetchCteeNews error:', e); return []; }
+}
+
 async function fetchCapNews(n) {
   try {
     const r = await fetch('/api/news?q=台股+投資&src=capital&n=' + n);
@@ -3499,11 +3506,11 @@ async function fetchCapNews(n) {
 }
 async function loadNewsTab() {
   loadWorldCup();
-  // 台股：UDN + 資本期貨，共10篇
+  // 台股：UDN + 工商時報 + 資本期貨，共10篇
   const twEl = document.getElementById('tw-news-tab');
   twEl.innerHTML = '<div class="loading-row"><span class="spin">⟳</span> 載入中…</div>';
-  Promise.all([fetchUDNNews('5590', 7), fetchCapNews(4)]).then(([a, b]) => {
-    const items = [...a, ...b].sort((x,y)=>(y.ts||0)-(x.ts||0)).slice(0,10);
+  Promise.all([fetchUDNNews('5590', 5), fetchCteeNews(4), fetchCapNews(2)]).then(([a, b, c]) => {
+    const items = [...a, ...b, ...c].sort((x,y)=>(y.ts||0)-(x.ts||0)).slice(0,10);
     twEl.innerHTML = items.length ? newsHTML(items) : '<div class="error-note">台股新聞暫無資料</div>';
   });
   // 美股 10篇
