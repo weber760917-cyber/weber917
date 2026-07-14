@@ -1003,6 +1003,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     </div>
   </div>
 
+  <!-- 配息再投入試算 -->
+  <div class="card" style="margin-bottom:14px" id="reinvest-card">
+    <div class="card-head">
+      <div class="card-title">💹 配息再投入試算</div>
+      <div style="font-size:13px;color:var(--sub);margin-top:3px">每月配息買入指定ETF的長期複利效果</div>
+    </div>
+    <div class="card-body">
+      <div style="font-size:12px;font-weight:700;color:var(--sub);letter-spacing:1px;margin-bottom:10px">選擇再投入標的</div>
+      <div id="reinvest-btns" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px"></div>
+      <div id="reinvest-result" style="color:var(--sub);font-size:13px;text-align:center;padding:10px">請先完成上方基金配置</div>
+    </div>
+  </div>
+
   <!-- 基金/ETF 即時資訊卡（收合在底部）-->
   <div class="card">
     <div class="card-head" onclick="toggleIncInfo()" style="cursor:pointer;user-select:none">
@@ -4563,6 +4576,7 @@ function initIncomeTab() {
       _incState[f.id] = { checked:f.id==='aling'||f.id==='brwt', alloc:f.id==='aling'?80:f.id==='brwt'?20:0, mode:f.defMode };
     });
   }
+  initReinvestBtns();
   renderIncomeFunds();
   calcIncome();
   fetchTwEtfPrices();
@@ -4603,6 +4617,132 @@ function updateIncTotalPct() {
 function incSetMode(id, mode) {
   if (_incState[id]) { _incState[id].mode = mode; renderIncomeFunds(); calcIncome(); }
 }
+
+// ── 配息再投入試算 ──
+var REINVEST_OPTS = [
+  { id:'none',  label:'不投入',  emoji:'💰', annReturn:0,    color:'#6b7280', desc:'配息存現金，不再投入' },
+  { id:'t0050', label:'0050',   emoji:'🇹🇼', annReturn:10.5, color:'#dc2626', desc:'元大台灣50，歷史年化約 10.5%' },
+  { id:'sp500', label:'S&P 500',emoji:'🇺🇸', annReturn:10.0, color:'#1d4ed8', desc:'美國大盤，歷史年化約 10%' },
+  { id:'qqq',   label:'QQQ',    emoji:'📡', annReturn:15.0, color:'#7c3aed', desc:'那斯達克100，歷史年化約 15%' },
+  { id:'vt',    label:'VT',     emoji:'🌍', annReturn:9.0,  color:'#059669', desc:'全球股市ETF，歷史年化約 9%' },
+  { id:'vwra',  label:'VWRA',   emoji:'🌐', annReturn:10.0, color:'#0891b2', desc:'全球股市累積型，歷史年化約 10%' },
+];
+var _reinvestSel = 'none';
+
+function initReinvestBtns() {
+  var el = document.getElementById('reinvest-btns');
+  if (!el) return;
+  el.innerHTML = REINVEST_OPTS.map(function(opt) {
+    return '<button onclick="setReinvest(\'' + opt.id + '\')" id="reinvest-btn-' + opt.id + '" title="' + opt.desc + '" ' +
+      'style="padding:7px 14px;border-radius:20px;border:2px solid #e5e7eb;background:white;font-size:13px;font-weight:600;cursor:pointer;color:#374151">' +
+      opt.emoji + ' ' + opt.label + '</button>';
+  }).join('');
+  setReinvest('none');
+}
+
+function setReinvest(id) {
+  _reinvestSel = id;
+  REINVEST_OPTS.forEach(function(opt) {
+    var btn = document.getElementById('reinvest-btn-' + opt.id);
+    if (!btn) return;
+    if (opt.id === id) {
+      btn.style.background = opt.color; btn.style.color = 'white'; btn.style.borderColor = opt.color;
+    } else {
+      btn.style.background = 'white'; btn.style.color = '#374151'; btn.style.borderColor = '#e5e7eb';
+    }
+  });
+  renderDivReinvest();
+}
+
+function renderDivReinvest() {
+  var el = document.getElementById('reinvest-result');
+  if (!el) return;
+  var principal = +((document.getElementById('inc-amt')||{}).value||0);
+  var checked = INCOME_FUNDS.filter(function(f){ return _incState[f.id]&&_incState[f.id].checked&&(_incState[f.id].alloc||0)>0; });
+  if (!checked.length || !principal) {
+    el.innerHTML = '<div style="text-align:center;color:var(--sub);font-size:13px;padding:10px">請先完成上方基金配置</div>';
+    return;
+  }
+  var opt = REINVEST_OPTS.find(function(o){ return o.id === _reinvestSel; }) || REINVEST_OPTS[0];
+  var r_mo = opt.annReturn > 0 ? Math.pow(1 + opt.annReturn/100, 1/12) - 1 : 0;
+  var periods = [5, 10, 20];
+
+  // y1 monthly dividend
+  var y1Monthly = 0;
+  checked.forEach(function(f) {
+    var s = _incState[f.id], V = principal*(s.alloc||0)/100;
+    if (!V || s.mode !== 'div') return;
+    y1Monthly += V * (f.divRate/100) / 12;
+  });
+
+  var cols = periods.map(function(yr) {
+    var totalCashDiv = 0, reinvestedFV = 0;
+    for (var y = 0; y < yr; y++) {
+      var monthlyDiv = 0;
+      checked.forEach(function(f) {
+        var s = _incState[f.id], V = principal*(s.alloc||0)/100;
+        if (!V || s.mode !== 'div') return;
+        monthlyDiv += V * Math.pow(1 + f.capRate/100, y) * (f.divRate/100) / 12;
+      });
+      totalCashDiv += monthlyDiv * 12;
+      for (var m = 0; m < 12; m++) {
+        var mLeft = (yr - y)*12 - m - 1;
+        reinvestedFV += monthlyDiv * (r_mo > 0 ? Math.pow(1+r_mo, mLeft) : 1);
+      }
+    }
+    return {
+      yr: yr,
+      totalCashDiv: Math.round(totalCashDiv),
+      reinvestedFV: Math.round(opt.annReturn > 0 ? reinvestedFV : totalCashDiv),
+      extra: Math.round(opt.annReturn > 0 ? reinvestedFV - totalCashDiv : 0)
+    };
+  });
+
+  var h = '';
+  h += '<div style="font-size:12px;color:var(--sub);margin-bottom:12px;padding:8px 10px;background:' +
+    (opt.annReturn>0?'#f0f9ff':'#f9fafb') + ';border-radius:8px;border-left:3px solid ' + opt.color + '">';
+  h += '💡 每月 <strong>' + incFmtP(Math.round(y1Monthly)) + '</strong> 配息';
+  h += opt.annReturn > 0
+    ? ' 全數買入 ' + opt.emoji + ' <strong>' + opt.label + '</strong>（假設年化 ' + opt.annReturn + '%，僅供參考）'
+    : '，<strong>存現金不再投入</strong>';
+  h += '</div>';
+
+  h += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:260px">';
+  h += '<thead><tr><th style="text-align:left;font-size:11px;color:var(--sub);padding:6px 6px;border-bottom:2px solid var(--border)">項目</th>';
+  cols.forEach(function(c) {
+    h += '<th style="text-align:center;font-size:13px;font-weight:800;color:var(--blue);padding:6px;border-bottom:2px solid var(--border)">' + c.yr + ' 年</th>';
+  });
+  h += '</tr></thead><tbody>';
+
+  // Row: 累積配息
+  h += '<tr><td style="font-size:12px;color:var(--sub);padding:9px 6px;border-bottom:1px solid var(--border)">💵 累積配息總額</td>';
+  cols.forEach(function(c) {
+    h += '<td style="text-align:center;font-size:13px;font-weight:700;color:#0891b2;padding:9px 6px;border-bottom:1px solid var(--border)">' + incFmtP(c.totalCashDiv) + '</td>';
+  });
+  h += '</tr>';
+
+  if (opt.annReturn > 0) {
+    // Row: 再投入ETF資產
+    h += '<tr><td style="font-size:12px;color:var(--sub);padding:9px 6px;border-bottom:1px solid var(--border)">' + opt.emoji + ' ' + opt.label + ' 資產價值</td>';
+    cols.forEach(function(c) {
+      h += '<td style="text-align:center;font-size:13px;font-weight:700;color:' + opt.color + ';padding:9px 6px;border-bottom:1px solid var(--border)">' + incFmtP(c.reinvestedFV) + '</td>';
+    });
+    h += '</tr>';
+    // Row: 複利增益
+    h += '<tr style="background:#f0fdf4"><td style="font-size:12px;font-weight:700;color:#16a34a;padding:9px 6px">✨ 複利增益</td>';
+    cols.forEach(function(c) {
+      var pct = c.totalCashDiv > 0 ? ((c.reinvestedFV/c.totalCashDiv-1)*100).toFixed(0) : '0';
+      h += '<td style="text-align:center;padding:9px 6px"><div style="font-size:13px;font-weight:800;color:#16a34a">+' + incFmtP(c.extra) + '</div>' +
+        '<div style="font-size:10px;color:#86efac;margin-top:1px">+' + pct + '%</div></td>';
+    });
+    h += '</tr>';
+  }
+
+  h += '</tbody></table></div>';
+  h += '<div style="font-size:10px;color:var(--sub);margin-top:8px;line-height:1.5">※ 年化報酬率為歷史數據，不代表未來績效。匯率風險未計入。配息金額每年將因基金淨值變動而調整。</div>';
+  el.innerHTML = h;
+}
+
 function renderIncomeFunds() {
   var rows = document.getElementById('inc-fund-rows');
   if (!rows) return;
@@ -4659,6 +4799,7 @@ function calcIncome() {
   var periods=[5,10,20];
   var results=periods.map(function(yr){ return incSimulate(principal,checked,yr); });
   incRenderResults(results,periods,checked,principal);
+  renderDivReinvest();
 }
 function incSimulate(principal, funds, years) {
   var y1Monthly=0, totalReceived=0, finalAccount=0, finalMonthly=0, byFund=[];
