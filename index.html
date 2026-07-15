@@ -996,7 +996,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
           <option value="blk">貝萊德環球資產配置 A10（月配）</option>
           <option value="pima2">品浩全球平衡收益 M（月配）</option>
         </optgroup>
-        <optgroup label="📈 配股型 ETF">
+        <optgroup label="📈 配股型投資標的">
           <option value="e0050">0050 元大台灣50（半年配）</option>
           <option value="e006208">006208 富邦台灣50（半年配）</option>
           <option value="e0056">0056 元大高股息（季配）</option>
@@ -4974,7 +4974,7 @@ function renderIncomeFunds() {
     html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">'+divFunds.map(makeRow).join('')+'</div>';
   }
   if (eqFunds.length) {
-    html += '<div style="'+secStyle+';background:#f0fdf4;color:#15803d">📈 配股型 ETF</div>';
+    html += '<div style="'+secStyle+';background:#f0fdf4;color:#15803d">📈 配股型投資標的</div>';
     html += '<div style="display:flex;flex-direction:column;gap:8px">'+eqFunds.map(makeRow).join('')+'</div>';
   }
   rows.innerHTML = html;
