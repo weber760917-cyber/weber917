@@ -4544,11 +4544,11 @@ var INC_PERF = {
   shz71:  { ytd:45.27, ret1y:60.3,  inception:712.0,   incLabel:'5年' },
   tlzr0:  { ytd:35.79, ret1y:null,  inception:null,    incLabel:'—'  },
   tlz63:  { ytd:13.59, ret1y:22.32, inception:122.16,  incLabel:'5年' },
-  vwra:   { ytd:10.33, ret1y:22.28, inception:117.48, incLabel:'7年'  },
-  e0050:  { ytd:58.78, ret1y:106.21, inception:204.76, incLabel:'23年' },
-  e006208:{ ytd:61.23, ret1y:104.48, inception:840.5,  incLabel:'14年' },
-  e0056:  { ytd:43.2,  ret1y:52.34,  inception:185.71, incLabel:'19年' },
-  vt:     { ytd:9.11,  ret1y:20.29, inception:215.86, incLabel:'18年' },
+  vwra:   { ytd:10.33, ret1y:22.28, inception:137.1,  incLabel:'7年'  },
+  e0050:  { ytd:58.78, ret1y:106.21, inception:1348.9, incLabel:'23年' },
+  e006208:{ ytd:61.23, ret1y:104.48, inception:430.6,  incLabel:'14年' },
+  e0056:  { ytd:43.2,  ret1y:52.34,  inception:326.7,  incLabel:'18年' },
+  vt:     { ytd:9.11,  ret1y:20.29, inception:362.9,  incLabel:'18年' },
 };
 var INC_HOLDINGS = {
   jpm:    '美國高收益債券、新興市場債、優先股、REITs',
@@ -4800,12 +4800,12 @@ function incSetMode(id, mode) {
 
 // ── 配息再投入試算 ──
 var REINVEST_OPTS = [
-  { id:'none',  label:'不投入',  emoji:'💰', annReturn:0,    color:'#6b7280', desc:'配息存現金，不再投入' },
-  { id:'t0050', label:'0050',   emoji:'🇹🇼', annReturn:10.5, color:'#dc2626', desc:'元大台灣50，歷史年化約 10.5%' },
-  { id:'sp500', label:'S&P 500',emoji:'🇺🇸', annReturn:10.0, color:'#1d4ed8', desc:'美國大盤，歷史年化約 10%' },
-  { id:'qqq',   label:'QQQ',    emoji:'📡', annReturn:15.0, color:'#7c3aed', desc:'那斯達克100，歷史年化約 15%' },
-  { id:'vt',    label:'VT',     emoji:'🌍', annReturn:9.0,  color:'#059669', desc:'全球股市ETF，歷史年化約 9%' },
-  { id:'vwra',  label:'VWRA',   emoji:'🌐', annReturn:10.0, color:'#0891b2', desc:'全球股市累積型，歷史年化約 10%' },
+  { id:'none',  label:'不投入',  emoji:'💰', annReturn:0,     color:'#6b7280', desc:'配息存現金，不再投入' },
+  { id:'t0050', label:'0050',   emoji:'🇹🇼', annReturn:12.81, color:'#dc2626', desc:'元大台灣50，成立至今(2003)含息年化 12.81%' },
+  { id:'sp500', label:'S&P 500',emoji:'🇺🇸', annReturn:9.72,  color:'#1d4ed8', desc:'SPY 成立至今(1993)含息年化 9.72%；近16年(VOO) 約 15%' },
+  { id:'qqq',   label:'QQQ',    emoji:'📡', annReturn:10.85, color:'#7c3aed', desc:'那斯達克100，成立至今(1999)含息年化 10.85%' },
+  { id:'vt',    label:'VT',     emoji:'🌍', annReturn:8.86,  color:'#059669', desc:'全球股市，成立至今(2008)含息年化 8.86%' },
+  { id:'vwra',  label:'VWRA',   emoji:'🌐', annReturn:13.5,  color:'#0891b2', desc:'富時全世界累積型，成立至今(2019)含息年化 13.5%' },
 ];
 var _reinvestSel = 'none';
 
