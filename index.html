@@ -4532,23 +4532,23 @@ var INCOME_FUNDS = [
 ];
 var _incState = {};
 var INC_PERF = {
-  jpm:    { ytd:13.3,  ret1y:20.88, ret3y:null  },
-  aling:  { ytd:13.62, ret1y:22.39, ret3y:27.09 },
-  tlz64:  { ytd:13.62, ret1y:22.37, ret3y:27.11 },
-  mg:     { ytd:13.49, ret1y:14.07, ret3y:21.54 },
-  ab:     { ytd:8.05,  ret1y:null,  ret3y:null  },
-  aiai:   { ytd:null,  ret1y:null,  ret3y:null  },
-  brwt:   { ytd:45.28, ret1y:60.22, ret3y:null  },
-  blk:    { ytd:14.25, ret1y:24.79, ret3y:null  },
-  pima2:  { ytd:22.21, ret1y:35.8,  ret3y:null  },
-  shz71:  { ytd:45.27, ret1y:60.3,  ret3y:75.21 },
-  tlzr0:  { ytd:35.79, ret1y:null,  ret3y:null  },
-  tlz63:  { ytd:null,  ret1y:null,  ret3y:null  },
-  vwra:   { ytd:null,  ret1y:null,  ret3y:null  },
-  e0050:  { ytd:null,  ret1y:null,  ret3y:null  },
-  e006208:{ ytd:null,  ret1y:null,  ret3y:null  },
-  e0056:  { ytd:null,  ret1y:null,  ret3y:null  },
-  vt:     { ytd:null,  ret1y:null,  ret3y:null  },
+  jpm:    { ytd:13.3,  ret1y:20.88, inception:33.64,   incLabel:'2年' },
+  aling:  { ytd:13.62, ret1y:22.39, inception:27.09,   incLabel:'3年' },
+  tlz64:  { ytd:13.62, ret1y:22.37, inception:122.28,  incLabel:'5年' },
+  mg:     { ytd:13.49, ret1y:14.07, inception:21.54,   incLabel:'3年' },
+  ab:     { ytd:8.05,  ret1y:null,  inception:null,    incLabel:'—'  },
+  aiai:   { ytd:35.84, ret1y:49.14, inception:311.88,  incLabel:'5年' },
+  brwt:   { ytd:45.28, ret1y:60.22, inception:119.19,  incLabel:'2年' },
+  blk:    { ytd:14.25, ret1y:24.79, inception:24.79,   incLabel:'1年' },
+  pima2:  { ytd:22.21, ret1y:35.8,  inception:35.8,    incLabel:'1年' },
+  shz71:  { ytd:45.27, ret1y:60.3,  inception:712.0,   incLabel:'5年' },
+  tlzr0:  { ytd:35.79, ret1y:null,  inception:null,    incLabel:'—'  },
+  tlz63:  { ytd:13.59, ret1y:22.32, inception:122.16,  incLabel:'5年' },
+  vwra:   { ytd:null,  ret1y:null,  inception:null,    incLabel:'—'  },
+  e0050:  { ytd:null,  ret1y:null,  inception:null,    incLabel:'—'  },
+  e006208:{ ytd:null,  ret1y:null,  inception:null,    incLabel:'—'  },
+  e0056:  { ytd:null,  ret1y:null,  inception:null,    incLabel:'—'  },
+  vt:     { ytd:null,  ret1y:null,  inception:null,    incLabel:'—'  },
 };
 var INC_HOLDINGS = {
   jpm:    '美國高收益債券、新興市場債、優先股、REITs',
@@ -4597,9 +4597,9 @@ function onIncFundSelect(id) {
     {l:'淨値',      v:navS,                          c:'var(--text)'},
     {l:'配息率',v:f.divRate>0?pp(f.divRate,2):'不配息', c:'#0891b2'},
     {l:'增値率',v:(f.capRate>=0?'+':'')+f.capRate.toFixed(1)+'%',  c:colorV(f.capRate)},
-    {l:'今年報酬',v:pp(perf.ytd),   c:colorV(perf.ytd)},
-    {l:'1年報酬', v:pp(perf.ret1y),     c:perf.ret1y!=null?'#0891b2':'var(--sub)'},
-    {l:'長期報酬',v:perf.ret3y!=null?pp(perf.ret3y)+' (3Y)':'—', c:perf.ret3y!=null?'#7c3aed':'var(--sub)'},
+    {l:'今年報酬',   v:pp(perf.ytd),   c:colorV(perf.ytd)},
+    {l:'近1年報酬', v:pp(perf.ret1y),  c:perf.ret1y!=null?'#0891b2':'var(--sub)'},
+    {l:'成立至今',  v:perf.inception!=null?perf.inception.toFixed(1)+'%'+(perf.incLabel&&perf.incLabel!=='—'?' ('+perf.incLabel+')':''):'—', c:perf.inception!=null?'#7c3aed':'var(--sub)'},
   ];
   var mGrid = metrics.map(function(m){
     return '<div style="background:#f8faff;border-radius:8px;padding:8px 4px;text-align:center">'+
