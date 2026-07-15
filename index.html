@@ -4593,18 +4593,27 @@ function onIncFundSelect(id) {
   var navS = (f.navCur==='USD'?'$':'NT$')+(+f.nav).toFixed(2);
   var pp = function(v,d){ return v!=null?v.toFixed(d||1)+'%':'—'; };
   var colorV = function(v){ return v==null?'var(--sub)':v>=0?'#16a34a':'#e53935'; };
+  var incYrsMap = {'1年':1,'2年':2,'3年':3,'5年':5,'14年':14,'19年':19,'23年':23};
+  var iYrs = incYrsMap[perf.incLabel||''] || 0;
+  var annRet = (perf.inception != null && iYrs >= 1)
+    ? ((Math.pow(1 + perf.inception/100, 1/iYrs) - 1)*100).toFixed(1)
+    : null;
   var metrics = [
-    {l:'淨値',      v:navS,                          c:'var(--text)'},
-    {l:'配息率',v:f.divRate>0?pp(f.divRate,2):'不配息', c:'#0891b2'},
-    {l:'增値率',v:(f.capRate>=0?'+':'')+f.capRate.toFixed(1)+'%',  c:colorV(f.capRate)},
-    {l:'今年報酬',   v:pp(perf.ytd),   c:colorV(perf.ytd)},
-    {l:'近1年報酬', v:pp(perf.ret1y),  c:perf.ret1y!=null?'#0891b2':'var(--sub)'},
-    {l:'成立至今',  v:perf.inception!=null?perf.inception.toFixed(1)+'%'+(perf.incLabel&&perf.incLabel!=='—'?' ('+perf.incLabel+')':''):'—', c:perf.inception!=null?'#7c3aed':'var(--sub)'},
+    {l:'淨値',     v:navS,                                          c:'var(--text)'},
+    {l:'配息率',   v:f.divRate>0?pp(f.divRate,2):'不配息',            c:'#0891b2'},
+    {l:'增値率',   v:(f.capRate>=0?'+':'')+f.capRate.toFixed(1)+'%', c:colorV(f.capRate)},
+    {l:'今年報酬', v:pp(perf.ytd),    c:colorV(perf.ytd)},
+    {l:'近1年報酬',v:pp(perf.ret1y),  c:perf.ret1y!=null?'#0891b2':'var(--sub)'},
+    {l:'成立至今', v:perf.inception!=null?perf.inception.toFixed(1)+'%'+(perf.incLabel&&perf.incLabel!=='—'?' ('+perf.incLabel+')':''):'—',
+     c:perf.inception!=null?'#7c3aed':'var(--sub)',
+     sub:annRet!=null?'年化 ≈ '+annRet+'%':null},
   ];
   var mGrid = metrics.map(function(m){
     return '<div style="background:#f8faff;border-radius:8px;padding:8px 4px;text-align:center">'+
       '<div style="font-size:10px;color:var(--sub);margin-bottom:3px">'+m.l+'</div>'+
-      '<div style="font-size:13px;font-weight:800;color:'+m.c+'">'+m.v+'</div></div>';
+      '<div style="font-size:13px;font-weight:800;color:'+m.c+'">'+m.v+'</div>'+
+      (m.sub?'<div style="font-size:10px;color:'+m.c+';margin-top:2px;opacity:0.85">'+m.sub+'</div>':'')+
+      '</div>';
   }).join('');
   var dH = '';
   if (f.divHist&&f.divHist.length>0) {
@@ -4632,6 +4641,7 @@ function onIncFundSelect(id) {
     '<a href="'+f.mdjUrl+'" target="_blank" style="font-size:12px;color:#0891b2;font-weight:600;text-decoration:none;flex-shrink:0;margin-left:8px">MoneyDJ ↗</a>'+
     '</div>'+
     '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">'+mGrid+'</div>'+
+    (annRet!=null?'<div style="display:flex;justify-content:space-between;align-items:center;background:#fef3c7;border-radius:8px;padding:9px 12px;margin-bottom:10px">'+'<span style="font-size:12px;font-weight:700;color:#92400e">📈 平均年化報酬（成立至今'+(iYrs>0?iYrs+'年':'')+'）</span>'+'<span style="font-size:20px;font-weight:900;color:#d97706">'+annRet+'%</span></div>':'')+
     '<div style="font-size:11px;color:var(--sub);font-weight:600;margin-bottom:5px">持股 / 配置</div>'+
     '<div style="font-size:12px;color:var(--text);background:#f8faff;border-radius:8px;padding:8px 10px;line-height:1.6">'+hold+'</div>'+
     dH+
