@@ -4471,6 +4471,24 @@ var INCOME_FUNDS = [
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=PIMA2',
     divHist:[{d:'2026/06',a:'$0.087'},{d:'2026/05',a:'$0.087'},{d:'2026/04',a:'$0.087'},{d:'2026/03',a:'$0.087'}] },
+    { id:'shz71', name:'貝萊德世界科技 A2',
+    nav:147.46, navCur:'USD', navKey:'shz71', distMo:0,
+    divRate:0, capRate:20.0, annReturn:20.0,
+    note:'累積型(不配息)', freq:'累積型', defMode:'acc',
+    mdjUrl:'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=SHZ71',
+    divHist:[] },
+  { id:'tlzr0', name:'安聯AI收益成長 AT',
+    nav:15.5511, navCur:'USD', navKey:'tlzr0', distMo:0,
+    divRate:0, capRate:15.0, annReturn:15.0,
+    note:'累積型(不配息)', freq:'累積型', defMode:'acc',
+    mdjUrl:'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=TLZR0',
+    divHist:[] },
+  { id:'tlz63', name:'安聯收益成長 AT',
+    nav:31.2356, navCur:'USD', navKey:'tlz63', distMo:0,
+    divRate:0, capRate:9.0, annReturn:9.0,
+    note:'累積型(不配息)', freq:'累積型', defMode:'acc',
+    mdjUrl:'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=TLZ63',
+    divHist:[] },
   { id:'vwra',   name:'VWRA 全世界（累積型）',
     nav:186.84, navCur:'USD', distMo:0,
     divRate:0,     capRate:13.7,  annReturn:13.7,
@@ -4625,6 +4643,24 @@ var REINVEST_OPTS = [
   { id:'sp500', label:'S&P 500',emoji:'🇺🇸', annReturn:10.0, color:'#1d4ed8', desc:'美國大盤，歷史年化約 10%' },
   { id:'qqq',   label:'QQQ',    emoji:'📡', annReturn:15.0, color:'#7c3aed', desc:'那斯達克100，歷史年化約 15%' },
   { id:'vt',    label:'VT',     emoji:'🌍', annReturn:9.0,  color:'#059669', desc:'全球股市ETF，歷史年化約 9%' },
+    { id:'shz71', name:'貝萊德世界科技 A2',
+    nav:147.46, navCur:'USD', navKey:'shz71', distMo:0,
+    divRate:0, capRate:20.0, annReturn:20.0,
+    note:'累積型(不配息)', freq:'累積型', defMode:'acc',
+    mdjUrl:'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=SHZ71',
+    divHist:[] },
+  { id:'tlzr0', name:'安聯AI收益成長 AT',
+    nav:15.5511, navCur:'USD', navKey:'tlzr0', distMo:0,
+    divRate:0, capRate:15.0, annReturn:15.0,
+    note:'累積型(不配息)', freq:'累積型', defMode:'acc',
+    mdjUrl:'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=TLZR0',
+    divHist:[] },
+  { id:'tlz63', name:'安聯收益成長 AT',
+    nav:31.2356, navCur:'USD', navKey:'tlz63', distMo:0,
+    divRate:0, capRate:9.0, annReturn:9.0,
+    note:'累積型(不配息)', freq:'累積型', defMode:'acc',
+    mdjUrl:'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=TLZ63',
+    divHist:[] },
   { id:'vwra',  label:'VWRA',   emoji:'🌐', annReturn:10.0, color:'#0891b2', desc:'全球股市累積型，歷史年化約 10%' },
 ];
 var _reinvestSel = 'none';
@@ -4748,44 +4784,57 @@ function renderIncomeFunds() {
   if (!rows) return;
   var principal = +((document.getElementById('inc-amt')||{}).value||0);
   var dc='#0891b2', ac='#16a34a';
-  rows.innerHTML = INCOME_FUNDS.map(function(f) {
+  var EQ_IDS = {'e0050':1,'e006208':1,'e0056':1,'vt':1,'vwra':1,'shz71':1,'tlzr0':1,'tlz63':1};
+  var divFunds = INCOME_FUNDS.filter(function(f){ return !EQ_IDS[f.id]; });
+  var eqFunds  = INCOME_FUNDS.filter(function(f){ return  EQ_IDS[f.id]; });
+
+  function makeRow(f) {
     var s = _incState[f.id]||{checked:false,alloc:0,mode:f.defMode};
     var isDiv = s.mode==='div';
     var bc = s.checked?(isDiv?dc:ac):'var(--border)';
     var bg = s.checked?(isDiv?'#f0f9ff':'#f0fdf4'):'white';
-    var html = '<div style="border:1.5px solid '+bc+';border-radius:10px;padding:9px 12px;background:'+bg+'">';
-    html += '<div style="display:flex;align-items:center;gap:8px">';
-    html += '<input type="checkbox" data-fid="'+f.id+'" '+(s.checked?'checked':'')+' onchange="incToggle(this.dataset.fid,this.checked)" style="width:16px;height:16px;accent-color:var(--blue);flex-shrink:0">';
-    html += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">'+f.name+'</div>';
+    var h = '<div style="border:1.5px solid '+bc+';border-radius:10px;padding:9px 12px;background:'+bg+'">';
+    h += '<div style="display:flex;align-items:center;gap:8px">';
+    h += '<input type="checkbox" data-fid="'+f.id+'" '+(s.checked?'checked':'')+' onchange="incToggle(this.dataset.fid,this.checked)" style="width:16px;height:16px;accent-color:var(--blue);flex-shrink:0">';
+    h += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">'+f.name+'</div>';
     var dLbl = f.divRate>0?'配息率 '+f.divRate.toFixed(2)+'% · 增值 '+f.capRate.toFixed(1)+'%':'增值 '+f.capRate.toFixed(1)+'%（累積型）';
-    html += '<div style="font-size:10px;color:var(--sub)">'+dLbl+' · '+f.freq+'</div></div>';
+    h += '<div style="font-size:10px;color:var(--sub)">'+dLbl+' · '+f.freq+'</div></div>';
     if (s.checked) {
-      html += '<div style="display:flex;gap:4px;flex-shrink:0">';
-      html += '<button data-fid="'+f.id+'" data-m="div" onclick="incSetMode(this.dataset.fid,this.dataset.m)" style="font-size:11px;padding:2px 9px;border-radius:20px;border:1.5px solid '+(isDiv?dc:'var(--border)')+';background:'+(isDiv?dc:'white')+';color:'+(isDiv?'white':'var(--sub)')+';cursor:pointer;font-weight:600">💵配息</button>';
-      html += '<button data-fid="'+f.id+'" data-m="acc" onclick="incSetMode(this.dataset.fid,this.dataset.m)" style="font-size:11px;padding:2px 9px;border-radius:20px;border:1.5px solid '+(!isDiv?ac:'var(--border)')+';background:'+(!isDiv?ac:'white')+';color:'+(!isDiv?'white':'var(--sub)')+';cursor:pointer;font-weight:600">📈再投入</button>';
-      html += '</div>';
+      h += '<div style="display:flex;gap:4px;flex-shrink:0">';
+      h += '<button data-fid="'+f.id+'" data-m="div" onclick="incSetMode(this.dataset.fid,this.dataset.m)" style="font-size:11px;padding:2px 9px;border-radius:20px;border:1.5px solid '+(isDiv?dc:'var(--border)')+';background:'+(isDiv?dc:'white')+';color:'+(isDiv?'white':'var(--sub)')+';cursor:pointer;font-weight:600">💵配息</button>';
+      h += '<button data-fid="'+f.id+'" data-m="acc" onclick="incSetMode(this.dataset.fid,this.dataset.m)" style="font-size:11px;padding:2px 9px;border-radius:20px;border:1.5px solid '+(!isDiv?ac:'var(--border)')+';background:'+(!isDiv?ac:'white')+';color:'+(!isDiv?'white':'var(--sub)')+';cursor:pointer;font-weight:600">📈再投入</button>';
+      h += '</div>';
     }
-    html += '</div>';
+    h += '</div>';
     if (s.checked) {
       var alloc = s.alloc||0;
       var amt = principal*alloc/100;
       var units = f.nav>0?(amt/f.nav):0;
       var uStr = units>=1000?(Math.round(units/1000)+'K'):units>=1?units.toFixed(1):units>0?units.toFixed(3):'0';
-      html += '<div style="margin-top:7px;padding-left:24px">';
-      html += '<div style="display:flex;align-items:center;gap:8px">';
-      html += '<input type="range" data-fid="'+f.id+'" min="0" max="100" step="5" value="'+alloc+'" oninput="incSetAlloc(this.dataset.fid,this.value)" style="flex:1;accent-color:var(--blue);cursor:pointer">';
-      html += '<span id="inc-alloc-lbl-'+f.id+'" style="font-size:14px;font-weight:800;color:var(--blue);min-width:38px;text-align:right">'+alloc+'%</span>';
-      html += '</div>';
-      html += '<div id="inc-alloc-info-'+f.id+'" style="display:'+(amt>0?'flex':'none')+';justify-content:space-between;font-size:11px;margin-top:3px">';
+      h += '<div style="margin-top:7px;padding-left:24px">';
+      h += '<div style="display:flex;align-items:center;gap:8px">';
+      h += '<input type="range" data-fid="'+f.id+'" min="0" max="100" step="5" value="'+alloc+'" oninput="incSetAlloc(this.dataset.fid,this.value)" style="flex:1;accent-color:var(--blue);cursor:pointer">';
+      h += '<span id="inc-alloc-lbl-'+f.id+'" style="font-size:14px;font-weight:800;color:var(--blue);min-width:38px;text-align:right">'+alloc+'%</span>';
+      h += '</div>';
+      h += '<div id="inc-alloc-info-'+f.id+'" style="display:'+(amt>0?'flex':'none')+';justify-content:space-between;font-size:11px;margin-top:3px">';
       if (amt>0) {
-        html += '<span style="color:var(--sub)">投入 <b style="color:var(--text)">'+incFmtP(amt)+'</b></span>';
-        html += '<span style="color:var(--sub)">可買 <b style="color:var(--blue)">'+uStr+' 單位</b> ('+(f.navCur==='USD'?'$':'NT$')+f.nav.toFixed(2)+')</span>';
+        h += '<span style="color:var(--sub)">投入 <b style="color:var(--text)">'+incFmtP(amt)+'</b></span>';
+        h += '<span style="color:var(--sub)">可買 <b style="color:var(--blue)">'+uStr+' 單位</b> ('+(f.navCur==='USD'?'$':'NT$')+f.nav.toFixed(2)+')</span>';
       }
-      html += '</div></div>';
+      h += '</div></div>';
     }
-    html += '</div>';
-    return html;
-  }).join('');
+    h += '</div>';
+    return h;
+  }
+
+  var secStyle = 'display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:1px;padding:6px 10px;border-radius:8px;margin-bottom:8px';
+  rows.innerHTML =
+    '<div style="'+secStyle+';background:#eff6ff;color:#1d4ed8">💰 配息型基金</div>' +
+    '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">' +
+    divFunds.map(makeRow).join('') + '</div>' +
+    '<div style="'+secStyle+';background:#f0fdf4;color:#15803d">📈 配股型 ETF</div>' +
+    '<div style="display:flex;flex-direction:column;gap:8px">' +
+    eqFunds.map(makeRow).join('') + '</div>';
 }
 function calcIncome() {
   var principal = +((document.getElementById('inc-amt')||{}).value||0);
