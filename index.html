@@ -962,8 +962,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   <!-- 月配息搭配試算 -->
   <div class="card" style="margin-bottom:14px">
     <div class="card-head">
-      <div class="card-title">💰 月配息搭配試算</div>
-      <div style="font-size:13px;color:var(--sub);margin-top:3px">配現金 vs 再投入 × 複利 × 多年比較</div>
+      <div class="card-title">💰 月配息 / 配股探索</div>
+      <div style="font-size:13px;color:var(--sub);margin-top:3px">選擇標的 → 查看詳情 → 加入組合試算</div>
     </div>
     <div class="card-body">
       <div style="margin-bottom:20px">
@@ -982,7 +982,41 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
           <button class="copy-ptab" onclick="setIncAmt(30000000)">3000萬</button>
         </div>
       </div>
-      <div style="font-size:12px;font-weight:700;color:var(--sub);letter-spacing:1px;margin-bottom:10px">基金配置（勾選並拉動比例）</div>
+      <div style="font-size:12px;font-weight:700;color:var(--sub);letter-spacing:1px;margin-bottom:8px">🔍 選擇投資標的</div>
+      <select id="inc-fund-sel" onchange="onIncFundSelect(this.value)" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;font-size:14px;font-weight:600;font-family:inherit;color:var(--text);background:white;cursor:pointer;outline:none">
+        <option value="">— 請選擇投資標的 —</option>
+        <optgroup label="💰 配息型基金">
+          <option value="jpm">摩根多重收益 JPM（月配）</option>
+          <option value="aling">安聯收益成長 AMg7（月配）</option>
+          <option value="tlz64">安聯收益成長 AM（月配）</option>
+          <option value="mg">M&amp;G 入息基金（月配）</option>
+          <option value="ab">聯博美國成長 AP（月配）</option>
+          <option value="aiai">安聯AI收益成長（月配）</option>
+          <option value="brwt">貝萊德世界科技 A10（月配）</option>
+          <option value="blk">貝萊德環球資產配置 A10（月配）</option>
+          <option value="pima2">品浩全球平衡收益 M（月配）</option>
+        </optgroup>
+        <optgroup label="📈 配股型 ETF">
+          <option value="e0050">0050 元大台灣50（半年配）</option>
+          <option value="e006208">006208 富邦台灣50（半年配）</option>
+          <option value="e0056">0056 元大高股息（季配）</option>
+          <option value="vt">VT 全球股市（季配）</option>
+          <option value="vwra">VWRA 全球股市（累積型）</option>
+          <option value="shz71">貝萊德世界科技 A2（累積型）</option>
+          <option value="tlzr0">安聯AI收益成長 AT（累積型）</option>
+          <option value="tlz63">安聯收益成長 AT（累積型）</option>
+        </optgroup>
+      </select>
+      <div id="inc-fund-detail" style="display:none"></div>
+    </div>
+  </div>
+
+  <div class="card" id="inc-portfolio-card" style="margin-bottom:14px;display:none">
+    <div class="card-head">
+      <div class="card-title">📋 我的模擬組合</div>
+      <div style="font-size:13px;color:var(--sub);margin-top:3px">設定配置比例，即可進行試算</div>
+    </div>
+    <div class="card-body">
       <div id="inc-fund-rows" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
         <span style="font-size:12px;color:var(--sub)">已配置：<span id="inc-total-pct" style="font-weight:700;color:var(--blue)">0%</span></span>
@@ -999,7 +1033,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       </div>
     </div>
     <div class="card-body">
-      <div id="inc-result-body" style="text-align:center;color:var(--sub);padding:20px">請勾選基金並設定配置比例</div>
+      <div id="inc-result-body" style="text-align:center;color:var(--sub);padding:20px">請從上方選擇並加入投資標的</div>
     </div>
   </div>
 
@@ -4497,6 +4531,124 @@ var INCOME_FUNDS = [
     divHist:[] },
 ];
 var _incState = {};
+var INC_PERF = {
+  jpm:    { ytd:13.3,  ret1y:20.88, ret3y:null  },
+  aling:  { ytd:13.62, ret1y:22.39, ret3y:27.09 },
+  tlz64:  { ytd:13.62, ret1y:22.37, ret3y:27.11 },
+  mg:     { ytd:13.49, ret1y:14.07, ret3y:21.54 },
+  ab:     { ytd:8.05,  ret1y:null,  ret3y:null  },
+  aiai:   { ytd:null,  ret1y:null,  ret3y:null  },
+  brwt:   { ytd:45.28, ret1y:60.22, ret3y:null  },
+  blk:    { ytd:14.25, ret1y:24.79, ret3y:null  },
+  pima2:  { ytd:22.21, ret1y:35.8,  ret3y:null  },
+  shz71:  { ytd:45.27, ret1y:60.3,  ret3y:75.21 },
+  tlzr0:  { ytd:35.79, ret1y:null,  ret3y:null  },
+  tlz63:  { ytd:null,  ret1y:null,  ret3y:null  },
+  vwra:   { ytd:null,  ret1y:null,  ret3y:null  },
+  e0050:  { ytd:null,  ret1y:null,  ret3y:null  },
+  e006208:{ ytd:null,  ret1y:null,  ret3y:null  },
+  e0056:  { ytd:null,  ret1y:null,  ret3y:null  },
+  vt:     { ytd:null,  ret1y:null,  ret3y:null  },
+};
+var INC_HOLDINGS = {
+  jpm:    '美國高收益債券、新興市場債、優先股、REITs',
+  aling:  '美國高收益債（60%）＋美國成長股（40%）',
+  tlz64:  '美國高收益債（60%）＋美國成長股（40%）',
+  mg:     '全球固定收益，以美元計價投資等級債為主',
+  ab:     '美國成長股為主（科技、醫療、消費）',
+  aiai:   '全球AI相關股票（50%）＋高收益債（50%）',
+  brwt:   '科技股（NVIDIA、Apple、Microsoft、台積電等）',
+  blk:    '全球股票、債券、REITs 均衡配置',
+  pima2:  '全球多元固定收益、高收益債、新興市場債',
+  shz71:  '全球科技股（累積型，不配息）',
+  tlzr0:  'AI相關股票＋高收益債（累積型）',
+  tlz63:  '美國成長股＋高收益債（累積型）',
+  e0050:  '台灣前50大市値股（台積電、聯發科、鉤海等）',
+  e006208:'台灣前50大市値股（富邦版本）',
+  e0056:  '台灣高殖利率股（以季配息為主）',
+  vt:     '全畨7000+支股票（美國60%、歐洲、亞太）',
+  vwra:   '全球股票（累積再投入，愛爾蘭版 UCITS ETF）',
+};
+function updatePortfolioCard() {
+  var any = INCOME_FUNDS.some(function(f){ return _incState[f.id]&&_incState[f.id].checked; });
+  var pc = document.getElementById('inc-portfolio-card');
+  if (pc) pc.style.display = any ? '' : 'none';
+}
+function onIncFundSelect(id) {
+  var det = document.getElementById('inc-fund-detail');
+  if (!id) { if(det) det.style.display='none'; return; }
+  var f = INCOME_FUNDS.find(function(x){ return x.id===id; });
+  if (!f||!det) return;
+  var perf = INC_PERF[id]||{};
+  var hold = INC_HOLDINGS[id]||'—';
+  var isAdded = _incState[id]&&_incState[id].checked;
+  var FREQ_STYLE = {
+    '月配': ['#0891b2','#e0f2fe'],
+    '半年配': ['#8b5cf6','#ede9fe'],
+    '季配': ['#7c3aed','#f5f3ff'],
+    '累積型': ['#16a34a','#dcfce7'],
+    '不配息': ['#16a34a','#dcfce7']
+  };
+  var fc = FREQ_STYLE[f.freq]||['#8a9ab5','#f3f4f6'];
+  var navS = (f.navCur==='USD'?'$':'NT$')+(+f.nav).toFixed(2);
+  var pp = function(v,d){ return v!=null?v.toFixed(d||1)+'%':'—'; };
+  var colorV = function(v){ return v==null?'var(--sub)':v>=0?'#16a34a':'#e53935'; };
+  var metrics = [
+    {l:'淨値',      v:navS,                          c:'var(--text)'},
+    {l:'配息率',v:f.divRate>0?pp(f.divRate,2):'不配息', c:'#0891b2'},
+    {l:'增値率',v:(f.capRate>=0?'+':'')+f.capRate.toFixed(1)+'%',  c:colorV(f.capRate)},
+    {l:'今年報酬',v:pp(perf.ytd),   c:colorV(perf.ytd)},
+    {l:'1年報酬', v:pp(perf.ret1y),     c:perf.ret1y!=null?'#0891b2':'var(--sub)'},
+    {l:'長期報酬',v:perf.ret3y!=null?pp(perf.ret3y)+' (3Y)':'—', c:perf.ret3y!=null?'#7c3aed':'var(--sub)'},
+  ];
+  var mGrid = metrics.map(function(m){
+    return '<div style="background:#f8faff;border-radius:8px;padding:8px 4px;text-align:center">'+
+      '<div style="font-size:10px;color:var(--sub);margin-bottom:3px">'+m.l+'</div>'+
+      '<div style="font-size:13px;font-weight:800;color:'+m.c+'">'+m.v+'</div></div>';
+  }).join('');
+  var dH = '';
+  if (f.divHist&&f.divHist.length>0) {
+    dH = '<div style="margin-top:12px">'+
+      '<div style="font-size:11px;color:var(--sub);font-weight:600;margin-bottom:6px">配息歷史（近4月）</div>'+
+      '<div style="display:flex;gap:4px;background:#f8faff;border-radius:8px;padding:8px">'+
+      f.divHist.map(function(d){
+        return '<div style="text-align:center;flex:1;min-width:0">'+
+          '<div style="font-size:10px;color:var(--sub)">'+d.d+'</div>'+
+          '<div style="font-size:11px;font-weight:700;color:var(--text)">'+d.a+'</div></div>';
+      }).join('')+'</div></div>';
+  }
+  var actBtn = isAdded
+    ? '<button onclick="incRemoveFund(\''+id+'\')" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid #e53935;background:white;color:#e53935;font-size:13px;font-weight:700;cursor:pointer">✕ 移除組合</button>'
+    : '<button onclick="incAddFund(\''+id+'\')" style="flex:1;padding:10px;border-radius:10px;border:none;background:var(--blue);color:white;font-size:13px;font-weight:700;cursor:pointer">＋ 加入模擬組合</button>';
+  det.style.display='';
+  det.innerHTML=
+    '<div style="border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-top:8px;background:white">'+
+    '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">'+
+    '<div><div style="font-size:15px;font-weight:800;color:var(--text)">'+f.name+'</div>'+
+    '<div style="display:flex;gap:6px;margin-top:4px">'+
+    '<span style="font-size:10px;padding:2px 8px;border-radius:12px;font-weight:700;background:'+fc[1]+';color:'+fc[0]+'">'+f.freq+'</span>'+
+    '<span style="font-size:10px;padding:2px 8px;border-radius:12px;font-weight:600;background:#f8faff;color:var(--sub)">'+f.navCur+'</span>'+
+    '</div></div>'+
+    '<a href="'+f.mdjUrl+'" target="_blank" style="font-size:12px;color:#0891b2;font-weight:600;text-decoration:none;flex-shrink:0;margin-left:8px">MoneyDJ ↗</a>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">'+mGrid+'</div>'+
+    '<div style="font-size:11px;color:var(--sub);font-weight:600;margin-bottom:5px">持股 / 配置</div>'+
+    '<div style="font-size:12px;color:var(--text);background:#f8faff;border-radius:8px;padding:8px 10px;line-height:1.6">'+hold+'</div>'+
+    dH+
+    '<div style="margin-top:12px">'+actBtn+'</div>'+
+    '</div>';
+}
+function incAddFund(id) {
+  if (!_incState[id]) _incState[id]={};
+  _incState[id].checked=true;
+  var f=INCOME_FUNDS.find(function(x){return x.id===id;});
+  if (f&&!_incState[id].mode) _incState[id].mode=f.defMode;
+  updatePortfolioCard(); renderIncomeFunds(); calcIncome(); onIncFundSelect(id);
+}
+function incRemoveFund(id) {
+  if (_incState[id]) { _incState[id].checked=false; _incState[id].alloc=0; }
+  updatePortfolioCard(); renderIncomeFunds(); calcIncome(); onIncFundSelect(id);
+}
 var _incInited = false;
 var _incInfoOpen = false;
 var _incNavLoaded = false;
@@ -4603,7 +4755,7 @@ function incToggle(id, checked) {
   if (!_incState[id]) _incState[id] = { checked:false, alloc:0, mode:'div' };
   _incState[id].checked = checked;
   if (!checked) _incState[id].alloc = 0;
-  renderIncomeFunds(); calcIncome();
+  updatePortfolioCard(); renderIncomeFunds(); calcIncome();
 }
 // slider: only update label + info text inline, debounce full recalc
 function incSetAlloc(id, val) {
