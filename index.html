@@ -4937,56 +4937,55 @@ function renderIncomeFunds() {
   var principal = +((document.getElementById('inc-amt')||{}).value||0);
   var dc='#0891b2', ac='#16a34a';
   var EQ_IDS = {'e0050':1,'e006208':1,'e0056':1,'vt':1,'vwra':1,'shz71':1,'tlzr0':1,'tlz63':1};
-  var divFunds = INCOME_FUNDS.filter(function(f){ return !EQ_IDS[f.id]; });
-  var eqFunds  = INCOME_FUNDS.filter(function(f){ return  EQ_IDS[f.id]; });
+  // 只顯示已加入的基金
+  var divFunds = INCOME_FUNDS.filter(function(f){ return !EQ_IDS[f.id] && _incState[f.id] && _incState[f.id].checked; });
+  var eqFunds  = INCOME_FUNDS.filter(function(f){ return  EQ_IDS[f.id] && _incState[f.id] && _incState[f.id].checked; });
 
   function makeRow(f) {
-    var s = _incState[f.id]||{checked:false,alloc:0,mode:f.defMode};
+    var s = _incState[f.id]||{checked:true,alloc:0,mode:f.defMode};
     var isDiv = s.mode==='div';
-    var bc = s.checked?(isDiv?dc:ac):'var(--border)';
-    var bg = s.checked?(isDiv?'#f0f9ff':'#f0fdf4'):'white';
+    var bc = isDiv?dc:ac;
+    var bg = isDiv?'#f0f9ff':'#f0fdf4';
+    var alloc = s.alloc||0;
+    var amt = principal*alloc/100;
+    var units = f.nav>0?(amt/f.nav):0;
+    var uStr = units>=1000?(Math.round(units/1000)+'K'):units>=1?units.toFixed(1):units>0?units.toFixed(3):'0';
     var h = '<div style="border:1.5px solid '+bc+';border-radius:10px;padding:9px 12px;background:'+bg+'">';
     h += '<div style="display:flex;align-items:center;gap:8px">';
-    h += '<input type="checkbox" data-fid="'+f.id+'" '+(s.checked?'checked':'')+' onchange="incToggle(this.dataset.fid,this.checked)" style="width:16px;height:16px;accent-color:var(--blue);flex-shrink:0">';
     h += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">'+f.name+'</div>';
     var dLbl = f.divRate>0?'配息率 '+f.divRate.toFixed(2)+'% · 增值 '+f.capRate.toFixed(1)+'%':'增值 '+f.capRate.toFixed(1)+'%（累積型）';
     h += '<div style="font-size:10px;color:var(--sub)">'+dLbl+' · '+f.freq+'</div></div>';
-    if (s.checked) {
-      h += '<div style="display:flex;gap:4px;flex-shrink:0">';
-      h += '<button data-fid="'+f.id+'" data-m="div" onclick="incSetMode(this.dataset.fid,this.dataset.m)" style="font-size:11px;padding:2px 9px;border-radius:20px;border:1.5px solid '+(isDiv?dc:'var(--border)')+';background:'+(isDiv?dc:'white')+';color:'+(isDiv?'white':'var(--sub)')+';cursor:pointer;font-weight:600">💵配息</button>';
-      h += '<button data-fid="'+f.id+'" data-m="acc" onclick="incSetMode(this.dataset.fid,this.dataset.m)" style="font-size:11px;padding:2px 9px;border-radius:20px;border:1.5px solid '+(!isDiv?ac:'var(--border)')+';background:'+(!isDiv?ac:'white')+';color:'+(!isDiv?'white':'var(--sub)')+';cursor:pointer;font-weight:600">📈再投入</button>';
-      h += '</div>';
-    }
+    h += '<div style="display:flex;gap:4px;flex-shrink:0">';
+    h += '<button data-fid="'+f.id+'" data-m="div" onclick="incSetMode(this.dataset.fid,this.dataset.m)" style="font-size:11px;padding:2px 9px;border-radius:20px;border:1.5px solid '+(isDiv?dc:'var(--border)')+';background:'+(isDiv?dc:'white')+';color:'+(isDiv?'white':'var(--sub)')+';cursor:pointer;font-weight:600">💵配息</button>';
+    h += '<button data-fid="'+f.id+'" data-m="acc" onclick="incSetMode(this.dataset.fid,this.dataset.m)" style="font-size:11px;padding:2px 9px;border-radius:20px;border:1.5px solid '+(!isDiv?ac:'var(--border)')+';background:'+(!isDiv?ac:'white')+';color:'+(!isDiv?'white':'var(--sub)')+';cursor:pointer;font-weight:600">📈再投入</button>';
+    h += '<button data-fid="'+f.id+'" onclick="incRemoveFund(this.dataset.fid)" style="font-size:11px;padding:2px 8px;border-radius:20px;border:1.5px solid #fca5a5;background:white;color:#e53935;cursor:pointer;font-weight:600">✕</button>';
+    h += '</div></div>';
+    h += '<div style="margin-top:7px">';
+    h += '<div style="display:flex;align-items:center;gap:8px">';
+    h += '<input type="range" data-fid="'+f.id+'" min="0" max="100" step="5" value="'+alloc+'" oninput="incSetAlloc(this.dataset.fid,this.value)" style="flex:1;accent-color:var(--blue);cursor:pointer">';
+    h += '<span id="inc-alloc-lbl-'+f.id+'" style="font-size:14px;font-weight:800;color:var(--blue);min-width:38px;text-align:right">'+alloc+'%</span>';
     h += '</div>';
-    if (s.checked) {
-      var alloc = s.alloc||0;
-      var amt = principal*alloc/100;
-      var units = f.nav>0?(amt/f.nav):0;
-      var uStr = units>=1000?(Math.round(units/1000)+'K'):units>=1?units.toFixed(1):units>0?units.toFixed(3):'0';
-      h += '<div style="margin-top:7px;padding-left:24px">';
-      h += '<div style="display:flex;align-items:center;gap:8px">';
-      h += '<input type="range" data-fid="'+f.id+'" min="0" max="100" step="5" value="'+alloc+'" oninput="incSetAlloc(this.dataset.fid,this.value)" style="flex:1;accent-color:var(--blue);cursor:pointer">';
-      h += '<span id="inc-alloc-lbl-'+f.id+'" style="font-size:14px;font-weight:800;color:var(--blue);min-width:38px;text-align:right">'+alloc+'%</span>';
-      h += '</div>';
-      h += '<div id="inc-alloc-info-'+f.id+'" style="display:'+(amt>0?'flex':'none')+';justify-content:space-between;font-size:11px;margin-top:3px">';
-      if (amt>0) {
-        h += '<span style="color:var(--sub)">投入 <b style="color:var(--text)">'+incFmtP(amt)+'</b></span>';
-        h += '<span style="color:var(--sub)">可買 <b style="color:var(--blue)">'+uStr+' 單位</b> ('+(f.navCur==='USD'?'$':'NT$')+f.nav.toFixed(2)+')</span>';
-      }
-      h += '</div></div>';
+    h += '<div id="inc-alloc-info-'+f.id+'" style="display:'+(amt>0?'flex':'none')+';justify-content:space-between;font-size:11px;margin-top:3px">';
+    if (amt>0) {
+      h += '<span style="color:var(--sub)">投入 <b style="color:var(--text)">'+incFmtP(amt)+'</b></span>';
+      h += '<span style="color:var(--sub)">可買 <b style="color:var(--blue)">'+uStr+' 單位</b> ('+(f.navCur==='USD'?'$':'NT$')+f.nav.toFixed(2)+')</span>';
     }
+    h += '</div></div>';
     h += '</div>';
     return h;
   }
 
   var secStyle = 'display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:1px;padding:6px 10px;border-radius:8px;margin-bottom:8px';
-  rows.innerHTML =
-    '<div style="'+secStyle+';background:#eff6ff;color:#1d4ed8">💰 配息型基金</div>' +
-    '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">' +
-    divFunds.map(makeRow).join('') + '</div>' +
-    '<div style="'+secStyle+';background:#f0fdf4;color:#15803d">📈 配股型 ETF</div>' +
-    '<div style="display:flex;flex-direction:column;gap:8px">' +
-    eqFunds.map(makeRow).join('') + '</div>';
+  var html = '';
+  if (divFunds.length) {
+    html += '<div style="'+secStyle+';background:#eff6ff;color:#1d4ed8">💰 配息型基金</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">'+divFunds.map(makeRow).join('')+'</div>';
+  }
+  if (eqFunds.length) {
+    html += '<div style="'+secStyle+';background:#f0fdf4;color:#15803d">📈 配股型 ETF</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:8px">'+eqFunds.map(makeRow).join('')+'</div>';
+  }
+  rows.innerHTML = html;
 }
 function calcIncome() {
   var principal = +((document.getElementById('inc-amt')||{}).value||0);
