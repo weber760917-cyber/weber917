@@ -3984,7 +3984,8 @@ function printIncome2Report() {
   if (!sel.length) { alert('請先勾選基金後再產生報表'); return; }
 
   var principal = _i2P || 5000000;
-  var isRot = document.querySelector('#i2-mode-rot') && document.querySelector('#i2-mode-rot').checked;
+  var _modeEl = document.querySelector('input[name="i2mode"][value="rot"]');
+  var isRot = _modeEl && _modeEl.checked;
   var mode = isRot ? 'rot' : 'std';
 
   // 讀試算結果
@@ -4095,13 +4096,16 @@ function printIncome2Report() {
     + '<th style="text-align:right">每月預估配息</th>'
     + '<th style="text-align:center">配息基準日</th></tr></thead><tbody>'
     + selFunds.map(function(s){
-        var fmtFp = Math.round(s.fp/10000)+'萬';
+        var dispFp   = (mode==='rot') ? rotP2 : s.fp;
+        var dispMoFund = dispFp * s.f.divRate / 100 / 12;
+        var fmtFp    = Math.round(dispFp/10000)+'萬';
+        var allocLbl = (mode==='rot') ? '全額輪入' : s.pct+'%';
         return '<tr>'
           +'<td style="font-weight:700;color:'+s.f.col+'">'+s.name+'</td>'
-          +'<td style="text-align:right">'+s.pct+'%</td>'
+          +'<td style="text-align:right">'+allocLbl+'</td>'
           +'<td style="text-align:right">'+fmtFp+'</td>'
           +'<td style="text-align:right;color:#16a34a;font-weight:700">'+s.f.divRate.toFixed(2)+'%</td>'
-          +'<td style="text-align:right;font-weight:800;color:'+s.f.col+'">'+incFmtP(Math.round(s.mo))+'元</td>'
+          +'<td style="text-align:right;font-weight:800;color:'+s.f.col+'">'+incFmtP(Math.round(dispMoFund))+'元</td>'
           +'<td style="text-align:center;color:#64748b">約'+s.f.payDay+'日</td>'
           +'</tr>';
       }).join('')
