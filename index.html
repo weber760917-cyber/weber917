@@ -4001,12 +4001,26 @@ function printIncome2Report() {
     moIncome = last ? (last.textContent||'').replace(/\s+/g,' ').trim() : '';
   }
 
-  // 配置比例
+  // 配置比例 & 每月配息試算
   var allocMap = {};
+  var selFunds = [];
+  var stdTotMo = 0;
+  var totAlloc2 = 0;
   sel.forEach(function(id){
     var el = document.getElementById('i2pct-'+id);
-    allocMap[id] = el ? el.value+'%' : '—';
+    var pct = el ? +el.value : 0;
+    allocMap[id] = pct+'%';
+    totAlloc2 += pct;
+    var fp = principal * pct / 100;
+    var f = I2_FUNDS[id];
+    var mo = fp * f.divRate / 100 / 12;
+    stdTotMo += mo;
+    selFunds.push({id:id, name:I2_NAMES[id], pct:pct, fp:fp, mo:mo, f:f});
   });
+  var rotP2 = principal * totAlloc2 / 100;
+  var totalDivRate2 = selFunds.reduce(function(s,x){return s+x.f.divRate;},0);
+  var rotMo2 = rotP2 * totalDivRate2 / 100 / 12;
+  var dispMo = (mode==='rot') ? rotMo2 : stdTotMo;
 
   var today = new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'long',day:'numeric'});
   var pTw = Math.round(principal/10000);
@@ -4072,12 +4086,34 @@ function printIncome2Report() {
       }).join('')
     + '</table></div>'
 
-    // Monthly income
+    // Monthly income – per fund breakdown
     + '<div class="section"><h2>二、月配息試算結果</h2>'
-    + '<div style="background:linear-gradient(135deg,#1e3a5f,#2563eb);border-radius:12px;padding:18px;color:white;margin-bottom:12px">'
-    + '<div style="font-size:11px;color:rgba(255,255,255,0.7);margin-bottom:4px">依目前配置試算（本金 '+pTw+'萬 · '+I2_FX+' TWD/USD）</div>'
-    + '<div id="rpt-mo" style="font-size:13px;color:rgba(255,255,255,0.9)">'+(moIncome||'請先完成試算後再列印')+'</div>'
-    + '</div></div>'
+    + '<table style="margin-bottom:10px"><thead><tr>'
+    + '<th>基金名稱</th><th style="text-align:right">配置比例</th>'
+    + '<th style="text-align:right">投入金額</th>'
+    + '<th style="text-align:right">年化配息率</th>'
+    + '<th style="text-align:right">每月預估配息</th>'
+    + '<th style="text-align:center">配息基準日</th></tr></thead><tbody>'
+    + selFunds.map(function(s){
+        var fmtFp = Math.round(s.fp/10000)+'萬';
+        return '<tr>'
+          +'<td style="font-weight:700;color:'+s.f.col+'">'+s.name+'</td>'
+          +'<td style="text-align:right">'+s.pct+'%</td>'
+          +'<td style="text-align:right">'+fmtFp+'</td>'
+          +'<td style="text-align:right;color:#16a34a;font-weight:700">'+s.f.divRate.toFixed(2)+'%</td>'
+          +'<td style="text-align:right;font-weight:800;color:'+s.f.col+'">'+incFmtP(Math.round(s.mo))+'元</td>'
+          +'<td style="text-align:center;color:#64748b">約'+s.f.payDay+'日</td>'
+          +'</tr>';
+      }).join('')
+    + '<tr style="background:#0f172a">'
+    + '<td colspan="4" style="color:white;font-weight:800;font-size:13px">'
+    + (mode==='rot'?'🔄 輪轉模式合計月配息':'📊 標準模式合計月配息')+'</td>'
+    + '<td style="text-align:right;font-size:16px;font-weight:900;color:#fde68a">'+incFmtP(Math.round(dispMo))+'元</td>'
+    + '<td style="color:#94a3b8;font-size:11px;text-align:center">每月</td>'
+    + '</tr></tbody></table>'
+    + (mode==='rot'?'<div style="background:#f5f3ff;border-radius:8px;padding:10px 14px;font-size:11px;color:#4c1d95;margin-bottom:8px">'
+    + '💡 <b>輪轉月配息邏輯：</b>本金 '+incFmtP(rotP2)+'元 × 各基金配息率加總 '+totalDivRate2.toFixed(2)+'% ÷ 12，實現每月均衡收益。</div>':'')
+    + '</div>'
 
     // Long-term table
     + '<div class="section" style="page-break-inside:avoid"><h2>三、長期複利預估（年均平均法 IRR）</h2>'
