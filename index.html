@@ -2271,7 +2271,7 @@ const NOW = new Date();
 function switchRetireSub(view, btnId) {
   ['rview-retire','rview-loan','rview-income','rview-income2','rview-platform'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.style.display = id === view ? '' : 'none';
+    if (el) el.style.display = id === view ? 'block' : 'none';
   });
   document.querySelectorAll('#panel-retire .market-sub').forEach(b => b.classList.remove('active'));
   const btn = document.getElementById(btnId);
