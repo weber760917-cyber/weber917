@@ -736,6 +736,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <button id="rtab-loan"   class="market-sub"        onclick="switchRetireSub('rview-loan','rtab-loan')">🏦 貸款試算</button>
     <button id="rtab-income" class="market-sub"        onclick="switchRetireSub('rview-income','rtab-income');initIncomeTab()">💰 月配息</button>
     <button id="rtab-income2" class="market-sub"       onclick="switchRetireSub('rview-income2','rtab-income2');initIncome2Tab()">📊 月配息2</button>
+    <button id="rtab-platform" class="market-sub"       onclick="switchRetireSub('rview-platform','rtab-platform');initPlatformTab()">🏛️ 選擇平台</button>
   </div>
 
   <div id="rview-retire">
@@ -1455,6 +1456,90 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 
 </div><!-- end rview-income2 -->
 
+<div id="rview-platform" style="display:none;padding:8px 0">
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#1e3a5f,#1d4ed8);border-radius:16px;padding:18px 20px;color:white;margin-bottom:14px">
+    <div style="font-size:17px;font-weight:900">🏛️ 投資型保單平台比較</div>
+    <div style="font-size:11px;opacity:0.75;margin-top:4px">選擇平台 × 計算扣除費用率後的實質每月收益</div>
+  </div>
+
+  <!-- Investment amount input -->
+  <div style="background:white;border-radius:12px;border:1.5px solid var(--border);padding:14px;margin-bottom:12px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="font-size:13px;font-weight:700;color:var(--text)">💰 投入本金</div>
+      <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:200px">
+        <input id="plat-amt" type="number" value="3000000" step="100000" min="100000"
+          style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px;font-weight:700;color:var(--text)"
+          oninput="calcPlatform()">
+        <span style="font-size:12px;color:var(--sub)">元</span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="setPlatAmt(1000000)" style="padding:5px 10px;border-radius:8px;border:1.5px solid var(--border);background:#f8faff;font-size:11px;font-weight:700;cursor:pointer">100萬</button>
+        <button onclick="setPlatAmt(3000000)" style="padding:5px 10px;border-radius:8px;border:1.5px solid var(--border);background:#f8faff;font-size:11px;font-weight:700;cursor:pointer">300萬</button>
+        <button onclick="setPlatAmt(5000000)" style="padding:5px 10px;border-radius:8px;border:1.5px solid var(--border);background:#f8faff;font-size:11px;font-weight:700;cursor:pointer">500萬</button>
+      </div>
+    </div>
+    <!-- Year selector -->
+    <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <div style="font-size:12px;font-weight:700;color:var(--sub)">📅 保單年度</div>
+      <select id="plat-year" onchange="calcPlatform()" style="border:1.5px solid var(--border);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--text)">
+        <option value="1">第 1 年（費率最高）</option>
+        <option value="2">第 2 年</option>
+        <option value="3">第 3 年</option>
+        <option value="4" selected>第 4 年（含）以後</option>
+      </select>
+      <span style="font-size:11px;color:var(--sub)">── 費率依年度自動套用</span>
+    </div>
+  </div>
+
+  <!-- Strategy rate inputs -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+    <div style="background:#eff6ff;border-radius:12px;padding:12px;border:1.5px solid #bfdbfe">
+      <div style="font-size:12px;font-weight:700;color:#1e40af;margin-bottom:6px">💰 月配息 預期年化配息率</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input id="plat-div1" type="number" value="10" min="1" max="30" step="0.5"
+          style="flex:1;border:1.5px solid #bfdbfe;border-radius:8px;padding:7px;font-size:16px;font-weight:900;color:#1e40af;text-align:center"
+          oninput="calcPlatform()">
+        <span style="font-size:14px;font-weight:900;color:#1e40af">%</span>
+      </div>
+      <div style="font-size:10px;color:#3b82f6;margin-top:4px">參考：安聯AMg7 ≈9%、聯博AP ≈13.5%</div>
+    </div>
+    <div style="background:#f5f3ff;border-radius:12px;padding:12px;border:1.5px solid #ddd6fe">
+      <div style="font-size:12px;font-weight:700;color:#6d28d9;margin-bottom:6px">🔄 雙配息（輪轉）預期年化配息率</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input id="plat-div2" type="number" value="22" min="1" max="50" step="0.5"
+          style="flex:1;border:1.5px solid #ddd6fe;border-radius:8px;padding:7px;font-size:16px;font-weight:900;color:#6d28d9;text-align:center"
+          oninput="calcPlatform()">
+        <span style="font-size:14px;font-weight:900;color:#6d28d9">%</span>
+      </div>
+      <div style="font-size:10px;color:#8b5cf6;margin-top:4px">輪轉策略合計：安聯+聯博 ≈22%</div>
+    </div>
+  </div>
+
+  <!-- Platform comparison table -->
+  <div style="background:white;border-radius:12px;border:1.5px solid var(--border);overflow:hidden;margin-bottom:14px">
+    <div style="padding:10px 14px;background:#0f172a;color:white;font-size:13px;font-weight:700">各平台費後實質月收益比較</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="background:#f1f5f9">
+            <th style="padding:9px 10px;text-align:left;font-weight:700;color:#475569">平台</th>
+            <th style="padding:9px 10px;text-align:center;color:#475569">月費率</th>
+            <th style="padding:9px 10px;text-align:right;color:#1e40af">💰月配息<br><span style="font-weight:400;font-size:10px">扣費後月收益</span></th>
+            <th style="padding:9px 10px;text-align:right;color:#6d28d9">🔄雙配息<br><span style="font-weight:400;font-size:10px">扣費後月收益</span></th>
+            <th style="padding:9px 10px;text-align:center;color:#475569">費率負擔<br><span style="font-weight:400;font-size:10px">佔配息%</span></th>
+          </tr>
+        </thead>
+        <tbody id="plat-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Platform detail cards -->
+  <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">📋 各平台商品特色</div>
+  <div id="plat-cards" style="display:flex;flex-direction:column;gap:10px"></div>
+</div><!-- end rview-platform -->
+
 </div>
 
 <div id="rview-loan" style="display:none;max-width:640px;margin:0 auto;padding:16px">
@@ -1910,7 +1995,7 @@ const NOW = new Date();
 
 
 function switchRetireSub(view, btnId) {
-  ['rview-retire','rview-loan','rview-income','rview-income2'].forEach(id => {
+  ['rview-retire','rview-loan','rview-income','rview-income2','rview-platform'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = id === view ? '' : 'none';
   });
@@ -1919,7 +2004,7 @@ function switchRetireSub(view, btnId) {
   if (btn) btn.classList.add('active');
   if (view === 'rview-loan') { calcLoan(); }
   // URL deep link
-  const hm = {'rview-income':'#income','rview-loan':'#loan','rview-retire':'#retire','rview-income2':'#income2'};
+  const hm = {'rview-income':'#income','rview-loan':'#loan','rview-retire':'#retire','rview-income2':'#income2','rview-platform':'#platform'};
   if (hm[view]) history.replaceState(null, '', hm[view]);
 }
 
@@ -3822,6 +3907,177 @@ function switchWcMatch(n) {
 
 
 
+
+// ── 投資型保單平台比較 ──
+var PLAT_DATA = [
+  { id:'kaige1', name:'招財進保', company:'凱基人壽', col:'#f59e0b',
+    fee:[0.0015,0.0015,0.0015,0.0015],
+    surrender:[15,10,8,2,0], loanRatio:55,
+    loanRate:'3.85%（≤300萬）/ 3.60%（>300萬）', transfer:'T+1',
+    bonus:null, adminFee:0,
+    highlight:'',
+    desc:'費率全年均一（每月0.15%），結構最簡單透明。第5年起無解約費，貸款上限55%享分層利率優惠。',
+    features:['四年均一費率，計算最直覺','第5年起解約費歸零','貸款利率分層：300萬以上享3.60%優惠','T+1轉換效率高']
+  },
+  { id:'kaige2', name:'一生傳富', company:'凱基人壽', col:'#d97706',
+    fee:[0.0026,0.0025,0.0024,0],
+    surrender:[13,11,10,4,0], loanRatio:60,
+    loanRate:'3.85%', transfer:'T+1',
+    bonus:null, adminFee:0,
+    highlight:'',
+    desc:'第4年起費率降為0%，長期持有成本極低。前三年費率稍高，適合規劃長期持有5年以上的投資人。貸款上限60%，解約費5年後歸零。',
+    features:['第4年起費率歸0，長期持有零費用','貸款上限高達60%','解約費5年後歸零','前三年費率適中（0.24-0.26%）']
+  },
+  { id:'taivita', name:'臻鑽盈盈', company:'台灣人壽', col:'#16a34a',
+    fee:[0.0021,0.002,0.00165,0],
+    surrender:[15,10,6,2,0], loanRatio:60,
+    loanRate:'4.27%', transfer:'T+1/T+2',
+    bonus:null, adminFee:0,
+    highlight:'',
+    desc:'第4年起費率降為0%，前三年費率逐年遞減。台灣人壽老牌保險公司，解約費5年後歸零，貸款上限60%。支援T+1、T+2兩種轉換模式。',
+    features:['第4年起費率歸0','前三年費率逐年遞降','貸款上限60%','支援T+1/T+2雙轉換模式','解約費5年後歸零']
+  },
+  { id:'first', name:'環球領航', company:'第一金壽', col:'#0891b2',
+    fee:[0.0024,0.002,0.0016,0.0014],
+    surrender:[10,9,7,6,5], loanRatio:50,
+    loanRate:'3.51%（市場最低之一）', transfer:'T/T+1',
+    bonus:null, adminFee:0,
+    highlight:'',
+    desc:'第一金人壽旗下，費率四年持續遞減，最終穩定在0.14%/月。貸款利率3.51%為比較表中最低。注意：第5年後仍有5%解約費，適合不打算提前解約的長期投資人。',
+    features:['貸款利率3.51%，比較表最低','費率四年持續遞減至0.14%','支援T/T+1即時轉換','注意：5年後仍有5%解約費']
+  },
+  { id:'skl', name:'超吉馬利', company:'新光人壽', col:'#e11d48',
+    fee:[0.0024,0.002,0.00165,0.00155],
+    surrender:[10,9,7,6,5], loanRatio:60,
+    loanRate:'3.80%', transfer:'T/T+1',
+    bonus:null, adminFee:0,
+    highlight:'',
+    desc:'新光人壽旗下，費率四年逐步遞減，貸款成數60%為中上水準，利率3.80%屬市場偏低。T/T+1雙模式轉換。同樣注意第5年後仍有5%解約費。',
+    features:['貸款上限60%，利率3.80%','費率四年逐步遞降','T/T+1雙轉換','注意：5年後仍有5%解約費']
+  },
+  { id:'allianz', name:'吉利發發', company:'安聯人壽', col:'#7c3aed',
+    fee:[0.0016,0.0016,0.0016,0.0016],
+    surrender:[7,6,5,2,0], loanRatio:50,
+    loanRate:'4.20%', transfer:'待確認',
+    bonus:null, adminFee:0,
+    highlight:'費率最低',
+    desc:'安聯人壽旗下，月費率0.16%為比較表最低，且全年均一。解約費也是最低之一（最高7%，5年後歸零）。費率結構對長期投資人最友善，適合重視費用控制的投資人。',
+    features:['月費率0.16%，比較表最低','解約費最低（最高7%），5年後歸零','費率均一，長期規劃最友善','安聯品牌，全球知名資產管理公司']
+  },
+  { id:'chubb', name:'富貴大贏家', company:'安達人壽', col:'#059669',
+    fee:[0.002,0.0018,0.0013,0.0013],
+    surrender:[9,8,7,6,5], loanRatio:40,
+    loanRate:'4.00%', transfer:'T+1/T+2',
+    bonus:null, adminFee:0,
+    highlight:'',
+    desc:'安達人壽（Chubb）旗下，前三年費率快速遞降，第4年起穩定在0.13%/月。貸款成數較低（40%），適合不需要保單貸款的投資人。注意：5年後仍有5%解約費。',
+    features:['第4年費率降至0.13%，長期成本低','Chubb全球信評優良品牌','T+1/T+2轉換彈性','注意：貸款成數僅40%，且5年後有5%解約費']
+  },
+  { id:'yuanta', name:'大利元滿', company:'元大人壽', col:'#dc2626',
+    fee:[0.0018,0,0,0],
+    surrender:[7,6,4,3,0], loanRatio:60,
+    loanRate:'4.00%', transfer:'T+1（每年12次免費）',
+    bonus:0.004, adminFee:100,
+    highlight:'第2年起0費率',
+    desc:'元大人壽旗艦投資型保單，最大特色是僅第1年收費0.18%/月，第2年起費率完全歸零！另收每月100元保單管理費（帳戶價值≥300萬免收）。第5年起享加值給付金0.4%（按前12月平均帳戶價值），等同額外多拿0.4%年化報酬。每年12次免費轉換。',
+    features:['第2年起月費率歸零，長期持有成本最低','第5年起加值給付金+0.4%（額外獎勵）','每年12次免費標的轉換','解約費最低之一（5年後歸零）','300萬以上帳戶：保單管理費100元/月免收']
+  }
+];
+
+function setPlatAmt(v){
+  var el=document.getElementById('plat-amt'); if(el){el.value=v; calcPlatform();}
+}
+
+function initPlatformTab(){
+  calcPlatform();
+}
+
+function calcPlatform(){
+  var principal = +(document.getElementById('plat-amt')||{value:3000000}).value || 3000000;
+  var yr = +((document.getElementById('plat-year')||{value:4}).value||4);
+  var div1 = +((document.getElementById('plat-div1')||{value:10}).value||10);
+  var div2 = +((document.getElementById('plat-div2')||{value:22}).value||22);
+
+  var gross1 = principal * div1/100/12;  // 月配息毛收益
+  var gross2 = principal * div2/100/12;  // 雙配息毛收益
+
+  var tbody = document.getElementById('plat-tbody');
+  var cards = document.getElementById('plat-cards');
+  if (!tbody || !cards) return;
+
+  var rows = '', cardHtml = '';
+  var bestNet2 = -Infinity, bestId = '';
+
+  PLAT_DATA.forEach(function(p){
+    var feeIdx = Math.min(yr-1, 3);
+    var mFee = p.fee[feeIdx];
+    var mFeeAmt = principal * mFee;
+    // 管理費（元大特有100元/月，300萬以上免收）
+    var adminFeeAmt = (p.adminFee && principal < 3000000) ? p.adminFee : 0;
+    var totalFeeAmt = mFeeAmt + adminFeeAmt;
+    // 加值給付金（元大，第5年後）
+    var bonusAmt = (p.bonus && yr >= 5) ? principal * p.bonus / 12 : 0;
+
+    var net1 = gross1 - totalFeeAmt + bonusAmt;
+    var net2 = gross2 - totalFeeAmt + bonusAmt;
+    if (net2 > bestNet2) { bestNet2 = net2; bestId = p.id; }
+
+    var feeRat1 = gross1>0 ? (totalFeeAmt/gross1*100).toFixed(1) : '—';
+
+    var fmt = function(n){ return n>=0 ? (Math.round(n)>=10000 ? Math.round(n/10000*10)/10+'萬' : Math.round(n).toLocaleString()+'元') : '<span style="color:#e53935">-'+(Math.abs(Math.round(n))>=10000?Math.abs(Math.round(n/10000*10)/10)+'萬':Math.abs(Math.round(n)).toLocaleString()+'元')+'</span>'; };
+
+    var isZeroFee = mFee === 0;
+    var feeLabel = isZeroFee ? '<span style="color:#16a34a;font-weight:800">0%</span>' : (mFee*100).toFixed(2)+'%';
+    rows += '<tr style="border-bottom:1px solid #f1f5f9">'
+      +'<td style="padding:8px 10px;font-weight:800;color:'+p.col+'">'
+        +(p.highlight?'<span style="font-size:9px;background:'+p.col+';color:white;padding:1px 5px;border-radius:6px;margin-right:4px">'+p.highlight+'</span>':'')
+        +p.name+'<br><span style="font-size:10px;color:#94a3b8;font-weight:400">'+p.company+'</span></td>'
+      +'<td style="padding:8px 10px;text-align:center">'+feeLabel
+        +(adminFeeAmt>0?'<br><span style="font-size:9px;color:#94a3b8">+$100管費</span>':'')
+        +(bonusAmt>0?'<br><span style="font-size:9px;color:#16a34a">+0.4%加值</span>':'')
+        +'</td>'
+      +'<td style="padding:8px 10px;text-align:right;font-weight:700;color:#1e40af">'+fmt(net1)+'</td>'
+      +'<td style="padding:8px 10px;text-align:right;font-weight:800;color:'+p.col+'">'+fmt(net2)+'</td>'
+      +'<td style="padding:8px 10px;text-align:center;font-size:11px;color:'+(parseFloat(feeRat1)>20?'#e53935':parseFloat(feeRat1)>10?'#d97706':'#16a34a')+'">'+feeRat1+'%</td>'
+      +'</tr>';
+  });
+
+  tbody.innerHTML = rows;
+
+  // Feature cards
+  PLAT_DATA.forEach(function(p){
+    var isBest = p.id === bestId;
+    cardHtml += '<div style="border:1.5px solid '+(isBest?p.col:'var(--border)')+';border-radius:12px;overflow:hidden">'
+      +'<div style="background:'+p.col+';padding:10px 14px;display:flex;justify-content:space-between;align-items:center">'
+        +'<div style="color:white;font-weight:800;font-size:14px">'+p.name+' <span style="font-size:11px;font-weight:400;opacity:0.85">— '+p.company+'</span></div>'
+        +(isBest?'<span style="background:white;color:'+p.col+';font-size:11px;font-weight:800;padding:2px 8px;border-radius:8px">🏆 雙配息最優</span>':'')
+        +(p.highlight?'<span style="background:rgba(255,255,255,0.25);color:white;font-size:11px;padding:2px 8px;border-radius:8px">★ '+p.highlight+'</span>':'')
+      +'</div>'
+      +'<div style="padding:10px 14px">'
+        +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;font-size:11px">'
+          +'<div style="background:#f8fafc;border-radius:7px;padding:7px;text-align:center"><div style="color:#64748b;margin-bottom:2px">各年月費率</div>'
+            +'<div style="font-weight:700;font-size:10px;color:#1e293b">'+p.fee.map(function(f,i){return 'Y'+(i+1)+':'+(f*100).toFixed(2)+'%';}).join('<br>')+'</div></div>'
+          +'<div style="background:#f8fafc;border-radius:7px;padding:7px;text-align:center"><div style="color:#64748b;margin-bottom:2px">解約費（5年）</div>'
+            +'<div style="font-weight:700;font-size:10px;color:#1e293b">'+p.surrender.map(function(s,i){return 'Y'+(i+1)+':'+s+'%';}).join('<br>')+'</div></div>'
+          +'<div style="background:#f8fafc;border-radius:7px;padding:7px;text-align:center"><div style="color:#64748b;margin-bottom:2px">貸款成數</div>'
+            +'<div style="font-weight:800;color:#0891b2">'+p.loanRatio+'%</div>'
+            +'<div style="font-size:10px;color:#64748b;margin-top:2px">利率：'+p.loanRate+'</div></div>'
+          +'<div style="background:#f8fafc;border-radius:7px;padding:7px;text-align:center"><div style="color:#64748b;margin-bottom:2px">轉換</div>'
+            +'<div style="font-weight:700;color:#7c3aed">'+p.transfer+'</div>'
+            +(p.bonus?'<div style="font-size:10px;color:#16a34a;margin-top:2px">加值給付+0.4%</div>':'')
+            +(p.adminFee?'<div style="font-size:10px;color:#f59e0b;margin-top:2px">管費$'+p.adminFee+'/月</div>':'')
+          +'</div>'
+        +'</div>'
+        +'<div style="font-size:12px;color:#475569;line-height:1.7;margin-bottom:8px">'+p.desc+'</div>'
+        +'<div style="display:flex;flex-wrap:wrap;gap:5px">'
+          +p.features.map(function(t){return '<span style="font-size:11px;background:#f1f5f9;border-radius:6px;padding:3px 8px;color:#334155">✓ '+t+'</span>';}).join('')
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  });
+
+  cards.innerHTML = cardHtml;
+}
 
 // ── 月配息2 ──
 var I2_FUNDS = {
