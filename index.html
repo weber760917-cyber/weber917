@@ -736,7 +736,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <button id="rtab-loan"   class="market-sub"        onclick="switchRetireSub('rview-loan','rtab-loan')">🏦 貸款試算</button>
     <button id="rtab-income" class="market-sub"        onclick="switchRetireSub('rview-income','rtab-income');initIncomeTab()">💰 月配息</button>
     <button id="rtab-income2" class="market-sub"       onclick="switchRetireSub('rview-income2','rtab-income2');initIncome2Tab()">📊 月配息2</button>
-    <button id="rtab-platform" class="market-sub"       onclick="switchRetireSub('rview-platform','rtab-platform');initPlatformTab()">🏛️ 選擇平台</button>
+    <button id="rtab-platform" class="market-sub"       onclick="switchRetireSub('rview-platform','rtab-platform')">🏛️ 選擇平台</button>
   </div>
 
   <div id="rview-retire">
@@ -2003,6 +2003,7 @@ function switchRetireSub(view, btnId) {
   const btn = document.getElementById(btnId);
   if (btn) btn.classList.add('active');
   if (view === 'rview-loan') { calcLoan(); }
+  if (view === 'rview-platform') { calcPlatform(); }
   // URL deep link
   const hm = {'rview-income':'#income','rview-loan':'#loan','rview-retire':'#retire','rview-income2':'#income2','rview-platform':'#platform'};
   if (hm[view]) history.replaceState(null, '', hm[view]);
@@ -4003,7 +4004,7 @@ function calcPlatform(){
 
   var tbody = document.getElementById('plat-tbody');
   var cards = document.getElementById('plat-cards');
-  if (!tbody || !cards) return;
+  if (!tbody || !cards) { setTimeout(calcPlatform, 100); return; }
 
   var rows = '', cardHtml = '';
   var bestNet2 = -Infinity, bestId = '';
