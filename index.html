@@ -1563,11 +1563,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
               <th style="padding:9px 6px;text-align:right;color:#86efac">配息基金<br><span style="opacity:0.7;font-size:9px">帳戶價值</span></th>
               <th style="padding:9px 6px;text-align:right;color:#93c5fd">配股基金<br><span style="opacity:0.7;font-size:9px">帳戶價值</span></th>
               <th style="padding:9px 6px;text-align:right;color:#fcd34d">已領利息<br><span style="opacity:0.7;font-size:9px">累計</span></th>
-              <th style="padding:9px 6px;text-align:right;color:#f9a8d4">年化<br><span style="opacity:0.7;font-size:9px">報酬率</span></th>
+              <th style="padding:9px 6px;text-align:right;color:#f9a8d4">整體年化<br><span style="opacity:0.7;font-size:9px">綜合報酬</span></th>
             </tr>
           </thead>
           <tbody id="wf-tbody"></tbody>
         </table>
+      </div>
+      <div style="font-size:10px;color:#94a3b8;margin-top:7px;padding:6px 8px;background:#f8faff;border-radius:7px;line-height:1.6">
+        📌 <b>整體年化報酬</b> = （累積利息 ＋ 配息帳戶 ＋ 配股帳戶）÷ 原始本金，年化後之綜合報酬率。<br>
+        配股基金本身歷史年化（12% / 10% / 8%）為基金獨立績效，整體報酬因含配息、費用分攤後會有所不同。
       </div>
     </div>
 
@@ -4479,7 +4483,7 @@ function calcWorkflow(){
 
   // Update amt display
   var ad = document.getElementById('wf-amt-display');
-  if(ad) ad.textContent = '= '+(P>=10000?(Math.round(P/10000)/10)+'萬':P.toLocaleString()+'元');
+  if(ad) ad.textContent = '= '+(P>=10000?(Math.round(P/1000)/10)+'萬':P.toLocaleString()+'元');
 
   // Platform
   var pr = document.querySelector('input[name="wf-plat"]:checked');
@@ -4548,9 +4552,17 @@ function calcWorkflow(){
       cumDiv += inc_acc * effInc / 12;
       // Growth fund appreciates
       grw_acc *= (1 + effGrw/12);
-      // Platform fee on TOTAL account, deducted from GROWTH fund
+      // Platform fee on TOTAL account → deducted from growth fund first,
+      // remainder from income fund (if growth depleted)
       var total = inc_acc + grw_acc;
-      grw_acc = Math.max(0, grw_acc - total * feeM);
+      var mo_fee = total * feeM;
+      if(grw_acc >= mo_fee){
+        grw_acc -= mo_fee;
+      } else {
+        var leftover = mo_fee - grw_acc;
+        grw_acc = 0;
+        inc_acc = Math.max(0, inc_acc - leftover);
+      }
     }
 
     var totalWealth = cumDiv + inc_acc + grw_acc;
