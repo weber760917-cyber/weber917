@@ -1814,6 +1814,114 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     <div style="display:flex;flex-wrap:wrap;gap:4px"><span style="font-size:11px;background:#f1f5f9;border-radius:6px;padding:3px 8px;color:#334155;display:inline-block;margin:2px">✓ 第2年起月費率歸零</span><span style="font-size:11px;background:#f1f5f9;border-radius:6px;padding:3px 8px;color:#334155;display:inline-block;margin:2px">✓ 第5年起加值給付金+0.4%</span><span style="font-size:11px;background:#f1f5f9;border-radius:6px;padding:3px 8px;color:#334155;display:inline-block;margin:2px">✓ 每年12次免費標的轉換</span><span style="font-size:11px;background:#f1f5f9;border-radius:6px;padding:3px 8px;color:#334155;display:inline-block;margin:2px">✓ 解約費5年後歸零</span><span style="font-size:11px;background:#f1f5f9;border-radius:6px;padding:3px 8px;color:#334155;display:inline-block;margin:2px">✓ 300萬以上免管費</span></div>
   </div>
 </div></div>
+
+<!-- ═══════ WORKFLOW: 長期效益試算 ═══════ -->
+<div id="wf-section" style="background:white;border-radius:14px;border:2px solid #e2e8f0;margin-top:14px;overflow:hidden">
+
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#0f172a,#1e40af);padding:14px 16px;color:white">
+    <div style="font-size:14px;font-weight:900">📊 長期效益試算</div>
+    <div style="font-size:11px;opacity:0.75;margin-top:3px">選平台 × 挑基金 → 5 / 10 / 20 年試算</div>
+  </div>
+
+  <div style="padding:14px">
+
+    <!-- 年齡 + 本金 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="background:#f8faff;border-radius:10px;padding:10px;border:1.5px solid #e2e8f0">
+        <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px">👤 客戶年齡</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input id="wf-age" type="number" value="45" min="0" max="80"
+            style="flex:1;border:1.5px solid #e2e8f0;border-radius:8px;padding:6px;font-size:17px;font-weight:800;text-align:center;width:0"
+            oninput="calcWorkflow()">
+          <span style="font-size:12px;color:#64748b;white-space:nowrap">歲</span>
+        </div>
+      </div>
+      <div style="background:#eff6ff;border-radius:10px;padding:10px;border:1.5px solid #bfdbfe">
+        <div style="font-size:11px;font-weight:700;color:#1e40af;margin-bottom:4px">💰 投入本金</div>
+        <div style="font-size:17px;font-weight:900;color:#1e40af" id="wf-principal-display">300萬</div>
+        <div style="font-size:10px;color:#93c5fd">同上方輸入</div>
+      </div>
+    </div>
+
+    <!-- ① 選擇平台 -->
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:800;color:#0f172a;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+        <span style="background:#1e40af;color:white;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900">1</span>
+        選擇保單平台
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px" id="wf-plat-grid"></div>
+    </div>
+
+    <!-- ② 配息基金 -->
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:800;color:#0f172a;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+        <span style="background:#059669;color:white;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900">2</span>
+        配息基金（可複選）
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px" id="wf-inc-grid"></div>
+      <!-- 輪替選項：2檔以上才顯示 -->
+      <div id="wf-rotation-row" style="display:none;margin-top:8px;background:#eff6ff;border-radius:10px;padding:10px;border:1.5px solid #bfdbfe">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+          <input type="checkbox" id="wf-rotation" onchange="calcWorkflow()"
+            style="width:17px;height:17px;accent-color:#1d4ed8;flex-shrink:0">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#1e40af">🔄 啟用輪替提領策略</div>
+            <div style="font-size:10px;color:#3b82f6;margin-top:2px">月月輪替兩檔，提升有效領回率（估+1.5%）</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- ③ 配股基金 -->
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:800;color:#0f172a;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+        <span style="background:#7c3aed;color:white;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900">3</span>
+        配股基金（累積型，可不選）
+      </div>
+      <div style="display:grid;grid-template-columns:1fr;gap:6px" id="wf-grw-grid"></div>
+      <!-- 配息/配股 比例 -->
+      <div id="wf-alloc-row" style="display:none;margin-top:8px;background:#f5f3ff;border-radius:10px;padding:12px;border:1.5px solid #ddd6fe">
+        <div style="font-size:11px;font-weight:700;color:#6d28d9;margin-bottom:8px">配息 / 配股 資金比例</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:#1e40af;font-weight:800;white-space:nowrap">💰配息</span>
+          <input type="range" id="wf-alloc-slider" min="10" max="90" value="70" step="10"
+            style="flex:1;accent-color:#7c3aed;height:6px"
+            oninput="document.getElementById('wf-alloc-label').textContent=this.value+'% / '+(100-this.value)+'%';calcWorkflow()">
+          <span style="font-size:11px;color:#7c3aed;font-weight:800;white-space:nowrap">📈配股</span>
+        </div>
+        <div style="text-align:center;font-size:13px;font-weight:900;color:#4c1d95;margin-top:6px" id="wf-alloc-label">70% / 30%</div>
+      </div>
+    </div>
+
+    <!-- 結果 -->
+    <div id="wf-results" style="display:none">
+      <div style="font-size:12px;font-weight:800;color:#0f172a;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+        <span style="background:#d97706;color:white;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900">4</span>
+        長期試算結果
+      </div>
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:8px;padding:8px 10px;background:#f8faff;border-radius:8px;line-height:1.6">
+        ⚠️ 試算假設：配息率、配股報酬率為估算值；平台費採第4年後穩定費率；不含解約費。<br>僅供參考，不代表實際績效保證。
+      </div>
+      <div style="background:white;border-radius:12px;border:1.5px solid #e2e8f0;overflow:hidden;margin-bottom:10px">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:#0f172a;color:white">
+              <th style="padding:9px 10px;text-align:left;font-weight:700">年期</th>
+              <th style="padding:9px 8px;text-align:right;font-weight:700;color:#86efac">累積領回<br><span style="font-size:9px;opacity:0.8">配息合計</span></th>
+              <th style="padding:9px 8px;text-align:right;font-weight:700;color:#93c5fd">帳戶剩餘<br><span style="font-size:9px;opacity:0.8">投資價值</span></th>
+              <th style="padding:9px 8px;text-align:right;font-weight:700;color:#fcd34d">息+值合計<br><span style="font-size:9px;opacity:0.8">vs 300萬</span></th>
+            </tr>
+          </thead>
+          <tbody id="wf-tbody"></tbody>
+        </table>
+      </div>
+      <div id="wf-monthly-note" style="font-size:11px;color:#64748b;text-align:center;padding:6px 0"></div>
+    </div>
+
+  </div>
+</div>
+<!-- end wf-section -->
 </div><!-- end rview-platform -->
 
 <div id="rview-loan" style="display:none;max-width:640px;margin:0 auto;padding:16px">
@@ -2277,7 +2385,7 @@ function switchRetireSub(view, btnId) {
   const btn = document.getElementById(btnId);
   if (btn) btn.classList.add('active');
   if (view === 'rview-loan') { calcLoan(); }
-  if (view === 'rview-platform') { calcPlatform(); }
+  if (view === 'rview-platform') { initWorkflow(); calcPlatform(); }
   // URL deep link
   const hm = {'rview-income':'#income','rview-loan':'#loan','rview-retire':'#retire','rview-income2':'#income2','rview-platform':'#platform'};
   if (hm[view]) history.replaceState(null, '', hm[view]);
@@ -4267,6 +4375,193 @@ function initPlatformTab(){
   calcPlatform();
 }
 
+
+// ─── Workflow data ───────────────────────────────────────────
+var WF_INC_FUNDS = [
+  { id:'abh',     name:'聯博全球高收益債',    rate:12,  icon:'📈', col:'#1d4ed8', desc:'高收益債・穩定配息' },
+  { id:'amg7',    name:'AMg7全球股票配息',    rate:9,   icon:'🌐', col:'#059669', desc:'全球股票收益型' },
+  { id:'blk_aa',  name:'貝萊德全球資產配置',  rate:6,   icon:'🏛️', col:'#7c3aed', desc:'多元資產・均衡配置' },
+  { id:'alz_am',  name:'安聯收益成長AM',      rate:10,  icon:'💼', col:'#d97706', desc:'股債混合・成長配息' },
+  { id:'pima_a',  name:'品浩全球投資等級債',  rate:5.5, icon:'📜', col:'#0891b2', desc:'投等債・穩健配息' },
+];
+var WF_GRW_FUNDS = [
+  { id:'shz71',   name:'貝萊德世界科技A2',   growthRate:12, icon:'💻', col:'#1d4ed8', desc:'全球科技龍頭，歷史年化≈12%' },
+  { id:'tlzr0',   name:'安聯AI收益成長AT',    growthRate:10, icon:'🤖', col:'#7c3aed', desc:'AI主題長線累積，歷史年化≈10%' },
+  { id:'msci_gl', name:'摩根全球精選股票',    growthRate:10, icon:'🌍', col:'#059669', desc:'全球優質企業，歷史年化≈10%' },
+];
+var _wfInited = false;
+
+function initWorkflow(){
+  if(_wfInited) return;
+  _wfInited = true;
+
+  // Platform radio cards
+  var g = document.getElementById('wf-plat-grid');
+  if(!g) return;
+  PLAT_DATA.forEach(function(p){
+    var d = document.createElement('div');
+    d.style.cssText = 'border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 10px;cursor:pointer';
+    var feeLabel = p.fee[3]===0 ? '第4年起0%' : '月費'+(p.fee[3]*100).toFixed(2)+'%';
+    d.innerHTML = '<label style="display:flex;align-items:center;gap:8px;cursor:pointer">'
+      +'<input type="radio" name="wf-plat" value="'+p.id+'" onchange="calcWorkflow()" style="accent-color:'+p.col+';width:15px;height:15px;flex-shrink:0">'
+      +'<div><div style="font-size:11px;font-weight:800;color:'+p.col+'">'+p.name+'</div>'
+      +'<div style="font-size:10px;color:#94a3b8">'+p.company+'</div>'
+      +'<div style="font-size:10px;color:#64748b">'+feeLabel+'</div></div></label>';
+    g.appendChild(d);
+  });
+  var def = g.querySelector('input[value="allianz"]');
+  if(def) def.checked = true;
+
+  // Income fund checkboxes
+  var ig = document.getElementById('wf-inc-grid');
+  WF_INC_FUNDS.forEach(function(f){
+    var d = document.createElement('div');
+    d.style.cssText = 'border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 10px;cursor:pointer';
+    d.innerHTML = '<label style="display:flex;align-items:center;gap:8px;cursor:pointer">'
+      +'<input type="checkbox" class="wf-inc-check" value="'+f.id+'" onchange="wfIncChange()" style="accent-color:'+f.col+';width:15px;height:15px;flex-shrink:0">'
+      +'<div><div style="font-size:11px;font-weight:700;color:'+f.col+'">'+f.icon+' '+f.name+'</div>'
+      +'<div style="font-size:10px;color:#94a3b8">年化配息約 '+f.rate+'%</div>'
+      +'<div style="font-size:9px;color:#cbd5e1">'+f.desc+'</div></div></label>';
+    ig.appendChild(d);
+  });
+
+  // Growth fund checkboxes
+  var gg = document.getElementById('wf-grw-grid');
+  WF_GRW_FUNDS.forEach(function(f){
+    var d = document.createElement('div');
+    d.style.cssText = 'border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 10px;cursor:pointer';
+    d.innerHTML = '<label style="display:flex;align-items:center;gap:8px;cursor:pointer">'
+      +'<input type="checkbox" class="wf-grw-check" value="'+f.id+'" onchange="wfGrwChange()" style="accent-color:'+f.col+';width:15px;height:15px;flex-shrink:0">'
+      +'<div><div style="font-size:11px;font-weight:700;color:'+f.col+'">'+f.icon+' '+f.name+'</div>'
+      +'<div style="font-size:10px;color:#94a3b8">'+f.desc+'</div></div></label>';
+    gg.appendChild(d);
+  });
+}
+
+function wfIncChange(){
+  var n = document.querySelectorAll('.wf-inc-check:checked').length;
+  var row = document.getElementById('wf-rotation-row');
+  if(row) row.style.display = n >= 2 ? 'block' : 'none';
+  if(n < 2){ var cb = document.getElementById('wf-rotation'); if(cb) cb.checked = false; }
+  calcWorkflow();
+}
+
+function wfGrwChange(){
+  var n = document.querySelectorAll('.wf-grw-check:checked').length;
+  var row = document.getElementById('wf-alloc-row');
+  if(row) row.style.display = n > 0 ? 'block' : 'none';
+  calcWorkflow();
+}
+
+function calcWorkflow(){
+  var P = +(document.getElementById('plat-amt')||{value:3000000}).value || 3000000;
+  var age = +(document.getElementById('wf-age')||{value:45}).value || 45;
+
+  // Principal display
+  var pd = document.getElementById('wf-principal-display');
+  if(pd) pd.textContent = P>=10000 ? (Math.round(P/10000)/10)+'萬' : P.toLocaleString()+'元';
+
+  // Platform
+  var pr = document.querySelector('input[name="wf-plat"]:checked');
+  if(!pr) return;
+  var plat = PLAT_DATA.find(function(x){ return x.id===pr.value; });
+  if(!plat) return;
+  var feeM = plat.fee[3]; // monthly fee (decimal, e.g. 0.0015 = 0.15%/mo)
+
+  // Income funds
+  var incSel = Array.from(document.querySelectorAll('.wf-inc-check:checked')).map(function(el){
+    return WF_INC_FUNDS.find(function(f){ return f.id===el.value; });
+  });
+  var isRot = !!(document.getElementById('wf-rotation') && document.getElementById('wf-rotation').checked);
+  var effIncRate = 0;
+  if(incSel.length > 0){
+    var avg = incSel.reduce(function(s,f){ return s+f.rate; },0) / incSel.length / 100;
+    effIncRate = isRot ? avg + 0.015 : avg; // rotation bonus +1.5%
+  }
+
+  // Growth funds
+  var grwSel = Array.from(document.querySelectorAll('.wf-grw-check:checked')).map(function(el){
+    return WF_GRW_FUNDS.find(function(f){ return f.id===el.value; });
+  });
+  var effGrwRate = grwSel.length > 0
+    ? grwSel.reduce(function(s,f){ return s+f.growthRate; },0) / grwSel.length / 100
+    : 0;
+
+  // Allocation
+  var incPct = 100;
+  if(grwSel.length > 0){
+    incPct = +(document.getElementById('wf-alloc-slider')||{value:70}).value || 70;
+  }
+  var grwPct = 100 - incPct;
+  var P_inc = P * incPct / 100;
+  var P_grw = P * grwPct / 100;
+
+  // Show/hide results
+  var hasData = incSel.length > 0 || grwSel.length > 0;
+  var rDiv = document.getElementById('wf-results');
+  if(rDiv) rDiv.style.display = hasData ? 'block' : 'none';
+  if(!hasData) return;
+
+  function fmtM(n){
+    if(isNaN(n)) return '—';
+    var sign = n < 0 ? '-' : '';
+    var a = Math.abs(Math.round(n));
+    return sign + (a >= 10000 ? (Math.round(a/1000)/10)+'萬' : a.toLocaleString()+'元');
+  }
+  function fmtDiff(n){
+    if(n === 0) return '';
+    var sign = n > 0 ? '+' : '';
+    return ' ('+sign+fmtM(n)+')';
+  }
+
+  var tbody = document.getElementById('wf-tbody');
+  if(!tbody) return;
+  tbody.innerHTML = '';
+
+  [5, 10, 20].forEach(function(yr){
+    var months = yr * 12;
+
+    // Income portion: monthly div paid out, fee reduces principal each month
+    var acc_inc = P_inc;
+    var cumDiv = 0;
+    for(var m = 0; m < months; m++){
+      cumDiv += acc_inc * effIncRate / 12; // this month's dividend
+      acc_inc *= (1 - feeM);              // fee deducted from principal
+    }
+
+    // Growth portion: grows at rate, fee also deducted monthly
+    var netGrwM = (1 + effGrwRate/12) * (1 - feeM) - 1;
+    var acc_grw = P_grw * Math.pow(1 + netGrwM, months);
+
+    var totalAcc = acc_inc + acc_grw;
+    var total = cumDiv + totalAcc;
+    var diff = total - P;
+    var diffCol = diff >= 0 ? '#059669' : '#dc2626';
+    var diffSign = diff >= 0 ? '▲' : '▼';
+    var bgCol = yr === 5 ? '#f0fdf4' : yr === 10 ? '#eff6ff' : '#faf5ff';
+
+    var tr = document.createElement('tr');
+    tr.style.cssText = 'border-bottom:1px solid #f1f5f9;background:'+bgCol;
+    tr.innerHTML =
+      '<td style="padding:10px;font-weight:900;font-size:13px">'
+        +yr+'年後<br><span style="font-size:9px;color:#94a3b8;font-weight:400">客戶約 '+(age+yr)+' 歲</span></td>'
+      +'<td style="padding:10px;text-align:right;font-weight:800;color:#059669;font-size:13px">'+fmtM(cumDiv)+'</td>'
+      +'<td style="padding:10px;text-align:right;font-weight:800;color:#1e40af;font-size:13px">'+fmtM(totalAcc)+'</td>'
+      +'<td style="padding:10px;text-align:right;font-weight:900;font-size:13px;color:'+diffCol+'">'
+        +fmtM(total)+'<br><span style="font-size:9px;font-weight:600">'+diffSign+' '+fmtM(Math.abs(diff))+'</span></td>';
+    tbody.appendChild(tr);
+  });
+
+  // Monthly income note (first month)
+  var mn = document.getElementById('wf-monthly-note');
+  if(mn && P_inc > 0){
+    var mo_div = P_inc * effIncRate / 12;
+    var mo_fee = P * feeM;
+    var mo_net = mo_div - mo_fee;
+    mn.innerHTML = '📌 初期每月：配息 <b>'+fmtM(mo_div)+'</b> ／ 平台費 <b>'+fmtM(mo_fee)+'</b> ／ 實質月收益 <b style="color:'+(mo_net>=0?'#059669':'#dc2626')+'">'+fmtM(mo_net)+'</b>';
+  }
+}
+
 function calcPlatform(){
   var principal = +(document.getElementById('plat-amt')||{value:3000000}).value || 3000000;
   var yr = +((document.getElementById('plat-year')||{value:4}).value||4);
@@ -4285,7 +4580,7 @@ function calcPlatform(){
 
   PLAT_DATA.forEach(function(p){
     var feeIdx = Math.min(yr-1, 3);
-    var mFee = p.fee[feeIdx] / 100;
+    var mFee = p.fee[feeIdx];
     var mFeeAmt = principal * mFee;
     var adminFeeAmt = (p.adminFee && principal < 3000000) ? p.adminFee : 0;
     var totalFeeAmt = mFeeAmt + adminFeeAmt;
