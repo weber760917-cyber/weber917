@@ -1459,6 +1459,122 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
 </div>
 
 <div id="rview-platform" style="display:none;padding:8px 0">
+
+<!-- ═══ WORKFLOW 長期效益試算 ═══ -->
+<div id="wf-section" style="background:white;border-radius:14px;border:2px solid #e2e8f0;margin-bottom:16px;overflow:hidden">
+
+  <div style="background:linear-gradient(135deg,#0f172a,#1e40af);padding:14px 16px;color:white">
+    <div style="font-size:15px;font-weight:900">📊 長期效益試算</div>
+    <div style="font-size:11px;opacity:0.75;margin-top:2px">選平台 × 挑基金 → 5 / 10 / 20 年試算</div>
+  </div>
+
+  <div style="padding:14px">
+
+    <!-- 本金 + 年齡 -->
+    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;margin-bottom:14px">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px">💰 投入本金</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px">
+          <button onclick="setWfAmt(1000000)"  style="padding:5px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8faff;font-size:12px;font-weight:700;cursor:pointer">100萬</button>
+          <button onclick="setWfAmt(2000000)"  style="padding:5px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8faff;font-size:12px;font-weight:700;cursor:pointer">200萬</button>
+          <button onclick="setWfAmt(3000000)"  style="padding:5px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8faff;font-size:12px;font-weight:700;cursor:pointer;border-color:#1d4ed8;color:#1d4ed8">300萬</button>
+          <button onclick="setWfAmt(5000000)"  style="padding:5px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8faff;font-size:12px;font-weight:700;cursor:pointer">500萬</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px">
+          <input id="wf-amt" type="number" value="3000000" min="100000" step="100000"
+            style="width:130px;border:1.5px solid #e2e8f0;border-radius:8px;padding:6px 8px;font-size:14px;font-weight:700"
+            oninput="syncPlatAmt();calcWorkflow()">
+          <span style="font-size:11px;color:#94a3b8">元</span>
+          <span id="wf-amt-display" style="font-size:12px;font-weight:800;color:#1e40af">= 300萬</span>
+        </div>
+      </div>
+      <div style="background:#f8faff;border-radius:10px;padding:10px;border:1.5px solid #e2e8f0;min-width:80px;text-align:center">
+        <div style="font-size:10px;font-weight:700;color:#64748b;margin-bottom:5px">👤 年齡</div>
+        <input id="wf-age" type="number" value="45" min="0" max="80"
+          style="width:55px;border:1.5px solid #e2e8f0;border-radius:8px;padding:5px;font-size:17px;font-weight:800;text-align:center"
+          oninput="calcWorkflow()">
+        <div style="font-size:10px;color:#94a3b8;margin-top:2px">歲</div>
+      </div>
+    </div>
+
+    <!-- ① 選擇平台 -->
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:800;color:#0f172a;margin-bottom:8px">
+        <span style="background:#1e40af;color:white;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;margin-right:5px">1</span>選擇保單平台
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px" id="wf-plat-grid"></div>
+    </div>
+
+    <!-- ② 配息基金 -->
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:800;color:#0f172a;margin-bottom:8px">
+        <span style="background:#059669;color:white;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;margin-right:5px">2</span>配息基金（可複選）
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px" id="wf-inc-grid"></div>
+      <div id="wf-rotation-row" style="display:none;margin-top:8px;background:#eff6ff;border-radius:9px;padding:10px;border:1.5px solid #bfdbfe">
+        <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
+          <input type="checkbox" id="wf-rotation" onchange="calcWorkflow()" style="width:16px;height:16px;accent-color:#1d4ed8;flex-shrink:0">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#1e40af">🔄 輪替提領策略</div>
+            <div style="font-size:10px;color:#3b82f6;margin-top:1px">兩檔輪替，估提升有效配息率 +1.5%</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- ③ 配股基金 -->
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:800;color:#0f172a;margin-bottom:8px">
+        <span style="background:#7c3aed;color:white;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;margin-right:5px">3</span>配股基金（累積型）
+        <span style="font-size:10px;color:#94a3b8;font-weight:400;margin-left:4px">平台費從這裡扣 → 配息穩定</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr;gap:5px" id="wf-grw-grid"></div>
+      <div id="wf-alloc-row" style="display:none;margin-top:8px;background:#f5f3ff;border-radius:9px;padding:11px;border:1.5px solid #ddd6fe">
+        <div style="font-size:11px;font-weight:700;color:#6d28d9;margin-bottom:7px">配息 / 配股 資金比例</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:#1e40af;font-weight:800">💰配息</span>
+          <input type="range" id="wf-alloc" min="10" max="90" value="70" step="10"
+            style="flex:1;accent-color:#7c3aed"
+            oninput="document.getElementById('wf-alloc-lbl').textContent=this.value+'% / '+(100-this.value)+'%';calcWorkflow()">
+          <span style="font-size:11px;color:#7c3aed;font-weight:800">📈配股</span>
+        </div>
+        <div style="text-align:center;font-size:13px;font-weight:900;color:#4c1d95;margin-top:5px" id="wf-alloc-lbl">70% / 30%</div>
+      </div>
+    </div>
+
+    <!-- 結果 -->
+    <div id="wf-results" style="display:none">
+      <!-- 每月穩定配息 -->
+      <div id="wf-mo-banner" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;margin-bottom:10px;text-align:center">
+        <div style="font-size:11px;color:#15803d;font-weight:700;margin-bottom:3px">📌 每月穩定配息（全程不變）</div>
+        <div style="font-size:24px;font-weight:900;color:#166534" id="wf-mo-inc">—</div>
+        <div style="font-size:10px;color:#4ade80;margin-top:2px">平台費全由配股基金承擔，配息帳戶不受影響</div>
+      </div>
+      <!-- 試算備注 -->
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:8px;padding:7px 10px;background:#f8faff;border-radius:7px;line-height:1.6">
+        ⚠️ 試算採第4年後穩定費率；配股基金報酬率為歷史估算，不保證未來績效。
+      </div>
+      <!-- 結果表格 -->
+      <div style="background:white;border-radius:11px;border:1.5px solid #e2e8f0;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead>
+            <tr style="background:#0f172a;color:white">
+              <th style="padding:9px 8px;text-align:left">年期</th>
+              <th style="padding:9px 6px;text-align:right;color:#86efac">配息基金<br><span style="opacity:0.7;font-size:9px">帳戶價值</span></th>
+              <th style="padding:9px 6px;text-align:right;color:#93c5fd">配股基金<br><span style="opacity:0.7;font-size:9px">帳戶價值</span></th>
+              <th style="padding:9px 6px;text-align:right;color:#fcd34d">已領利息<br><span style="opacity:0.7;font-size:9px">累計</span></th>
+              <th style="padding:9px 6px;text-align:right;color:#f9a8d4">年化<br><span style="opacity:0.7;font-size:9px">報酬率</span></th>
+            </tr>
+          </thead>
+          <tbody id="wf-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- end wf-section -->
+
   <!-- Header -->
   <div style="background:linear-gradient(135deg,#1e3a5f,#1d4ed8);border-radius:16px;padding:18px 20px;color:white;margin-bottom:14px">
     <div style="font-size:17px;font-weight:900">🏛️ 投資型保單平台比較</div>
@@ -1815,113 +1931,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   </div>
 </div></div>
 
-<!-- ═══════ WORKFLOW: 長期效益試算 ═══════ -->
-<div id="wf-section" style="background:white;border-radius:14px;border:2px solid #e2e8f0;margin-top:14px;overflow:hidden">
-
-  <!-- Header -->
-  <div style="background:linear-gradient(135deg,#0f172a,#1e40af);padding:14px 16px;color:white">
-    <div style="font-size:14px;font-weight:900">📊 長期效益試算</div>
-    <div style="font-size:11px;opacity:0.75;margin-top:3px">選平台 × 挑基金 → 5 / 10 / 20 年試算</div>
-  </div>
-
-  <div style="padding:14px">
-
-    <!-- 年齡 + 本金 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-      <div style="background:#f8faff;border-radius:10px;padding:10px;border:1.5px solid #e2e8f0">
-        <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px">👤 客戶年齡</div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <input id="wf-age" type="number" value="45" min="0" max="80"
-            style="flex:1;border:1.5px solid #e2e8f0;border-radius:8px;padding:6px;font-size:17px;font-weight:800;text-align:center;width:0"
-            oninput="calcWorkflow()">
-          <span style="font-size:12px;color:#64748b;white-space:nowrap">歲</span>
-        </div>
-      </div>
-      <div style="background:#eff6ff;border-radius:10px;padding:10px;border:1.5px solid #bfdbfe">
-        <div style="font-size:11px;font-weight:700;color:#1e40af;margin-bottom:4px">💰 投入本金</div>
-        <div style="font-size:17px;font-weight:900;color:#1e40af" id="wf-principal-display">300萬</div>
-        <div style="font-size:10px;color:#93c5fd">同上方輸入</div>
-      </div>
-    </div>
-
-    <!-- ① 選擇平台 -->
-    <div style="margin-bottom:14px">
-      <div style="font-size:12px;font-weight:800;color:#0f172a;margin-bottom:8px;display:flex;align-items:center;gap:6px">
-        <span style="background:#1e40af;color:white;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900">1</span>
-        選擇保單平台
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px" id="wf-plat-grid"></div>
-    </div>
-
-    <!-- ② 配息基金 -->
-    <div style="margin-bottom:14px">
-      <div style="font-size:12px;font-weight:800;color:#0f172a;margin-bottom:8px;display:flex;align-items:center;gap:6px">
-        <span style="background:#059669;color:white;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900">2</span>
-        配息基金（可複選）
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px" id="wf-inc-grid"></div>
-      <!-- 輪替選項：2檔以上才顯示 -->
-      <div id="wf-rotation-row" style="display:none;margin-top:8px;background:#eff6ff;border-radius:10px;padding:10px;border:1.5px solid #bfdbfe">
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
-          <input type="checkbox" id="wf-rotation" onchange="calcWorkflow()"
-            style="width:17px;height:17px;accent-color:#1d4ed8;flex-shrink:0">
-          <div>
-            <div style="font-size:12px;font-weight:700;color:#1e40af">🔄 啟用輪替提領策略</div>
-            <div style="font-size:10px;color:#3b82f6;margin-top:2px">月月輪替兩檔，提升有效領回率（估+1.5%）</div>
-          </div>
-        </label>
-      </div>
-    </div>
-
-    <!-- ③ 配股基金 -->
-    <div style="margin-bottom:14px">
-      <div style="font-size:12px;font-weight:800;color:#0f172a;margin-bottom:8px;display:flex;align-items:center;gap:6px">
-        <span style="background:#7c3aed;color:white;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900">3</span>
-        配股基金（累積型，可不選）
-      </div>
-      <div style="display:grid;grid-template-columns:1fr;gap:6px" id="wf-grw-grid"></div>
-      <!-- 配息/配股 比例 -->
-      <div id="wf-alloc-row" style="display:none;margin-top:8px;background:#f5f3ff;border-radius:10px;padding:12px;border:1.5px solid #ddd6fe">
-        <div style="font-size:11px;font-weight:700;color:#6d28d9;margin-bottom:8px">配息 / 配股 資金比例</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:11px;color:#1e40af;font-weight:800;white-space:nowrap">💰配息</span>
-          <input type="range" id="wf-alloc-slider" min="10" max="90" value="70" step="10"
-            style="flex:1;accent-color:#7c3aed;height:6px"
-            oninput="document.getElementById('wf-alloc-label').textContent=this.value+'% / '+(100-this.value)+'%';calcWorkflow()">
-          <span style="font-size:11px;color:#7c3aed;font-weight:800;white-space:nowrap">📈配股</span>
-        </div>
-        <div style="text-align:center;font-size:13px;font-weight:900;color:#4c1d95;margin-top:6px" id="wf-alloc-label">70% / 30%</div>
-      </div>
-    </div>
-
-    <!-- 結果 -->
-    <div id="wf-results" style="display:none">
-      <div style="font-size:12px;font-weight:800;color:#0f172a;margin-bottom:8px;display:flex;align-items:center;gap:6px">
-        <span style="background:#d97706;color:white;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900">4</span>
-        長期試算結果
-      </div>
-      <div style="font-size:10px;color:#94a3b8;margin-bottom:8px;padding:8px 10px;background:#f8faff;border-radius:8px;line-height:1.6">
-        ⚠️ 試算假設：配息率、配股報酬率為估算值；平台費採第4年後穩定費率；不含解約費。<br>僅供參考，不代表實際績效保證。
-      </div>
-      <div style="background:white;border-radius:12px;border:1.5px solid #e2e8f0;overflow:hidden;margin-bottom:10px">
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          <thead>
-            <tr style="background:#0f172a;color:white">
-              <th style="padding:9px 10px;text-align:left;font-weight:700">年期</th>
-              <th style="padding:9px 8px;text-align:right;font-weight:700;color:#86efac">累積領回<br><span style="font-size:9px;opacity:0.8">配息合計</span></th>
-              <th style="padding:9px 8px;text-align:right;font-weight:700;color:#93c5fd">帳戶剩餘<br><span style="font-size:9px;opacity:0.8">投資價值</span></th>
-              <th style="padding:9px 8px;text-align:right;font-weight:700;color:#fcd34d">息+值合計<br><span style="font-size:9px;opacity:0.8">vs 300萬</span></th>
-            </tr>
-          </thead>
-          <tbody id="wf-tbody"></tbody>
-        </table>
-      </div>
-      <div id="wf-monthly-note" style="font-size:11px;color:#64748b;text-align:center;padding:6px 0"></div>
-    </div>
-
-  </div>
-</div>
-<!-- end wf-section -->
 </div><!-- end rview-platform -->
 
 <div id="rview-loan" style="display:none;max-width:640px;margin:0 auto;padding:16px">
@@ -4383,6 +4392,15 @@ var WF_GRW_FUNDS = [
   { id:'tlzr0', name:'安聯AI收益成長 AT', growthRate:10, icon:'🤖', col:'#7c3aed', desc:'AI主題累積型，歷史年化≈10%' },
   { id:'tlz63', name:'安聯收益成長 AT',   growthRate:8,  icon:'📊', col:'#d97706', desc:'股債混合累積型，歷史年化≈8%' },
 ];
+
+function setWfAmt(v){
+  var el=document.getElementById('wf-amt'); if(el){el.value=v; syncPlatAmt(); calcWorkflow();}
+}
+function syncPlatAmt(){
+  var v=+(document.getElementById('wf-amt')||{value:3000000}).value||3000000;
+  var el=document.getElementById('plat-amt'); if(el){el.value=v; calcPlatform();}
+}
+
 var _wfInited = false;
 
 function initWorkflow(){
@@ -4455,113 +4473,105 @@ function wfGrwChange(){
 }
 
 function calcWorkflow(){
-  var P = +(document.getElementById('plat-amt')||{value:3000000}).value || 3000000;
+  if(!_wfInited) return;
+  var P = +(document.getElementById('wf-amt')||{value:3000000}).value || 3000000;
   var age = +(document.getElementById('wf-age')||{value:45}).value || 45;
 
-  // Principal display
-  var pd = document.getElementById('wf-principal-display');
-  if(pd) pd.textContent = P>=10000 ? (Math.round(P/10000)/10)+'萬' : P.toLocaleString()+'元';
+  // Update amt display
+  var ad = document.getElementById('wf-amt-display');
+  if(ad) ad.textContent = '= '+(P>=10000?(Math.round(P/10000)/10)+'萬':P.toLocaleString()+'元');
 
   // Platform
   var pr = document.querySelector('input[name="wf-plat"]:checked');
   if(!pr) return;
-  var plat = PLAT_DATA.find(function(x){ return x.id===pr.value; });
+  var plat = PLAT_DATA.find(function(x){return x.id===pr.value;});
   if(!plat) return;
-  var feeM = plat.fee[3]; // monthly fee (decimal, e.g. 0.0015 = 0.15%/mo)
+  var feeM = plat.fee[3]; // monthly fee rate (decimal, e.g. 0.0015)
 
   // Income funds
   var incSel = Array.from(document.querySelectorAll('.wf-inc-check:checked')).map(function(el){
-    return WF_INC_FUNDS.find(function(f){ return f.id===el.value; });
-  });
+    return WF_INC_FUNDS.find(function(f){return f.id===el.value;});
+  }).filter(Boolean);
   var isRot = !!(document.getElementById('wf-rotation') && document.getElementById('wf-rotation').checked);
-  var effIncRate = 0;
-  if(incSel.length > 0){
-    var avg = incSel.reduce(function(s,f){ return s+f.rate; },0) / incSel.length / 100;
-    effIncRate = isRot ? avg + 0.015 : avg; // rotation bonus +1.5%
+  var effInc = 0;
+  if(incSel.length>0){
+    var avg = incSel.reduce(function(s,f){return s+f.rate;},0)/incSel.length/100;
+    effInc = isRot&&incSel.length>=2 ? avg+0.015 : avg;
   }
 
   // Growth funds
   var grwSel = Array.from(document.querySelectorAll('.wf-grw-check:checked')).map(function(el){
-    return WF_GRW_FUNDS.find(function(f){ return f.id===el.value; });
-  });
-  var effGrwRate = grwSel.length > 0
-    ? grwSel.reduce(function(s,f){ return s+f.growthRate; },0) / grwSel.length / 100
-    : 0;
+    return WF_GRW_FUNDS.find(function(f){return f.id===el.value;});
+  }).filter(Boolean);
+  var effGrw = grwSel.length>0 ? grwSel.reduce(function(s,f){return s+f.growthRate;},0)/grwSel.length/100 : 0;
 
   // Allocation
   var incPct = 100;
-  if(grwSel.length > 0){
-    incPct = +(document.getElementById('wf-alloc-slider')||{value:70}).value || 70;
-  }
+  if(grwSel.length>0){ incPct = +(document.getElementById('wf-alloc')||{value:70}).value||70; }
   var grwPct = 100 - incPct;
   var P_inc = P * incPct / 100;
   var P_grw = P * grwPct / 100;
 
-  // Show/hide results
-  var hasData = incSel.length > 0 || grwSel.length > 0;
+  var hasData = incSel.length>0 || grwSel.length>0;
   var rDiv = document.getElementById('wf-results');
   if(rDiv) rDiv.style.display = hasData ? 'block' : 'none';
   if(!hasData) return;
 
-  function fmtM(n){
-    if(isNaN(n)) return '—';
-    var sign = n < 0 ? '-' : '';
-    var a = Math.abs(Math.round(n));
-    return sign + (a >= 10000 ? (Math.round(a/1000)/10)+'萬' : a.toLocaleString()+'元');
+  // Monthly stable income (income fund has NO fees deducted → P_inc stays constant)
+  var moInc = P_inc * effInc / 12;
+  var moEl = document.getElementById('wf-mo-inc');
+  if(moEl){
+    var mo = Math.round(moInc);
+    moEl.textContent = mo>=10000 ? (Math.round(mo/1000)/10)+'萬元/月' : mo.toLocaleString()+'元/月';
   }
-  function fmtDiff(n){
-    if(n === 0) return '';
-    var sign = n > 0 ? '+' : '';
-    return ' ('+sign+fmtM(n)+')';
+
+  function fmt(n){
+    if(isNaN(n)||n<0) return '—';
+    var a=Math.round(Math.abs(n));
+    return (n<0?'-':'')+(a>=10000?(Math.round(a/1000)/10)+'萬':a.toLocaleString()+'元');
   }
 
   var tbody = document.getElementById('wf-tbody');
   if(!tbody) return;
-  tbody.innerHTML = '';
+  tbody.innerHTML='';
 
-  [5, 10, 20].forEach(function(yr){
-    var months = yr * 12;
-
-    // Income portion: monthly div paid out, fee reduces principal each month
-    var acc_inc = P_inc;
+  [5,10,20].forEach(function(yr){
+    var months = yr*12;
+    // Income fund: stays at P_inc (no fees, dividends paid out)
+    var inc_acc = P_inc;
+    // Growth fund: grows at rate, absorbs ALL platform fees (on total account)
+    var grw_acc = P_grw;
     var cumDiv = 0;
-    for(var m = 0; m < months; m++){
-      cumDiv += acc_inc * effIncRate / 12; // this month's dividend
-      acc_inc *= (1 - feeM);              // fee deducted from principal
+
+    for(var m=0; m<months; m++){
+      // Dividend paid from income fund (stable)
+      cumDiv += inc_acc * effInc / 12;
+      // Growth fund appreciates
+      grw_acc *= (1 + effGrw/12);
+      // Platform fee on TOTAL account, deducted from GROWTH fund
+      var total = inc_acc + grw_acc;
+      grw_acc = Math.max(0, grw_acc - total * feeM);
     }
 
-    // Growth portion: grows at rate, fee also deducted monthly
-    var netGrwM = (1 + effGrwRate/12) * (1 - feeM) - 1;
-    var acc_grw = P_grw * Math.pow(1 + netGrwM, months);
-
-    var totalAcc = acc_inc + acc_grw;
-    var total = cumDiv + totalAcc;
-    var diff = total - P;
-    var diffCol = diff >= 0 ? '#059669' : '#dc2626';
-    var diffSign = diff >= 0 ? '▲' : '▼';
-    var bgCol = yr === 5 ? '#f0fdf4' : yr === 10 ? '#eff6ff' : '#faf5ff';
+    var totalWealth = cumDiv + inc_acc + grw_acc;
+    var annRet = (Math.pow(totalWealth/P, 1/yr) - 1) * 100;
+    var diff = totalWealth - P;
+    var diffCol = diff>=0?'#059669':'#dc2626';
+    var bgCol = yr===5?'#f0fdf4':yr===10?'#eff6ff':'#faf5ff';
 
     var tr = document.createElement('tr');
-    tr.style.cssText = 'border-bottom:1px solid #f1f5f9;background:'+bgCol;
-    tr.innerHTML =
-      '<td style="padding:10px;font-weight:900;font-size:13px">'
-        +yr+'年後<br><span style="font-size:9px;color:#94a3b8;font-weight:400">客戶約 '+(age+yr)+' 歲</span></td>'
-      +'<td style="padding:10px;text-align:right;font-weight:800;color:#059669;font-size:13px">'+fmtM(cumDiv)+'</td>'
-      +'<td style="padding:10px;text-align:right;font-weight:800;color:#1e40af;font-size:13px">'+fmtM(totalAcc)+'</td>'
-      +'<td style="padding:10px;text-align:right;font-weight:900;font-size:13px;color:'+diffCol+'">'
-        +fmtM(total)+'<br><span style="font-size:9px;font-weight:600">'+diffSign+' '+fmtM(Math.abs(diff))+'</span></td>';
+    tr.style.cssText='border-bottom:1px solid #f1f5f9;background:'+bgCol;
+    tr.innerHTML=
+      '<td style="padding:9px 8px;font-weight:900;font-size:12px">'+yr+'年後<br>'
+        +'<span style="font-size:9px;color:#94a3b8;font-weight:400">約'+(age+yr)+'歲</span></td>'
+      +'<td style="padding:9px 6px;text-align:right;font-weight:800;color:#059669">'+fmt(inc_acc)+'</td>'
+      +'<td style="padding:9px 6px;text-align:right;font-weight:800;color:#1e40af">'+fmt(grw_acc)+'</td>'
+      +'<td style="padding:9px 6px;text-align:right;font-weight:800;color:#d97706">'+fmt(cumDiv)+'</td>'
+      +'<td style="padding:9px 6px;text-align:right;font-weight:900;font-size:12px;color:'+diffCol+'">'+annRet.toFixed(1)+'%</td>';
     tbody.appendChild(tr);
   });
-
-  // Monthly income note (first month)
-  var mn = document.getElementById('wf-monthly-note');
-  if(mn && P_inc > 0){
-    var mo_div = P_inc * effIncRate / 12;
-    var mo_fee = P * feeM;
-    var mo_net = mo_div - mo_fee;
-    mn.innerHTML = '📌 初期每月：配息 <b>'+fmtM(mo_div)+'</b> ／ 平台費 <b>'+fmtM(mo_fee)+'</b> ／ 實質月收益 <b style="color:'+(mo_net>=0?'#059669':'#dc2626')+'">'+fmtM(mo_net)+'</b>';
-  }
 }
+
 
 function calcPlatform(){
   var principal = +(document.getElementById('plat-amt')||{value:3000000}).value || 3000000;
@@ -4603,12 +4613,12 @@ function calcPlatform(){
 
 // ── 月配息2 ──
 var I2_FUNDS = {
-  jpm:  { payDay:9,  grp:'w2', divRate:11.0,  capRate:-1.0, navUSD:74.38, divUSD:0.693,  col:'#d97706', defChk:false, defPct:0  },
-  aling:{ payDay:15, grp:'w3', divRate:9.12,  capRate:-2.0, navUSD:8.7995,  divUSD:0.06796,  col:'#7c3aed', defChk:true,  defPct:50 },
-  mg:   { payDay:19, grp:'w3', divRate:9.95, capRate:-6.0, navUSD:77.5527, divUSD:0.654,  col:'#0369a1', defChk:false, defPct:0  },
-  ab:   { payDay:29, grp:'w4', divRate:13.55, capRate:-2.0, navUSD:71.75, divUSD:0.8322, col:'#dc2626', defChk:true,  defPct:50 },
-  blk:  { payDay:30, grp:'w4', divRate:7.65,  capRate:-2.0, navUSD:11.35,  divUSD:0.0735, col:'#6366f1', defChk:false, defPct:0  },
-  pima2:{ payDay:28, grp:'w4', divRate:8.93,  capRate:-1.0, navUSD:11.62, divUSD:0.087,  col:'#059669', defChk:false, defPct:0  }
+  jpm:  { payDay:9,  grp:'w2', divRate:11.0,  capRate:-1.0, navUSD:74.73, divUSD:0.693,  col:'#d97706', defChk:false, defPct:0  },
+  aling:{ payDay:15, grp:'w3', divRate:9.09,  capRate:-2.0, navUSD:8.922,  divUSD:0.06796,  col:'#7c3aed', defChk:true,  defPct:50 },
+  mg:   { payDay:19, grp:'w3', divRate:9.95, capRate:-6.0, navUSD:78.3241, divUSD:0.654,  col:'#0369a1', defChk:false, defPct:0  },
+  ab:   { payDay:29, grp:'w4', divRate:13.55, capRate:-2.0, navUSD:73.76, divUSD:0.8322, col:'#dc2626', defChk:true,  defPct:50 },
+  blk:  { payDay:30, grp:'w4', divRate:7.65,  capRate:-2.0, navUSD:11.48,  divUSD:0.0735, col:'#6366f1', defChk:false, defPct:0  },
+  pima2:{ payDay:28, grp:'w4', divRate:8.93,  capRate:-1.0, navUSD:11.68, divUSD:0.087,  col:'#059669', defChk:false, defPct:0  }
 };
 var I2_NAMES = { jpm:'摩根多重收益', aling:'安聯AMg7', mg:'M&G入息', ab:'聯博AP', blk:'貝萊德環球A10', pima2:'品浩平衡M' };
 var I2_IDS   = ['jpm','aling','mg','ab','blk','pima2'];
@@ -5117,15 +5127,15 @@ function calcLoan() {
 
 // ── 月配息基金資料 ──
 const FUND_DIST = {
-  jfzn3: { name:'摩根多重收益 JPM',   nav:74.38,   dist:0.693,    annRate:11.0, color:'#f59e0b', week:'第一週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=JFZN3' },
-  tlzf9: { name:'安聯收益成長 AMg7',  nav:8.7995,  dist:0.06796, annRate:9.12,  color:'#3b82f6', week:'第二週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZF9' },
-  mmg55: { name:'M&G 入息基金',       nav:77.5527, dist:0.654,   annRate:9.95,  color:'#8b5cf6', week:'第三週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=MMG55' },
-  albt8: { name:'聯博美國成長 AP',    nav:71.75,   dist:0.8322,  annRate:13.55, color:'#10b981', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=ALBT8' },
-  tlzl7: { name:'安聯AI收益成長 AM',  nav:26.9026, dist:0.14619, annRate:6.38, color:'#f97316', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZL7' },
-  shzv9: { name:'貝萊德世界科技 A10', nav:20.78,   dist:0.1375,  annRate:7.49, color:'#ec4899', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=SHZV9' },
-  tlz64: { name:'安聯收益成長 AM',   nav:8.6306,  dist:0.055,   annRate:7.53,  color:'#06b6d4', week:'第二週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZ64' },
-  shzw8: { name:'貝萊德環球資產配置 A10', nav:11.35, dist:0.0735, annRate:7.65, color:'#6366f1', week:'第4週', url:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=SHZW8' },
-  pima2: { name:'品浩收益增長 M',    nav:11.62, dist:0.087, annRate:8.93, color:'#059669', week:'第四週', url:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=PIMA2' },
+  jfzn3: { name:'摩根多重收益 JPM',   nav:74.73,   dist:0.693,    annRate:11.0, color:'#f59e0b', week:'第一週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=JFZN3' },
+  tlzf9: { name:'安聯收益成長 AMg7',  nav:8.922,  dist:0.06796, annRate:9.09,  color:'#3b82f6', week:'第二週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZF9' },
+  mmg55: { name:'M&G 入息基金',       nav:78.3241, dist:0.654,   annRate:9.95,  color:'#8b5cf6', week:'第三週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=MMG55' },
+  albt8: { name:'聯博美國成長 AP',    nav:73.76,   dist:0.8322,  annRate:13.55, color:'#10b981', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=ALBT8' },
+  tlzl7: { name:'安聯AI收益成長 AM',  nav:27.2683, dist:0.14619, annRate:6.33, color:'#f97316', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZL7' },
+  shzv9: { name:'貝萊德世界科技 A10', nav:20.99,   dist:0.1375,  annRate:7.49, color:'#ec4899', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=SHZV9' },
+  tlz64: { name:'安聯收益成長 AM',   nav:8.7391,  dist:0.055,   annRate:7.52,  color:'#06b6d4', week:'第二週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZ64' },
+  shzw8: { name:'貝萊德環球資產配置 A10', nav:11.48, dist:0.0735, annRate:7.65, color:'#6366f1', week:'第4週', url:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=SHZW8' },
+  pima2: { name:'品浩收益增長 M',    nav:11.68, dist:0.087, annRate:8.93, color:'#059669', week:'第四週', url:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=PIMA2' },
 };
 var _selFund = null;
 
@@ -5246,43 +5256,43 @@ function calcFund() {
 // ── 月配息搭配試算 ──
 var INCOME_FUNDS = [
   { id:'jpm',    name:'摩根多重收益',
-    nav:74.38,  navCur:'USD', navKey:'jfzn3',  distMo:0.693,
+    nav:74.73,  navCur:'USD', navKey:'jfzn3',  distMo:0.693,
     divRate:11.0, capRate:-0.38, annReturn:10.6,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=JFZN3',
     divHist:[{d:'2026/06',a:'$0.69'},{d:'2026/05',a:'$0.69'},{d:'2026/04',a:'$0.69'},{d:'2026/03',a:'$0.69'}] },
   { id:'aling',  name:'安聯收益成長 AMg7',
-    nav:8.7995, navCur:'TWD', navKey:'tlzf9',  distMo:0.06796,
-    divRate:9.12,  capRate:-1.05, annReturn:8.1,
+    nav:8.922, navCur:'TWD', navKey:'tlzf9',  distMo:0.06796,
+    divRate:9.09,  capRate:-1.05, annReturn:8.1,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZF9',
     divHist:[{d:'2026/06',a:'NT$0.0680'},{d:'2026/05',a:'NT$0.0680'},{d:'2026/04',a:'NT$0.0680'},{d:'2026/03',a:'NT$0.0680'}] },
   { id:'tlz64',  name:'安聯收益成長 AM',
-    nav:8.6306, navCur:'TWD', navKey:'tlz64',  distMo:0.055,
-    divRate:7.53,  capRate:0.24, annReturn:7.8,
+    nav:8.7391, navCur:'TWD', navKey:'tlz64',  distMo:0.055,
+    divRate:7.52,  capRate:0.24, annReturn:7.8,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZ64',
     divHist:[{d:'2026/06',a:'NT$0.055'},{d:'2026/05',a:'NT$0.055'},{d:'2026/04',a:'NT$0.055'},{d:'2026/03',a:'NT$0.055'}] },
   { id:'mg',     name:'M&G 入息基金',
-    nav:77.5527,navCur:'USD', navKey:'mmg55',  distMo:0.654,
+    nav:78.3241,navCur:'USD', navKey:'mmg55',  distMo:0.654,
     divRate:9.95, capRate:-5.14, annReturn:4.9,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=MMG55',
     divHist:[{d:'2026/06',a:'$0.654'},{d:'2026/05',a:'$0.654'},{d:'2026/04',a:'$0.654'},{d:'2026/03',a:'$0.654'}] },
   { id:'ab',     name:'聯博美國成長 AP',
-    nav:71.75,  navCur:'USD', navKey:'albt8',  distMo:0.8322,
+    nav:73.76,  navCur:'USD', navKey:'albt8',  distMo:0.8322,
     divRate:13.55, capRate:-2.92, annReturn:10.9,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=ALBT8',
     divHist:[{d:'2026/06',a:'$0.832'},{d:'2026/05',a:'$0.832'},{d:'2026/04',a:'$0.832'},{d:'2026/03',a:'$0.832'}] },
   { id:'aiai',   name:'安聯AI收益成長',
-    nav:26.9026,navCur:'TWD', navKey:'tlzl7',  distMo:0.14619,
-    divRate:6.38,  capRate:9.13, annReturn:15.4,
+    nav:27.2683,navCur:'TWD', navKey:'tlzl7',  distMo:0.14619,
+    divRate:6.33,  capRate:9.13, annReturn:15.4,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZL7',
     divHist:[{d:'2026/06',a:'NT$0.146'},{d:'2026/05',a:'NT$0.146'},{d:'2026/04',a:'NT$0.146'},{d:'2026/03',a:'NT$0.146'}] },
   { id:'brwt',   name:'貝萊德世界科技 A10',
-    nav:20.78,  navCur:'TWD', navKey:'shzv9',  distMo:0.1375,
+    nav:20.99,  navCur:'TWD', navKey:'shzv9',  distMo:0.1375,
     divRate:7.49,  capRate:27.73, annReturn:35.2,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=SHZV9',
@@ -5312,13 +5322,13 @@ var INCOME_FUNDS = [
     mdjUrl:'https://www.moneydj.com/ETF/X/Basic/Basic0004.xdjhtm?etfid=VT',
     divHist:[{d:'2026/06',a:'$0.563'},{d:'2026/03',a:'$0.327'},{d:'2025/12',a:'$1.115'},{d:'2025/09',a:'$0.478'}] },
   { id:'blk',    name:'貝萊德環球資產配置 A10',
-    nav:11.35,  navCur:'USD', navKey:'shzw8',  distMo:0.0735,
+    nav:11.48,  navCur:'USD', navKey:'shzw8',  distMo:0.0735,
     divRate:7.65,  capRate:-2.0, annReturn:5.7,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=SHZW8',
     divHist:[{d:'2026/06',a:'$0.0735'},{d:'2026/05',a:'$0.0735'},{d:'2026/04',a:'$0.069'},{d:'2026/03',a:'$0.069'}] },
   { id:'pima2',  name:'品浩全球平衡收益M',
-    nav:11.62,  navCur:'USD', navKey:'pima2',  distMo:0.087,
+    nav:11.68,  navCur:'USD', navKey:'pima2',  distMo:0.087,
     divRate:8.93,  capRate:0.09, annReturn:8.93,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=PIMA2',
