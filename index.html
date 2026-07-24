@@ -4377,23 +4377,23 @@ function initPlatformTab(){
 
 
 // ─── Workflow data ───────────────────────────────────────────
-var WF_INC_FUNDS = [
-  { id:'abh',     name:'聯博全球高收益債',    rate:12,  icon:'📈', col:'#1d4ed8', desc:'高收益債・穩定配息' },
-  { id:'amg7',    name:'AMg7全球股票配息',    rate:9,   icon:'🌐', col:'#059669', desc:'全球股票收益型' },
-  { id:'blk_aa',  name:'貝萊德全球資產配置',  rate:6,   icon:'🏛️', col:'#7c3aed', desc:'多元資產・均衡配置' },
-  { id:'alz_am',  name:'安聯收益成長AM',      rate:10,  icon:'💼', col:'#d97706', desc:'股債混合・成長配息' },
-  { id:'pima_a',  name:'品浩全球投資等級債',  rate:5.5, icon:'📜', col:'#0891b2', desc:'投等債・穩健配息' },
-];
+var WF_INC_FUNDS = null; // 動態建立自 I2_FUNDS
 var WF_GRW_FUNDS = [
-  { id:'shz71',   name:'貝萊德世界科技A2',   growthRate:12, icon:'💻', col:'#1d4ed8', desc:'全球科技龍頭，歷史年化≈12%' },
-  { id:'tlzr0',   name:'安聯AI收益成長AT',    growthRate:10, icon:'🤖', col:'#7c3aed', desc:'AI主題長線累積，歷史年化≈10%' },
-  { id:'msci_gl', name:'摩根全球精選股票',    growthRate:10, icon:'🌍', col:'#059669', desc:'全球優質企業，歷史年化≈10%' },
+  { id:'shz71', name:'貝萊德世界科技 A2', growthRate:12, icon:'💻', col:'#1d4ed8', desc:'全球科技龍頭，歷史年化≈12%' },
+  { id:'tlzr0', name:'安聯AI收益成長 AT', growthRate:10, icon:'🤖', col:'#7c3aed', desc:'AI主題累積型，歷史年化≈10%' },
+  { id:'tlz63', name:'安聯收益成長 AT',   growthRate:8,  icon:'📊', col:'#d97706', desc:'股債混合累積型，歷史年化≈8%' },
 ];
 var _wfInited = false;
 
 function initWorkflow(){
   if(_wfInited) return;
   _wfInited = true;
+
+  // Build income fund list from the same I2_FUNDS data used in 月配息2
+  WF_INC_FUNDS = I2_IDS.map(function(id){
+    var f = I2_FUNDS[id];
+    return { id:id, name:I2_NAMES[id], rate:f.divRate, icon:'💰', col:f.col, desc:'月配息 年化約'+f.divRate+'%' };
+  });
 
   // Platform radio cards
   var g = document.getElementById('wf-plat-grid');
@@ -4417,11 +4417,12 @@ function initWorkflow(){
   WF_INC_FUNDS.forEach(function(f){
     var d = document.createElement('div');
     d.style.cssText = 'border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 10px;cursor:pointer';
+    // Get full name from I2_PROFILES if available
+    var fullName = (typeof I2_PROFILES !== 'undefined' && I2_PROFILES[f.id]) ? I2_PROFILES[f.id].full : f.name;
     d.innerHTML = '<label style="display:flex;align-items:center;gap:8px;cursor:pointer">'
       +'<input type="checkbox" class="wf-inc-check" value="'+f.id+'" onchange="wfIncChange()" style="accent-color:'+f.col+';width:15px;height:15px;flex-shrink:0">'
-      +'<div><div style="font-size:11px;font-weight:700;color:'+f.col+'">'+f.icon+' '+f.name+'</div>'
-      +'<div style="font-size:10px;color:#94a3b8">年化配息約 '+f.rate+'%</div>'
-      +'<div style="font-size:9px;color:#cbd5e1">'+f.desc+'</div></div></label>';
+      +'<div><div style="font-size:11px;font-weight:700;color:'+f.col+'">'+f.name+'</div>'
+      +'<div style="font-size:10px;color:#059669;font-weight:700">年化配息 '+f.rate+'%</div></div></label>';
     ig.appendChild(d);
   });
 
