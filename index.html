@@ -5083,30 +5083,41 @@ function calcIncome2() {
   var cEl = document.getElementById('i2-conv-rows');
   if (cEl) cEl.innerHTML = cr || '<div style="padding:12px;text-align:center;color:var(--sub);font-size:12px">請先勾選基金</div>';
 
-  // 5/10/20 yr + IRR（用「年均配息」法估算，反映長期配息遞減，IRR隨年期遞減）
+  // 5/10/20 yr + IRR（逐年實際現金流法，精確反映配息逐年遞減）
   if (sel.length === 0) return;
   var mode = (document.querySelector('input[name="i2mode"]:checked')||{value:'std'}).value;
-  var avgCapRate = sel.reduce(function(s,x){return s+I2_FUNDS[x.id].capRate;},0)/sel.length;
-  var monthlyCapFactor = Math.pow(1 + avgCapRate/100, 1/12);
-  var effDivRate = (mode==='rot') ? totalDivRate : totalDivRate/sel.length;
+
+  // 輪轉模式：同一本金循環所有基金，收取各基金完整配息（取率總和）；資本侵蝕取各基金平均
+  // 標準模式：各基金各自持有，加權平均配息率與侵蝕率（依各基金配置比例加權）
+  var effDivRate, effCapRate;
+  if (mode === 'rot') {
+    effDivRate = sel.reduce(function(s,x){return s+I2_FUNDS[x.id].divRate;},0);
+    effCapRate = sel.length > 0 ? sel.reduce(function(s,x){return s+I2_FUNDS[x.id].capRate;},0)/sel.length : 0;
+  } else {
+    effDivRate = totAlloc > 0 ? sel.reduce(function(s,x){return s+I2_FUNDS[x.id].divRate*x.pct;},0)/totAlloc : 0;
+    effCapRate = totAlloc > 0 ? sel.reduce(function(s,x){return s+I2_FUNDS[x.id].capRate*x.pct;},0)/totAlloc : 0;
+  }
+  var monthlyCapFactor = Math.pow(1 + effCapRate/100, 1/12);
 
   [5,10,20].forEach(function(yr) {
     var n = yr * 12;
     var cap = rotP, cumDiv = 0;
+    var annDivs = new Array(yr).fill(0);
     for (var m = 1; m <= n; m++) {
-      cumDiv += cap * effDivRate / 100 / 12;
+      var mDiv = cap * effDivRate / 100 / 12;
+      cumDiv += mDiv;
+      annDivs[Math.floor((m-1)/12)] += mDiv; // 逐年累計配息（反映資本侵蝕後遞減）
       cap *= monthlyCapFactor;
     }
-    // 年均配息法 IRR：0 = -P + Σ(annAvg/(1+r)^t) + terminal/(1+r)^n
-    var annAvg = cumDiv / yr;
+    // 逐年現金流IRR（各年配息不同，比年均法更準確）
     var terminal = cap;
-    var r = 0.10; // 初始猜值
+    var r = 0.05;
     for (var i = 0; i < 200; i++) {
       var f = -rotP, df = 0;
-      for (var t = 1; t <= yr; t++) {
-        var v = Math.pow(1+r, t);
-        f  += annAvg / v;
-        df -= t * annAvg / (v * (1+r));
+      for (var t = 0; t < yr; t++) {
+        var v = Math.pow(1+r, t+1);
+        f  += annDivs[t] / v;
+        df -= (t+1) * annDivs[t] / (v * (1+r));
       }
       var vn = Math.pow(1+r, yr);
       f  += terminal / vn;
