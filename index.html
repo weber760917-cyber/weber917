@@ -1533,7 +1533,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
         <div style="font-size:11px;font-weight:700;color:#6d28d9;margin-bottom:7px">配息 / 配股 資金比例</div>
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:11px;color:#1e40af;font-weight:800">💰配息</span>
-          <input type="range" id="wf-alloc" min="10" max="90" value="70" step="10"
+          <input type="range" id="wf-alloc" min="5" max="95" value="70" step="5"
             style="flex:1;accent-color:#7c3aed"
             oninput="document.getElementById('wf-alloc-lbl').textContent=this.value+'% / '+(100-this.value)+'%';calcWorkflow()">
           <span style="font-size:11px;color:#7c3aed;font-weight:800">📈配股</span>
@@ -4307,16 +4307,16 @@ function switchWcMatch(n) {
 // ── 投資型保單平台比較 ──
 var PLAT_DATA = [
   { id:'kaige1', name:'招財進保', company:'凱基人壽', col:'#f59e0b',
-    fee:[0.0015,0.0015,0.0015,0.0015],
+    fee:[0.0015,0.0015,0.0015,0.0015], feePost:0,
     surrender:[15,10,8,2,0], loanRatio:55,
     loanRate:'3.85%（≤300萬）/ 3.60%（>300萬）', transfer:'T+1',
     bonus:null, adminFee:0,
     highlight:'',
-    desc:'費率全年均一（每月0.15%），結構最簡單透明。第5年起無解約費，貸款上限55%享分層利率優惠。',
-    features:['四年均一費率，計算最直覺','第5年起解約費歸零','貸款利率分層：300萬以上享3.60%優惠','T+1轉換效率高']
+    desc:'費率全年均一（每月0.15%），只收4年（48個月），第5年起費率歸零。結構最簡單透明，貸款上限55%享分層利率優惠。',
+    features:['四年均一費率（0.15%/月），第5年起0%','第5年起解約費歸零','貸款利率分層：300萬以上享3.60%優惠','T+1轉換效率高']
   },
   { id:'kaige2', name:'一生傳富', company:'凱基人壽', col:'#d97706',
-    fee:[0.0026,0.0025,0.0024,0],
+    fee:[0.0026,0.0025,0.0024,0], feePost:0,
     surrender:[13,11,10,4,0], loanRatio:60,
     loanRate:'3.85%', transfer:'T+1',
     bonus:null, adminFee:0,
@@ -4325,7 +4325,7 @@ var PLAT_DATA = [
     features:['第4年起費率歸0，長期持有零費用','貸款上限高達60%','解約費5年後歸零','前三年費率適中（0.24-0.26%）']
   },
   { id:'taivita', name:'臻鑽盈盈', company:'台灣人壽', col:'#16a34a',
-    fee:[0.0021,0.002,0.00165,0],
+    fee:[0.0021,0.002,0.00165,0], feePost:0,
     surrender:[15,10,6,2,0], loanRatio:60,
     loanRate:'4.27%', transfer:'T+1/T+2',
     bonus:null, adminFee:0,
@@ -4334,7 +4334,7 @@ var PLAT_DATA = [
     features:['第4年起費率歸0','前三年費率逐年遞降','貸款上限60%','支援T+1/T+2雙轉換模式','解約費5年後歸零']
   },
   { id:'first', name:'環球領航', company:'第一金壽', col:'#0891b2',
-    fee:[0.0024,0.002,0.0016,0.0014],
+    fee:[0.0024,0.002,0.0016,0.0014], feePost:0.0014,
     surrender:[10,9,7,6,5], loanRatio:50,
     loanRate:'3.51%（市場最低之一）', transfer:'T/T+1',
     bonus:null, adminFee:0,
@@ -4343,7 +4343,7 @@ var PLAT_DATA = [
     features:['貸款利率3.51%，比較表最低','費率四年持續遞減至0.14%','支援T/T+1即時轉換','注意：5年後仍有5%解約費']
   },
   { id:'skl', name:'超吉馬利', company:'新光人壽', col:'#e11d48',
-    fee:[0.0024,0.002,0.00165,0.00155],
+    fee:[0.0024,0.002,0.00165,0.00155], feePost:0.00155,
     surrender:[10,9,7,6,5], loanRatio:60,
     loanRate:'3.80%', transfer:'T/T+1',
     bonus:null, adminFee:0,
@@ -4352,7 +4352,7 @@ var PLAT_DATA = [
     features:['貸款上限60%，利率3.80%','費率四年逐步遞降','T/T+1雙轉換','注意：5年後仍有5%解約費']
   },
   { id:'allianz', name:'吉利發發', company:'安聯人壽', col:'#7c3aed',
-    fee:[0.0016,0.0016,0.0016,0.0016],
+    fee:[0.0016,0.0016,0.0016,0.0016], feePost:0.0016,
     surrender:[7,6,5,2,0], loanRatio:50,
     loanRate:'4.20%', transfer:'待確認',
     bonus:null, adminFee:0,
@@ -4361,7 +4361,7 @@ var PLAT_DATA = [
     features:['月費率0.16%，比較表最低','解約費最低（最高7%），5年後歸零','費率均一，長期規劃最友善','安聯品牌，全球知名資產管理公司']
   },
   { id:'chubb', name:'富貴大贏家', company:'安達人壽', col:'#059669',
-    fee:[0.002,0.0018,0.0013,0.0013],
+    fee:[0.002,0.0018,0.0013,0.0013], feePost:0.0013,
     surrender:[9,8,7,6,5], loanRatio:40,
     loanRate:'4.00%', transfer:'T+1/T+2',
     bonus:null, adminFee:0,
@@ -4370,7 +4370,7 @@ var PLAT_DATA = [
     features:['第4年費率降至0.13%，長期成本低','Chubb全球信評優良品牌','T+1/T+2轉換彈性','注意：貸款成數僅40%，且5年後有5%解約費']
   },
   { id:'yuanta', name:'大利元滿', company:'元大人壽', col:'#dc2626',
-    fee:[0.0018,0,0,0],
+    fee:[0.0018,0,0,0], feePost:0,
     surrender:[7,6,4,3,0], loanRatio:60,
     loanRate:'4.00%', transfer:'T+1（每年12次免費）',
     bonus:0.004, adminFee:100,
@@ -4490,7 +4490,7 @@ function calcWorkflow(){
   if(!pr) return;
   var plat = PLAT_DATA.find(function(x){return x.id===pr.value;});
   if(!plat) return;
-  var feeM = plat.fee[3]; // monthly fee rate (decimal, e.g. 0.0015)
+  // fee: per-year schedule; feePost = rate after 48 months (0 if stops)
 
   // Income funds
   var incSel = Array.from(document.querySelectorAll('.wf-inc-check:checked')).map(function(el){
@@ -4554,8 +4554,11 @@ function calcWorkflow(){
       grw_acc *= (1 + effGrw/12);
       // Platform fee on TOTAL account → deducted from growth fund first,
       // remainder from income fund (if growth depleted)
+      var feeRate = m < 48
+        ? plat.fee[Math.min(Math.floor(m/12), 3)]
+        : (plat.feePost || 0);
       var total = inc_acc + grw_acc;
-      var mo_fee = total * feeM;
+      var mo_fee = total * feeRate;
       if(grw_acc >= mo_fee){
         grw_acc -= mo_fee;
       } else {
