@@ -1516,7 +1516,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
           <input type="checkbox" id="wf-rotation" onchange="calcWorkflow()" style="width:16px;height:16px;accent-color:#1d4ed8;flex-shrink:0">
           <div>
             <div style="font-size:12px;font-weight:700;color:#1e40af">🔄 輪替提領策略</div>
-            <div style="font-size:10px;color:#3b82f6;margin-top:1px">兩檔輪替，估提升有效配息率 +1.5%</div>
+            <div style="font-size:10px;color:#3b82f6;margin-top:1px">贖回再申購，每檔基金全額輪替收息</div>
           </div>
         </label>
       </div>
@@ -4500,7 +4500,10 @@ function calcWorkflow(){
   var effInc = 0;
   if(incSel.length>0){
     var avg = incSel.reduce(function(s,f){return s+f.rate;},0)/incSel.length/100;
-    effInc = isRot&&incSel.length>=2 ? avg+0.015 : avg;
+    var sumRates = incSel.reduce(function(s,f){return s+f.rate;},0)/100;
+    // 真正輪轉：450萬先配完A再配B → 各基金完整利率全加
+    // 非輪轉：只有平均利率
+    effInc = isRot&&incSel.length>=2 ? sumRates : avg;
   }
 
   // Growth funds
