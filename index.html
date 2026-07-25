@@ -4414,7 +4414,7 @@ function initWorkflow(){
   // Build income fund list from the same I2_FUNDS data used in 月配息2
   WF_INC_FUNDS = I2_IDS.map(function(id){
     var f = I2_FUNDS[id];
-    return { id:id, name:I2_NAMES[id], rate:f.divRate, icon:'💰', col:f.col, desc:'月配息 年化約'+f.divRate+'%' };
+    return { id:id, name:I2_NAMES[id], rate:f.divRate, capRate:f.capRate||0, icon:'💰', col:f.col, desc:'月配息 年化約'+f.divRate+'%' };
   });
 
   // Platform radio cards
@@ -4498,12 +4498,17 @@ function calcWorkflow(){
   }).filter(Boolean);
   var isRot = !!(document.getElementById('wf-rotation') && document.getElementById('wf-rotation').checked);
   var effInc = 0;
+  var effCapErosion = 0;
   if(incSel.length>0){
     var avg = incSel.reduce(function(s,f){return s+f.rate;},0)/incSel.length/100;
     var sumRates = incSel.reduce(function(s,f){return s+f.rate;},0)/100;
     // 真正輪轉：450萬先配完A再配B → 各基金完整利率全加
     // 非輪轉：只有平均利率
     effInc = isRot&&incSel.length>=2 ? sumRates : avg;
+    // 輪轉時的資本侵蝕率：各基金平均 capRate / 12（每基金持有約 1/n 個月）
+    effCapErosion = isRot&&incSel.length>=2
+      ? incSel.reduce(function(s,f){return s+(f.capRate||0);},0)/incSel.length/12/100
+      : 0;
   }
 
   // Growth funds
@@ -4551,8 +4556,10 @@ function calcWorkflow(){
     var cumDiv = 0;
 
     for(var m=0; m<months; m++){
-      // Dividend paid from income fund (stable)
+      // Dividend paid from income fund (stable; may erode in rotation)
       cumDiv += inc_acc * effInc / 12;
+      // Capital erosion from capRate (rotation only)
+      if(effCapErosion !== 0) inc_acc = inc_acc * (1 + effCapErosion);
       // Growth fund appreciates
       grw_acc *= (1 + effGrw/12);
       // Platform fee on TOTAL account → deducted from growth fund first,
