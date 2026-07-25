@@ -1475,15 +1475,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       <div>
         <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px">💰 投入本金</div>
         <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px">
-          <button onclick="setWfAmt(1000000)"  style="padding:5px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8faff;font-size:12px;font-weight:700;cursor:pointer">100萬</button>
-          <button onclick="setWfAmt(2000000)"  style="padding:5px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8faff;font-size:12px;font-weight:700;cursor:pointer">200萬</button>
-          <button onclick="setWfAmt(3000000)"  style="padding:5px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8faff;font-size:12px;font-weight:700;cursor:pointer;border-color:#1d4ed8;color:#1d4ed8">300萬</button>
-          <button onclick="setWfAmt(5000000)"  style="padding:5px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8faff;font-size:12px;font-weight:700;cursor:pointer">500萬</button>
+          <button class="wf-amt-btn" data-v="1000000" onclick="setWfAmt(1000000)" style="padding:5px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8faff;font-size:12px;font-weight:700;cursor:pointer">100萬</button>
+          <button class="wf-amt-btn" data-v="2000000" onclick="setWfAmt(2000000)" style="padding:5px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8faff;font-size:12px;font-weight:700;cursor:pointer">200萬</button>
+          <button class="wf-amt-btn" data-v="3000000" onclick="setWfAmt(3000000)" style="padding:5px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8faff;font-size:12px;font-weight:700;cursor:pointer">300萬</button>
+          <button class="wf-amt-btn" data-v="5000000" onclick="setWfAmt(5000000)" style="padding:5px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8faff;font-size:12px;font-weight:700;cursor:pointer">500萬</button>
         </div>
         <div style="display:flex;align-items:center;gap:5px">
           <input id="wf-amt" type="number" value="3000000" min="100000" step="100000"
             style="width:130px;border:1.5px solid #e2e8f0;border-radius:8px;padding:6px 8px;font-size:14px;font-weight:700"
-            oninput="syncPlatAmt();calcWorkflow()">
+            oninput="syncPlatAmt();calcWorkflow();highlightAmtBtn(this.value)">
           <span style="font-size:11px;color:#94a3b8">元</span>
           <span id="wf-amt-display" style="font-size:12px;font-weight:800;color:#1e40af">= 300萬</span>
         </div>
@@ -4397,8 +4397,17 @@ var WF_GRW_FUNDS = [
   { id:'tlz63', name:'安聯收益成長 AT',   growthRate:8,  icon:'📊', col:'#d97706', desc:'股債混合累積型，10年年化8.16%・成立以來8.01%，模擬8%精確' },
 ];
 
+function highlightAmtBtn(v){
+  document.querySelectorAll('.wf-amt-btn').forEach(function(b){
+    var active = +b.getAttribute('data-v') === +v;
+    b.style.borderColor = active ? '#1d4ed8' : '#e2e8f0';
+    b.style.color        = active ? '#1d4ed8' : '';
+    b.style.fontWeight   = active ? '900'     : '700';
+  });
+}
 function setWfAmt(v){
   var el=document.getElementById('wf-amt'); if(el){el.value=v; syncPlatAmt(); calcWorkflow();}
+  highlightAmtBtn(v);
 }
 function syncPlatAmt(){
   var v=+(document.getElementById('wf-amt')||{value:3000000}).value||3000000;
@@ -4441,10 +4450,17 @@ function initWorkflow(){
     d.style.cssText = 'border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 10px;cursor:pointer';
     // Get full name from I2_PROFILES if available
     var fullName = (typeof I2_PROFILES !== 'undefined' && I2_PROFILES[f.id]) ? I2_PROFILES[f.id].full : f.name;
+    var moDiv = (f.rate/12).toFixed(2);
+    var capAbs = Math.abs(f.capRate||0);
+    var capColor = (f.capRate||0) >= 0 ? '#059669' : '#dc2626';
+    var capText = (f.capRate||0) >= 0 ? '資本增值 +'+capAbs+'%/年' : '資本侵蝕 -'+capAbs+'%/年';
     d.innerHTML = '<label style="display:flex;align-items:center;gap:8px;cursor:pointer">'
       +'<input type="checkbox" class="wf-inc-check" value="'+f.id+'" onchange="wfIncChange()" style="accent-color:'+f.col+';width:15px;height:15px;flex-shrink:0">'
-      +'<div><div style="font-size:11px;font-weight:700;color:'+f.col+'">'+f.name+'</div>'
-      +'<div style="font-size:10px;color:#059669;font-weight:700">年化配息 '+f.rate+'%</div></div></label>';
+      +'<div style="line-height:1.5">'
+      +'<div style="font-size:11px;font-weight:700;color:'+f.col+'">'+f.name+'</div>'
+      +'<div style="font-size:10px;color:#059669;font-weight:700">年化配息 '+f.rate+'%</div>'
+      +'<div style="font-size:9px;color:#64748b">除息月降 ≈ '+moDiv+'%&nbsp;·&nbsp;<span style="color:'+capColor+'">'+capText+'</span></div>'
+      +'</div></label>';
     ig.appendChild(d);
   });
 
@@ -4453,12 +4469,19 @@ function initWorkflow(){
   WF_GRW_FUNDS.forEach(function(f){
     var d = document.createElement('div');
     d.style.cssText = 'border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 10px;cursor:pointer';
+    var riskMap = {12:'高波動（科技股）', 10:'中高波動（AI主題）', 8:'中波動（股債混合）'};
+    var riskNote = riskMap[f.growthRate] || '中高波動';
     d.innerHTML = '<label style="display:flex;align-items:center;gap:8px;cursor:pointer">'
       +'<input type="checkbox" class="wf-grw-check" value="'+f.id+'" onchange="wfGrwChange()" style="accent-color:'+f.col+';width:15px;height:15px;flex-shrink:0">'
-      +'<div><div style="font-size:11px;font-weight:700;color:'+f.col+'">'+f.icon+' '+f.name+'</div>'
-      +'<div style="font-size:10px;color:#94a3b8">'+f.desc+'</div></div></label>';
+      +'<div style="line-height:1.5">'
+      +'<div style="font-size:11px;font-weight:700;color:'+f.col+'">'+f.icon+' '+f.name+'</div>'
+      +'<div style="font-size:10px;color:#7c3aed;font-weight:700">累積型・歷史年化 '+f.growthRate+'%</div>'
+      +'<div style="font-size:9px;color:#64748b">不除息 NAV 持續複利・'+riskNote+'</div>'
+      +'</div></label>';
     gg.appendChild(d);
   });
+  // 初始化時同步 highlight 目前金額
+  highlightAmtBtn(document.getElementById('wf-amt').value);
 }
 
 function wfIncChange(){
