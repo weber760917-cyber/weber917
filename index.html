@@ -4641,12 +4641,14 @@ function calcWorkflow(){
     var grw_acc = P_grw;
     var cumDiv = 0;
 
+    // 配息固定：單位數 × 每單位配息 = 常數，NAV下跌只影響帳戶價值
+    var fixedMonthlyIncDiv = P_inc * effInc / 12;
     for(var m=0; m<months; m++){
-      // 情境：第1個月NAV衝擊（悲觀：市場修正）
+      // 情境：第1個月淨值衝擊（只影響帳戶價值，配息金額不變）
       if(m===0 && scShock!==0){ inc_acc*=(1+scShock); grw_acc*=(1+scShock); }
-      // Dividend paid from income fund (stable; may erode in rotation)
-      cumDiv += inc_acc * effInc / 12;
-      // Capital erosion from capRate (rotation only, scenario-adjusted)
+      // 配息固定，不隨NAV侵蝕而減少
+      cumDiv += fixedMonthlyIncDiv;
+      // Capital erosion from capRate (rotation only, scenario-adjusted) — 帳戶淨值侵蝕
       if(adjCapErosion !== 0) inc_acc = inc_acc * (1 + adjCapErosion);
       // Growth fund appreciates (scenario-adjusted rate)
       grw_acc *= (1 + adjGrw/12);
@@ -5172,16 +5174,18 @@ function calcIncome2() {
   var adjCapRate = effCapRate * sc.capMult;
   var monthlyCapFactor = Math.pow(1 + adjCapRate/100, 1/12);
 
+  // 配息金額固定：單位數不變 × 每單位配息不變 → 以期初本金計算，NAV下跌只影響帳戶價值
+  var fixedMonthlyDiv = rotP * effDivRate / 100 / 12;
+
   [5,10,20].forEach(function(yr) {
     var n = yr * 12;
     var cap = rotP, cumDiv = 0;
     var annDivs = new Array(yr).fill(0);
     for (var m = 1; m <= n; m++) {
-      if (m === 1 && sc.shock !== 0) cap *= (1 + sc.shock); // 悲觀：第1月NAV衝擊
-      var mDiv = cap * effDivRate / 100 / 12;
-      cumDiv += mDiv;
-      annDivs[Math.floor((m-1)/12)] += mDiv;
-      cap *= monthlyCapFactor;
+      if (m === 1 && sc.shock !== 0) cap *= (1 + sc.shock); // 悲觀：淨值一次性下跌（配息不受影響）
+      cumDiv += fixedMonthlyDiv; // 配息固定，不隨NAV變動
+      annDivs[Math.floor((m-1)/12)] += fixedMonthlyDiv;
+      cap *= monthlyCapFactor; // 帳戶淨值持續侵蝕
     }
     var terminal = cap;
     var r = 0.05;
@@ -5213,9 +5217,9 @@ function calcIncome2() {
 
 // 選擇平台情境切換
 var _WF_SCENE_CFG = {
-  opt: { col:'#16a34a', bg:'#f0fdf4', bdr:'#16a34a', desc:'📈 樂觀：歷史年化報酬維持（配股12/10/8%），資本侵蝕依模型估算。' },
-  neu: { col:'#d97706', bg:'#fffbeb', bdr:'#fbbf24', desc:'📊 中立：配股報酬打7折（8.4/7/5.6%），配息基金資本侵蝕×1.5，市場無明顯修正。' },
-  pes: { col:'#dc2626', bg:'#fff1f2', bdr:'#fca5a5', desc:'📉 悲觀：第1個月市場修正-12%，配股報酬打4折（4.8/4/3.2%），資本侵蝕×2.5。' }
+  opt: { col:'#16a34a', bg:'#f0fdf4', bdr:'#16a34a', desc:'📈 樂觀：歷史年化報酬維持（配股12/10/8%），資本侵蝕依模型估算。配息金額不變。' },
+  neu: { col:'#d97706', bg:'#fffbeb', bdr:'#fbbf24', desc:'📊 中立：配股報酬打7折（8.4/7/5.6%），資本侵蝕×1.5。配息金額固定不受影響。' },
+  pes: { col:'#dc2626', bg:'#fff1f2', bdr:'#fca5a5', desc:'📉 悲觀：第1個月淨值下跌12%（帳戶縮水），配股報酬打4折，資本侵蝕×2.5。配息金額仍固定不變。' }
 };
 window._wfScene = 'opt';
 function setWfScene(s) {
@@ -5235,9 +5239,9 @@ function setWfScene(s) {
 
 // 月配息2情境切換
 var _I2_SCENE_CFG = {
-  opt: { col:'#16a34a', bg:'#f0fdf4', bdr:'#16a34a', desc:'📈 樂觀：市場正常運行，配息依歷史水準維持，資本侵蝕依各基金模型估算。' },
-  neu: { col:'#d97706', bg:'#fffbeb', bdr:'#fbbf24', desc:'📊 中立：市場溫和波動，配息照常，但資本侵蝕速率加快 ×1.5（NAV長期略承壓）。' },
-  pes: { col:'#dc2626', bg:'#fff1f2', bdr:'#fca5a5', desc:'📉 悲觀：持有期遇市場修正，第1個月NAV下跌約 12%；加上資本侵蝕速率 ×2.5（長期看空）。' }
+  opt: { col:'#16a34a', bg:'#f0fdf4', bdr:'#16a34a', desc:'📈 樂觀：市場正常，每月配息固定（單位數不變），資本侵蝕依模型估算。' },
+  neu: { col:'#d97706', bg:'#fffbeb', bdr:'#fbbf24', desc:'📊 中立：每月配息金額固定不變，資本侵蝕×1.5（NAV長期略承壓）。' },
+  pes: { col:'#dc2626', bg:'#fff1f2', bdr:'#fca5a5', desc:'📉 悲觀：第1個月淨值下跌12%（帳戶縮水，但配息金額仍固定），資本侵蝕速率×2.5。' }
 };
 window._i2Scene = 'opt';
 function setI2Scene(s) {
