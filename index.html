@@ -1598,6 +1598,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       <div style="font-size:10px;color:#94a3b8;margin-bottom:8px;padding:7px 10px;background:#f8faff;border-radius:7px;line-height:1.6">
         ⚠️ 試算採第4年後穩定費率；配股基金報酬率為歷史估算，不保證未來績效。
       </div>
+      <!-- 情境選擇 -->
+      <div style="display:flex;gap:6px;margin-bottom:7px">
+        <button class="wf-sc-btn" data-s="opt" onclick="setWfScene('opt')"
+          style="flex:1;padding:7px 4px;border-radius:9px;border:1.5px solid #16a34a;background:#f0fdf4;font-size:11px;font-weight:800;color:#166534;cursor:pointer">📈 樂觀</button>
+        <button class="wf-sc-btn" data-s="neu" onclick="setWfScene('neu')"
+          style="flex:1;padding:7px 4px;border-radius:9px;border:1.5px solid #e2e8f0;background:var(--bg);font-size:11px;font-weight:700;color:#374151;cursor:pointer">📊 中立</button>
+        <button class="wf-sc-btn" data-s="pes" onclick="setWfScene('pes')"
+          style="flex:1;padding:7px 4px;border-radius:9px;border:1.5px solid #e2e8f0;background:var(--bg);font-size:11px;font-weight:700;color:#374151;cursor:pointer">📉 悲觀</button>
+      </div>
+      <div id="wf-sc-desc" style="font-size:10px;background:#f0fdf4;border-radius:7px;padding:7px 10px;color:#166534;margin-bottom:8px;line-height:1.5">
+        📈 樂觀：歷史年化報酬維持，資本侵蝕依模型估算。
+      </div>
       <!-- 結果表格 -->
       <div style="background:white;border-radius:11px;border:1.5px solid #e2e8f0;overflow:hidden">
         <table style="width:100%;border-collapse:collapse;font-size:11px">
@@ -4584,6 +4596,13 @@ function calcWorkflow(){
   }).filter(Boolean);
   var effGrw = grwSel.length>0 ? grwSel.reduce(function(s,f){return s+f.growthRate;},0)/grwSel.length/100 : 0;
 
+  // 情境調整
+  var _wscMap = { opt:{grwMult:1.0,capMult:1.0,shock:0}, neu:{grwMult:0.7,capMult:1.5,shock:0}, pes:{grwMult:0.4,capMult:2.5,shock:-0.12} };
+  var _wsc = _wscMap[window._wfScene||'opt'] || _wscMap['opt'];
+  var adjGrw = effGrw * _wsc.grwMult;
+  var adjCapErosion = effCapErosion * _wsc.capMult;
+  var scShock = _wsc.shock;
+
   // Allocation
   var incPct = 100;
   if(grwSel.length>0){ incPct = +(document.getElementById('wf-alloc')||{value:70}).value||70; }
@@ -4623,12 +4642,14 @@ function calcWorkflow(){
     var cumDiv = 0;
 
     for(var m=0; m<months; m++){
+      // 情境：第1個月NAV衝擊（悲觀：市場修正）
+      if(m===0 && scShock!==0){ inc_acc*=(1+scShock); grw_acc*=(1+scShock); }
       // Dividend paid from income fund (stable; may erode in rotation)
       cumDiv += inc_acc * effInc / 12;
-      // Capital erosion from capRate (rotation only)
-      if(effCapErosion !== 0) inc_acc = inc_acc * (1 + effCapErosion);
-      // Growth fund appreciates
-      grw_acc *= (1 + effGrw/12);
+      // Capital erosion from capRate (rotation only, scenario-adjusted)
+      if(adjCapErosion !== 0) inc_acc = inc_acc * (1 + adjCapErosion);
+      // Growth fund appreciates (scenario-adjusted rate)
+      grw_acc *= (1 + adjGrw/12);
       // Platform fee on TOTAL account → deducted from growth fund first,
       // remainder from income fund (if growth depleted)
       var feeRate = m < 48
@@ -5190,7 +5211,29 @@ function calcIncome2() {
   });
 }
 
-// 情境切換
+// 選擇平台情境切換
+var _WF_SCENE_CFG = {
+  opt: { col:'#16a34a', bg:'#f0fdf4', bdr:'#16a34a', desc:'📈 樂觀：歷史年化報酬維持（配股12/10/8%），資本侵蝕依模型估算。' },
+  neu: { col:'#d97706', bg:'#fffbeb', bdr:'#fbbf24', desc:'📊 中立：配股報酬打7折（8.4/7/5.6%），配息基金資本侵蝕×1.5，市場無明顯修正。' },
+  pes: { col:'#dc2626', bg:'#fff1f2', bdr:'#fca5a5', desc:'📉 悲觀：第1個月市場修正-12%，配股報酬打4折（4.8/4/3.2%），資本侵蝕×2.5。' }
+};
+window._wfScene = 'opt';
+function setWfScene(s) {
+  window._wfScene = s;
+  var cfg = _WF_SCENE_CFG[s];
+  document.querySelectorAll('.wf-sc-btn').forEach(function(b) {
+    var active = b.getAttribute('data-s') === s;
+    b.style.borderColor = active ? cfg.bdr : '#e2e8f0';
+    b.style.background  = active ? cfg.bg  : 'var(--bg)';
+    b.style.color       = active ? cfg.col : '#374151';
+    b.style.fontWeight  = active ? '800'   : '700';
+  });
+  var descEl = document.getElementById('wf-sc-desc');
+  if (descEl) { descEl.textContent = cfg.desc; descEl.style.background = cfg.bg; descEl.style.color = cfg.col; }
+  calcWorkflow();
+}
+
+// 月配息2情境切換
 var _I2_SCENE_CFG = {
   opt: { col:'#16a34a', bg:'#f0fdf4', bdr:'#16a34a', desc:'📈 樂觀：市場正常運行，配息依歷史水準維持，資本侵蝕依各基金模型估算。' },
   neu: { col:'#d97706', bg:'#fffbeb', bdr:'#fbbf24', desc:'📊 中立：市場溫和波動，配息照常，但資本侵蝕速率加快 ×1.5（NAV長期略承壓）。' },
