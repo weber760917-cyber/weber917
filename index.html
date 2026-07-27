@@ -1411,11 +1411,43 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     </div>
   </div>
 
+  <!-- 風險提示 -->
+  <div class="card" style="margin-bottom:10px;border:1.5px solid #fca5a5">
+    <div class="card-head" style="background:#fef2f2;cursor:pointer" onclick="var b=document.getElementById('i2-risk-body');b.style.display=b.style.display==='none'?'block':'none'">
+      <div class="card-title" style="color:#991b1b">⚠️ 輪轉策略的主要風險</div>
+      <div style="font-size:10px;color:#dc2626;margin-top:2px">點擊展開／收合</div>
+    </div>
+    <div id="i2-risk-body" class="card-body" style="display:none;font-size:11px;color:#374151;line-height:1.7">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="background:#fff1f2;border-radius:8px;padding:9px 12px;border-left:3px solid #dc2626">
+          <div style="font-weight:700;color:#b91c1c;margin-bottom:2px">📉 持有期間市場風險（最主要）</div>
+          每次持有基金約 2 週，若遇 Fed 決議、地緣衝突等事件，NAV 可能下跌 5~15%。配息收益（每次約 0.7~1.1%）遠不夠補，單次循環可能實際虧損。
+        </div>
+        <div style="background:#fff7ed;border-radius:8px;padding:9px 12px;border-left:3px solid #f97316">
+          <div style="font-weight:700;color:#c2410c;margin-bottom:2px">⏳ 贖回空窗期</div>
+          贖回後資金入帳需 T+3～5 工作天，這段期間閒置不生息。若下一檔除息日落在空窗期內，可能直接錯過當月配息。
+        </div>
+        <div style="background:#fffbeb;border-radius:8px;padding:9px 12px;border-left:3px solid #eab308">
+          <div style="font-weight:700;color:#854d0e;margin-bottom:2px">💱 匯率風險</div>
+          基金以 USD 計價，台幣升值時換回的金額縮水。美元每跌 1%，相當於當月配息打九折。
+        </div>
+        <div style="background:#f0fdf4;border-radius:8px;padding:9px 12px;border-left:3px solid #16a34a">
+          <div style="font-weight:700;color:#166534;margin-bottom:2px">🪨 資本侵蝕（長期）</div>
+          各基金 NAV 長期緩跌（capRate），部分配息來自本金。20 年後本金可能剩 60～80%，侵蝕速度因基金而異。
+        </div>
+        <div style="background:#f5f3ff;border-radius:8px;padding:9px 12px;border-left:3px solid #7c3aed">
+          <div style="font-weight:700;color:#5b21b6;margin-bottom:2px">✂️ 配息調降風險</div>
+          基金表現不佳時，基金公司可能下調每單位配息金額，輪轉策略的配息總收入隨之縮水。
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 5/10/20年 -->
   <div class="card">
     <div class="card-head"><div class="card-title">📈 長期預估（5／10／20年）</div></div>
     <div class="card-body">
-      <div style="display:flex;gap:8px;margin-bottom:10px">
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
         <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;background:#f5f3ff;border-radius:8px;padding:6px 12px;border:1.5px solid #7c3aed">
           <input type="radio" name="i2mode" value="std" checked onchange="calcIncome2()"> 標準分配提領
         </label>
@@ -1423,7 +1455,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
           <input type="radio" name="i2mode" value="rot" onchange="calcIncome2()"> 🔄 輪轉提領
         </label>
       </div>
-      <div style="font-size:11px;color:var(--sub);margin-bottom:8px">每月配息全部提領；IRR以「年均配息÷年數」簡化公式估算，反映長期配息遞減的現實感。</div>
+      <!-- 情境選擇 -->
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button class="i2-sc-btn" data-s="opt" onclick="setI2Scene('opt')"
+          style="flex:1;padding:7px 4px;border-radius:9px;border:1.5px solid #16a34a;background:#f0fdf4;font-size:11px;font-weight:700;color:#166534;cursor:pointer">📈 樂觀</button>
+        <button class="i2-sc-btn" data-s="neu" onclick="setI2Scene('neu')"
+          style="flex:1;padding:7px 4px;border-radius:9px;border:1.5px solid #e2e8f0;background:var(--bg);font-size:11px;font-weight:700;color:#374151;cursor:pointer">📊 中立</button>
+        <button class="i2-sc-btn" data-s="pes" onclick="setI2Scene('pes')"
+          style="flex:1;padding:7px 4px;border-radius:9px;border:1.5px solid #e2e8f0;background:var(--bg);font-size:11px;font-weight:700;color:#374151;cursor:pointer">📉 悲觀</button>
+      </div>
+      <div id="i2-sc-desc" style="font-size:10px;background:#f0fdf4;border-radius:7px;padding:7px 10px;color:#166534;margin-bottom:8px;line-height:1.5">
+        📈 樂觀：市場正常運行，配息依歷史水準維持，資本侵蝕依模型估算。
+      </div>
       <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
         <div style="background:var(--border);display:grid;grid-template-columns:60px 1fr 1fr 1fr 72px;padding:8px 10px;font-size:11px;font-weight:700;text-align:center">
           <div></div><div>帳戶價值</div><div>已領配息</div><div>合計</div><div>年化IRR</div>
@@ -1441,7 +1484,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
           <div id="inc2-acc-20" style="font-weight:700">—</div><div id="inc2-div-20" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-20" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2-irr-20" style="font-weight:800;color:#dc2626">—</div>
         </div>
       </div>
-      <div style="background:#fef3c7;border-radius:8px;padding:10px 12px;margin-top:10px;font-size:11px;color:#92400e">
+      <div id="i2-warn" style="background:#fef3c7;border-radius:8px;padding:10px 12px;margin-top:10px;font-size:11px;color:#92400e">
         ⚠️ 假設：每月配息如期提領、本金依資本增值率估算（輪轉模式兩檔各持半月）。實際績效視市場而異，僅供參考。
       </div>
 
@@ -5084,12 +5127,10 @@ function calcIncome2() {
   var cEl = document.getElementById('i2-conv-rows');
   if (cEl) cEl.innerHTML = cr || '<div style="padding:12px;text-align:center;color:var(--sub);font-size:12px">請先勾選基金</div>';
 
-  // 5/10/20 yr + IRR（逐年實際現金流法，精確反映配息逐年遞減）
+  // 5/10/20 yr + IRR（逐年實際現金流法 + 情境分析）
   if (sel.length === 0) return;
   var mode = (document.querySelector('input[name="i2mode"]:checked')||{value:'std'}).value;
 
-  // 輪轉模式：同一本金循環所有基金，收取各基金完整配息（取率總和）；資本侵蝕取各基金平均
-  // 標準模式：各基金各自持有，加權平均配息率與侵蝕率（依各基金配置比例加權）
   var effDivRate, effCapRate;
   if (mode === 'rot') {
     effDivRate = sel.reduce(function(s,x){return s+I2_FUNDS[x.id].divRate;},0);
@@ -5098,19 +5139,29 @@ function calcIncome2() {
     effDivRate = totAlloc > 0 ? sel.reduce(function(s,x){return s+I2_FUNDS[x.id].divRate*x.pct;},0)/totAlloc : 0;
     effCapRate = totAlloc > 0 ? sel.reduce(function(s,x){return s+I2_FUNDS[x.id].capRate*x.pct;},0)/totAlloc : 0;
   }
-  var monthlyCapFactor = Math.pow(1 + effCapRate/100, 1/12);
+
+  // 情境參數：capMultiplier=資本侵蝕倍率；shock=第1個月NAV一次性衝擊（負值=下跌）
+  var _sc = window._i2Scene || 'opt';
+  var scMap = {
+    opt: { capMult:1.0, shock:0    },
+    neu: { capMult:1.5, shock:0    },
+    pes: { capMult:2.5, shock:-0.12 }
+  };
+  var sc = scMap[_sc] || scMap['opt'];
+  var adjCapRate = effCapRate * sc.capMult;
+  var monthlyCapFactor = Math.pow(1 + adjCapRate/100, 1/12);
 
   [5,10,20].forEach(function(yr) {
     var n = yr * 12;
     var cap = rotP, cumDiv = 0;
     var annDivs = new Array(yr).fill(0);
     for (var m = 1; m <= n; m++) {
+      if (m === 1 && sc.shock !== 0) cap *= (1 + sc.shock); // 悲觀：第1月NAV衝擊
       var mDiv = cap * effDivRate / 100 / 12;
       cumDiv += mDiv;
-      annDivs[Math.floor((m-1)/12)] += mDiv; // 逐年累計配息（反映資本侵蝕後遞減）
+      annDivs[Math.floor((m-1)/12)] += mDiv;
       cap *= monthlyCapFactor;
     }
-    // 逐年現金流IRR（各年配息不同，比年均法更準確）
     var terminal = cap;
     var r = 0.05;
     for (var i = 0; i < 200; i++) {
@@ -5129,11 +5180,36 @@ function calcIncome2() {
       if (Math.abs(delta) < 1e-10) break;
       if (r < -0.5) r = 0.01;
     }
+    // IRR色彩：正高=綠，正低=橙，負=紅
+    var irrColor = r >= 0.05 ? '#16a34a' : (r >= 0 ? '#d97706' : '#dc2626');
     $t('inc2-acc-'+yr, incFmtP(cap)+'元');
     $t('inc2-div-'+yr, incFmtP(cumDiv)+'元');
     $t('inc2-tot-'+yr, incFmtP(cap+cumDiv)+'元');
-    $t('inc2-irr-'+yr, (r*100).toFixed(2)+'%');
+    var irrEl = document.getElementById('inc2-irr-'+yr);
+    if (irrEl) { irrEl.textContent = (r*100).toFixed(2)+'%'; irrEl.style.color = irrColor; }
   });
+}
+
+// 情境切換
+var _I2_SCENE_CFG = {
+  opt: { col:'#16a34a', bg:'#f0fdf4', bdr:'#16a34a', desc:'📈 樂觀：市場正常運行，配息依歷史水準維持，資本侵蝕依各基金模型估算。' },
+  neu: { col:'#d97706', bg:'#fffbeb', bdr:'#fbbf24', desc:'📊 中立：市場溫和波動，配息照常，但資本侵蝕速率加快 ×1.5（NAV長期略承壓）。' },
+  pes: { col:'#dc2626', bg:'#fff1f2', bdr:'#fca5a5', desc:'📉 悲觀：持有期遇市場修正，第1個月NAV下跌約 12%；加上資本侵蝕速率 ×2.5（長期看空）。' }
+};
+window._i2Scene = 'opt';
+function setI2Scene(s) {
+  window._i2Scene = s;
+  var cfg = _I2_SCENE_CFG[s];
+  document.querySelectorAll('.i2-sc-btn').forEach(function(b) {
+    var active = b.getAttribute('data-s') === s;
+    b.style.borderColor   = active ? cfg.bdr : '#e2e8f0';
+    b.style.background    = active ? cfg.bg  : 'var(--bg)';
+    b.style.color         = active ? cfg.col : '#374151';
+    b.style.fontWeight    = active ? '800'   : '700';
+  });
+  var descEl = document.getElementById('i2-sc-desc');
+  if (descEl) { descEl.textContent = cfg.desc; descEl.style.background = cfg.bg; descEl.style.color = cfg.col; }
+  calcIncome2();
 }
 </script>
 
