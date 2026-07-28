@@ -5174,17 +5174,29 @@ function calcIncome2() {
   var adjCapRate = effCapRate * sc.capMult;
   var monthlyCapFactor = Math.pow(1 + adjCapRate/100, 1/12);
 
-  // 配息金額固定：單位數不變 × 每單位配息不變 → 以期初本金計算，NAV下跌只影響帳戶價值
-  var fixedMonthlyDiv = rotP * effDivRate / 100 / 12;
+  // 配息模型差異：
+  // 標準持有：單位數固定 → 每月配息固定（NAV漲跌不影響配息）
+  // 輪轉策略：每次贖回後拿到「當時淨值×單位數」作為下一檔本金
+  //   → 若NAV跌，贖回金額減少 → 下一檔投入本金變少 → 下一檔配息也跟著減少
+  var isRotMode = (mode === 'rot');
+  var fixedMonthlyDiv = rotP * effDivRate / 100 / 12; // 標準模式：固定
 
   [5,10,20].forEach(function(yr) {
     var n = yr * 12;
     var cap = rotP, cumDiv = 0;
     var annDivs = new Array(yr).fill(0);
     for (var m = 1; m <= n; m++) {
-      if (m === 1 && sc.shock !== 0) cap *= (1 + sc.shock); // 悲觀：淨值一次性下跌（配息不受影響）
-      cumDiv += fixedMonthlyDiv; // 配息固定，不隨NAV變動
-      annDivs[Math.floor((m-1)/12)] += fixedMonthlyDiv;
+      if (m === 1 && sc.shock !== 0) cap *= (1 + sc.shock); // 悲觀：淨值一次性下跌
+      if (isRotMode) {
+        // 輪轉：配息 = 當前本金 × 配息率（本金因贖回NAV跌而縮減）
+        var mDiv = cap * effDivRate / 100 / 12;
+        cumDiv += mDiv;
+        annDivs[Math.floor((m-1)/12)] += mDiv;
+      } else {
+        // 標準持有：配息固定，不隨NAV變動
+        cumDiv += fixedMonthlyDiv;
+        annDivs[Math.floor((m-1)/12)] += fixedMonthlyDiv;
+      }
       cap *= monthlyCapFactor; // 帳戶淨值持續侵蝕
     }
     var terminal = cap;
@@ -5239,9 +5251,9 @@ function setWfScene(s) {
 
 // 月配息2情境切換
 var _I2_SCENE_CFG = {
-  opt: { col:'#16a34a', bg:'#f0fdf4', bdr:'#16a34a', desc:'📈 樂觀：市場正常，每月配息固定（單位數不變），資本侵蝕依模型估算。' },
-  neu: { col:'#d97706', bg:'#fffbeb', bdr:'#fbbf24', desc:'📊 中立：每月配息金額固定不變，資本侵蝕×1.5（NAV長期略承壓）。' },
-  pes: { col:'#dc2626', bg:'#fff1f2', bdr:'#fca5a5', desc:'📉 悲觀：第1個月淨值下跌12%（帳戶縮水，但配息金額仍固定），資本侵蝕速率×2.5。' }
+  opt: { col:'#16a34a', bg:'#f0fdf4', bdr:'#16a34a', desc:'📈 樂觀：市場正常。【持有】配息固定；【輪轉】贖回金額正常，下一檔本金不縮水。' },
+  neu: { col:'#d97706', bg:'#fffbeb', bdr:'#fbbf24', desc:'📊 中立：資本侵蝕×1.5。【持有】配息固定；【輪轉】本金因NAV漸跌而逐月微縮，配息隨之遞減。' },
+  pes: { col:'#dc2626', bg:'#fff1f2', bdr:'#fca5a5', desc:'📉 悲觀：第1月淨值-12%＋侵蝕×2.5。【持有】配息固定，帳戶縮水；【輪轉】贖回少→下一檔本金少→配息連帶縮減，複利惡化。' }
 };
 window._i2Scene = 'opt';
 function setI2Scene(s) {
