@@ -1422,6 +1422,106 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     </div>
   </div>
 
+  <!-- 歷史回測 -->
+  <div class="card" style="margin-bottom:10px;border:1.5px solid #6366f1">
+    <div class="card-head" style="background:#eef2ff;cursor:pointer" onclick="var b=document.getElementById('i2-bt-body');b.style.display=b.style.display==='none'?'block':'none'">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="card-title" style="color:#4338ca">📊 真實歷史回測</div>
+        <div style="font-size:9px;font-weight:700;background:#4338ca;color:white;border-radius:5px;padding:2px 7px">MoneyDJ實際數據</div>
+      </div>
+      <div style="font-size:10px;color:#6366f1;margin-top:2px">安聯AMg7 ＋ 聯博AP｜2025/01～2026/06｜200萬初始｜點擊展開</div>
+    </div>
+    <div id="i2-bt-body" class="card-body" style="display:none;padding:10px">
+      <!-- 說明 -->
+      <div style="font-size:10px;background:#eef2ff;border-radius:7px;padding:8px 10px;color:#3730a3;margin-bottom:10px;line-height:1.6">
+        策略：每月先買 <b>安聯AMg7</b>（月中除息），除息後贖回轉入 <b>聯博AP</b>（月底除息），再贖回。<br>
+        NAV 由 MoneyDJ 配息歷史反推（每單位配息 ÷ 年化配息率），USD/TWD＝32。
+      </div>
+      <!-- 指標 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+        <div style="background:#f0fdf4;border-radius:8px;padding:8px;text-align:center">
+          <div style="font-size:9px;color:#166534;font-weight:700">平均月收入</div>
+          <div style="font-size:15px;font-weight:800;color:#16a34a">3.2萬</div>
+          <div style="font-size:9px;color:#166534">18個月平均</div>
+        </div>
+        <div style="background:#fff7ed;border-radius:8px;padding:8px;text-align:center">
+          <div style="font-size:9px;color:#c2410c;font-weight:700">最終本金</div>
+          <div style="font-size:15px;font-weight:800;color:#ea580c">142萬</div>
+          <div style="font-size:9px;color:#c2410c">-28.9%（侵蝕）</div>
+        </div>
+        <div style="background:#eff6ff;border-radius:8px;padding:8px;text-align:center">
+          <div style="font-size:9px;color:#1e40af;font-weight:700">總財富</div>
+          <div style="font-size:15px;font-weight:800;color:#2563eb">200萬</div>
+          <div style="font-size:9px;color:#1e40af">本金+累計配息≈持平</div>
+        </div>
+      </div>
+      <!-- 表格 -->
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:10px">
+          <thead>
+            <tr style="background:#eef2ff;color:#3730a3;font-weight:700">
+              <td style="padding:5px 4px;border-bottom:1px solid #c7d2fe">月份</td>
+              <td style="padding:5px 4px;border-bottom:1px solid #c7d2fe;text-align:right">安聯NAV</td>
+              <td style="padding:5px 4px;border-bottom:1px solid #c7d2fe;text-align:right">安聯配息↗</td>
+              <td style="padding:5px 4px;border-bottom:1px solid #c7d2fe;text-align:right">聯博NAV</td>
+              <td style="padding:5px 4px;border-bottom:1px solid #c7d2fe;text-align:right">聯博配息↗</td>
+              <td style="padding:5px 4px;border-bottom:1px solid #c7d2fe;text-align:right">月收入</td>
+              <td style="padding:5px 4px;border-bottom:1px solid #c7d2fe;text-align:right">剩餘本金</td>
+            </tr>
+          </thead>
+          <tbody id="i2-bt-tbody"></tbody>
+        </table>
+      </div>
+      <!-- 注意 -->
+      <div style="font-size:9px;color:var(--sub);margin-top:8px;line-height:1.5">
+        ⚠️ 此回測為理想情境：假設贖回後立即再申購、無T+3空窗、匯率固定32。實際操作會因空窗期少領1次配息、匯率變動而有差異。歷史數據不代表未來績效。
+      </div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    var BT_DATA = [
+      {month:'2025/01',a_nav:8.643,a_div:0.069,b_nav:81.19,b_div:0.8322,div_a:15967,div_b:20336,month_div:36303,capital:1963697},
+      {month:'2025/02',a_nav:8.856,a_div:0.069,b_nav:75.199,b_div:0.8322,div_a:15300,div_b:21562,month_div:36863,capital:1926834},
+      {month:'2025/03',a_nav:8.347,a_div:0.069,b_nav:69.689,b_div:0.8322,div_a:15928,div_b:22819,month_div:38748,capital:1888086},
+      {month:'2025/04',a_nav:8.087,a_div:0.068,b_nav:69.933,b_div:0.8322,div_a:15876,div_b:22279,month_div:38155,capital:1849931},
+      {month:'2025/05',a_nav:8.482,a_div:0.068,b_nav:74.749,b_div:0.8322,div_a:14830,div_b:20431,month_div:35261,capital:1814670},
+      {month:'2025/06',a_nav:8.482,a_div:0.068,b_nav:78.448,b_div:0.8322,div_a:14548,div_b:19096,month_div:33644,capital:1781026},
+      {month:'2025/07',a_nav:8.644,a_div:0.068,b_nav:79.132,b_div:0.8322,div_a:14011,div_b:18583,month_div:32594,capital:1748433},
+      {month:'2025/08',a_nav:8.718,a_div:0.068,b_nav:79.51,b_div:0.8322,div_a:13638,div_b:18158,month_div:31795,capital:1716637},
+      {month:'2025/09',a_nav:8.793,a_div:0.068,b_nav:79.573,b_div:0.8322,div_a:13275,div_b:17814,month_div:31090,capital:1685547},
+      {month:'2025/10',a_nav:8.709,a_div:0.06822,b_nav:80.083,b_div:0.8322,div_a:13204,div_b:17378,month_div:30582,capital:1654969},
+      {month:'2025/11',a_nav:8.718,a_div:0.06822,b_nav:79.006,b_div:0.8322,div_a:12950,div_b:17296,month_div:30246,capital:1624727},
+      {month:'2025/12',a_nav:8.803,a_div:0.06822,b_nav:78.08,b_div:0.8322,div_a:12592,div_b:17183,month_div:29774,capital:1594956},
+      {month:'2026/01',a_nav:8.803,a_div:0.06822,b_nav:76.701,b_div:0.8322,div_a:12361,div_b:17171,month_div:29532,capital:1565428},
+      {month:'2026/02',a_nav:8.727,a_div:0.06822,b_nav:73.755,b_div:0.8322,div_a:12236,div_b:17525,month_div:29762,capital:1535670},
+      {month:'2026/03',a_nav:8.501,a_div:0.06822,b_nav:65.442,b_div:0.8322,div_a:12324,div_b:19372,month_div:31696,capital:1503978},
+      {month:'2026/04',a_nav:8.713,a_div:0.06796,b_nav:74.47,b_div:0.8322,div_a:11731,div_b:16676,month_div:28407,capital:1475581},
+      {month:'2026/05',a_nav:9.041,a_div:0.06796,b_nav:77.115,b_div:0.8322,div_a:11092,div_b:15804,month_div:26896,capital:1448695},
+      {month:'2026/06',a_nav:8.972,a_div:0.06796,b_nav:73.7,b_div:0.8322,div_a:10974,div_b:16234,month_div:27208,capital:1421496}
+    ];
+    function fmt(n){return n.toLocaleString();}
+    var tbody = document.getElementById('i2-bt-tbody');
+    if(!tbody) return;
+    var html = '';
+    BT_DATA.forEach(function(r,i){
+      var bg = i%2===0 ? '' : 'background:#f8f9ff';
+      // Highlight months where market dropped (b_nav < 72)
+      var flag = r.b_nav < 70 ? '🔴' : '';
+      html += '<tr style="'+bg+'">'
+        +'<td style="padding:4px;font-weight:700;color:#4338ca">'+r.month+'</td>'
+        +'<td style="padding:4px;text-align:right;color:#374151">'+r.a_nav.toFixed(3)+'</td>'
+        +'<td style="padding:4px;text-align:right;color:#7c3aed">'+fmt(r.div_a)+'</td>'
+        +'<td style="padding:4px;text-align:right;color:#374151">'+flag+r.b_nav.toFixed(2)+'</td>'
+        +'<td style="padding:4px;text-align:right;color:#dc2626">'+fmt(r.div_b)+'</td>'
+        +'<td style="padding:4px;text-align:right;font-weight:800;color:#16a34a">'+fmt(r.month_div)+'</td>'
+        +'<td style="padding:4px;text-align:right;color:#374151">'+fmt(r.capital)+'</td>'
+        +'</tr>';
+    });
+    tbody.innerHTML = html;
+  })();
+  </script>
+
   <!-- 風險提示 -->
   <div class="card" style="margin-bottom:10px;border:1.5px solid #fca5a5">
     <div class="card-head" style="background:#fef2f2;cursor:pointer" onclick="var b=document.getElementById('i2-risk-body');b.style.display=b.style.display==='none'?'block':'none'">
