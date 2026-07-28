@@ -5340,9 +5340,8 @@ function calcIncome2() {
 
 // 逐月輪轉模擬
 function runRotationSim() {
-  var pEl = document.getElementById('i2-principal');
-  var P = pEl ? +pEl.value * 10000 : 0;
-  if (!P) { alert('請先輸入本金'); return; }
+  var P = _i2P || 0;
+  if (!P) { alert('請先在上方設定本金金額'); return; }
   var USD = 32; // TWD/USD
   var MONTHS = 12;
 
