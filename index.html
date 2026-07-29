@@ -5354,54 +5354,51 @@ function runHistoricalSim(P, USD) {
   var capital = P, totalDiv = 0;
   var tableRows = '';
   var prevANav = null, prevBNav = null;
+  var monthlyData = [];
 
   data.forEach(function(r, i) {
     var moCapStart = capital;
-
-    // NAV方向（和上個月比）
     var aDir = prevANav === null ? '' : r.a_nav > prevANav ? '↑' : r.a_nav < prevANav ? '↓' : '→';
     var bDir = prevBNav === null ? '' : r.b_nav > prevBNav ? '↑' : r.b_nav < prevBNav ? '↓' : '→';
     var aDirCol = aDir==='↑'?'#16a34a':aDir==='↓'?'#dc2626':'#64748b';
     var bDirCol = bDir==='↑'?'#16a34a':bDir==='↓'?'#dc2626':'#64748b';
 
-    // 安聯（月中除息）
     var units_a = capital / (r.a_nav * USD);
     var div_a = units_a * r.a_div * USD;
-    var redeem_a = units_a * (r.a_nav - r.a_div) * USD;
+    var ex_nav_a = r.a_nav - r.a_div;
+    var redeem_a = units_a * ex_nav_a * USD;
     var capChg_a = redeem_a - capital;
     capital = redeem_a;
 
-    // 聯博（月底除息）
     var units_b = capital / (r.b_nav * USD);
     var div_b = units_b * r.b_div * USD;
-    var redeem_b = units_b * (r.b_nav - r.b_div) * USD;
+    var ex_nav_b = r.b_nav - r.b_div;
+    var redeem_b = units_b * ex_nav_b * USD;
     var capChg_b = redeem_b - capital;
     capital = redeem_b;
 
     var monthDiv = div_a + div_b;
     totalDiv += monthDiv;
     var moCapChg = capital - moCapStart;
-
     prevANav = r.a_nav; prevBNav = r.b_nav;
 
+    monthlyData.push({
+      r:r, i:i, moCapStart:moCapStart, moCapChg:moCapChg,
+      div_a:div_a, div_b:div_b, monthDiv:monthDiv,
+      capChg_a:capChg_a, capChg_b:capChg_b,
+      ex_nav_a:ex_nav_a, ex_nav_b:ex_nav_b,
+      aDir:aDir, bDir:bDir, aDirCol:aDirCol, bDirCol:bDirCol,
+      capital:capital
+    });
+
     var bg = i%2===0 ? '#f8faff' : 'white';
-    // 月行
     tableRows += '<div style="display:grid;grid-template-columns:58px 1fr 70px 1fr 70px 72px 80px;padding:6px 8px;font-size:10px;border-bottom:1px solid #e2e8f0;align-items:center;background:'+bg+'">';
     tableRows += '<div style="font-weight:800;color:#4338ca;font-size:11px">'+r.month+'</div>';
-    // 安聯
-    tableRows += '<div style="color:#7c3aed;font-weight:700">安聯<br>'
-      +'<span style="font-size:9px;font-weight:400;color:'+aDirCol+'">'+aDir+' $'+r.a_nav.toFixed(3)+'</span></div>';
-    tableRows += '<div style="text-align:right;color:#7c3aed;font-weight:700">+'+Math.round(div_a).toLocaleString()
-      +'<br><span style="font-size:9px;color:'+(capChg_a>=0?'#16a34a':'#dc2626')+'">'+(capChg_a>=0?'+':'')+Math.round(capChg_a).toLocaleString()+'</span></div>';
-    // 聯博
-    tableRows += '<div style="color:#dc2626;font-weight:700">聯博<br>'
-      +'<span style="font-size:9px;font-weight:400;color:'+bDirCol+'">'+bDir+' $'+r.b_nav.toFixed(2)+'</span></div>';
-    tableRows += '<div style="text-align:right;color:#dc2626;font-weight:700">+'+Math.round(div_b).toLocaleString()
-      +'<br><span style="font-size:9px;color:'+(capChg_b>=0?'#16a34a':'#dc2626')+'">'+(capChg_b>=0?'+':'')+Math.round(capChg_b).toLocaleString()+'</span></div>';
-    // 月收入
-    tableRows += '<div style="text-align:right;font-weight:900;color:#16a34a;font-size:11px">+'+Math.round(monthDiv).toLocaleString()
-      +'<br><span style="font-size:9px;color:'+(moCapChg>=0?'#16a34a':'#dc2626')+';font-weight:700">'+(moCapChg>=0?'▲':'▼')+Math.round(Math.abs(moCapChg)).toLocaleString()+'</span></div>';
-    // 剩餘本金
+    tableRows += '<div style="color:#7c3aed;font-weight:700">安聯<br><span style="font-size:9px;font-weight:400;color:'+aDirCol+'">'+aDir+' $'+r.a_nav.toFixed(3)+'</span></div>';
+    tableRows += '<div style="text-align:right;color:#7c3aed;font-weight:700">+'+Math.round(div_a).toLocaleString()+'<br><span style="font-size:9px;color:'+(capChg_a>=0?'#16a34a':'#dc2626')+'">'+(capChg_a>=0?'+':'')+Math.round(capChg_a).toLocaleString()+'</span></div>';
+    tableRows += '<div style="color:#dc2626;font-weight:700">聯博<br><span style="font-size:9px;font-weight:400;color:'+bDirCol+'">'+bDir+' $'+r.b_nav.toFixed(2)+'</span></div>';
+    tableRows += '<div style="text-align:right;color:#dc2626;font-weight:700">+'+Math.round(div_b).toLocaleString()+'<br><span style="font-size:9px;color:'+(capChg_b>=0?'#16a34a':'#dc2626')+'">'+(capChg_b>=0?'+':'')+Math.round(capChg_b).toLocaleString()+'</span></div>';
+    tableRows += '<div style="text-align:right;font-weight:900;color:#16a34a;font-size:11px">+'+Math.round(monthDiv).toLocaleString()+'<br><span style="font-size:9px;color:'+(moCapChg>=0?'#16a34a':'#dc2626')+';font-weight:700">'+(moCapChg>=0?'▲':'▼')+Math.round(Math.abs(moCapChg)).toLocaleString()+'</span></div>';
     tableRows += '<div style="text-align:right;font-size:10px;font-weight:700;color:#1e40af">'+Math.round(capital).toLocaleString()+'</div>';
     tableRows += '</div>';
   });
@@ -5409,20 +5406,84 @@ function runHistoricalSim(P, USD) {
   var capLeft = capital;
   var avgMonthly = totalDiv / data.length;
 
-  var html = '<div style="font-size:10px;background:#fef3c7;border-radius:8px;padding:8px 10px;margin-bottom:8px;color:#92400e;line-height:1.6;border:1px solid #fcd34d">'
-    +'📡 <b>真實歷史數據回測</b>（MoneyDJ除息記錄 2025/01～2026/06，共'+data.length+'個月）<br>'
-    +'↑ 綠色箭頭 = NAV較上月上漲；↓ 紅色 = 下跌。NAV漲時月收入下降（買較少單位），NAV跌時月收入反而上升。'
-    +'</div>';
+  // ── 填息分析 ──
+  var fillRows = '';
+  var fillCountA=0, fillCountB=0, bothFill=0, neitherFill=0;
+  var nPairs = monthlyData.length - 1;
 
-  // 表頭
+  for (var fi = 0; fi < monthlyData.length; fi++) {
+    var md = monthlyData[fi];
+    var hasNext = fi < data.length - 1;
+    var aFill=false, bFill=false;
+    var aFillHtml='<span style="color:#94a3b8">—</span>';
+    var bFillHtml='<span style="color:#94a3b8">—</span>';
+    var rowBg = fi%2===0?'#f9fafb':'white';
+
+    if (hasNext) {
+      var nextR = data[fi+1];
+      var aGap = nextR.a_nav - md.ex_nav_a;
+      var bGap = nextR.b_nav - md.ex_nav_b;
+      aFill = aGap > 0.005;
+      bFill = bGap > 0.05;
+      if (aFill) fillCountA++;
+      if (bFill) fillCountB++;
+      if (aFill && bFill) bothFill++;
+      if (!aFill && !bFill) neitherFill++;
+
+      if (aGap > 0.02) {
+        aFillHtml = '<span style="color:#16a34a;font-weight:700">✅ +$'+aGap.toFixed(3)+'</span>';
+      } else if (aGap > -0.02) {
+        aFillHtml = '<span style="color:#d97706">🟡 '+aGap.toFixed(3)+'</span>';
+      } else {
+        aFillHtml = '<span style="color:#dc2626;font-weight:700">❌ -$'+Math.abs(aGap).toFixed(3)+'</span>';
+      }
+      if (bGap > 0.05) {
+        bFillHtml = '<span style="color:#16a34a;font-weight:700">✅ +$'+bGap.toFixed(2)+'</span>';
+      } else if (bGap > -0.05) {
+        bFillHtml = '<span style="color:#d97706">🟡 '+bGap.toFixed(2)+'</span>';
+      } else {
+        bFillHtml = '<span style="color:#dc2626;font-weight:700">❌ -$'+Math.abs(bGap).toFixed(2)+'</span>';
+      }
+      if (aFill && bFill) rowBg='#f0fff4';
+      else if (!aFill && !bFill) rowBg='#fff5f5';
+    }
+    fillRows += '<div style="display:grid;grid-template-columns:60px 1fr 1fr 68px;padding:5px 8px;font-size:10px;border-bottom:1px solid #e2e8f0;align-items:center;background:'+rowBg+'">';
+    fillRows += '<div style="font-weight:800;color:#4338ca;font-size:11px">'+md.r.month+'</div>';
+    fillRows += '<div style="font-size:9px;line-height:1.6">除息:$'+md.ex_nav_a.toFixed(3)+'<br>'+aFillHtml+'</div>';
+    fillRows += '<div style="font-size:9px;line-height:1.6">除息:$'+md.ex_nav_b.toFixed(2)+'<br>'+bFillHtml+'</div>';
+    fillRows += '<div style="text-align:right;font-weight:700;color:#16a34a;font-size:10px">+'+Math.round(md.monthDiv).toLocaleString()+'</div>';
+    fillRows += '</div>';
+  }
+
+  // ── 長期真實收益分析 ──
+  var firstD=data[0], lastD=data[data.length-1];
+  var aNavChg = lastD.a_nav - firstD.a_nav;
+  var bNavChg = lastD.b_nav - firstD.b_nav;
+  var aTotalDiv=0, bTotalDiv=0;
+  data.forEach(function(r){ aTotalDiv+=r.a_div; bTotalDiv+=r.b_div; });
+  var aTotalRet = (aNavChg + aTotalDiv) / firstD.a_nav * 100;
+  var bTotalRet = (bNavChg + bTotalDiv) / firstD.b_nav * 100;
+  // 聯博：配息中有多少是補本金（NAV跌多少）
+  var bNavLossAmt = Math.max(0, -bNavChg);
+  var bDivCompPct = bTotalDiv > 0 ? Math.min(100, bNavLossAmt / bTotalDiv * 100) : 0;
+  var bRealIncomePct = 100 - bDivCompPct;
+
+  // ── 組裝 HTML ──
+  var html = '';
+
+  // 說明欄（新加：本金必然補貼原理）
+  html += '<div style="font-size:10px;background:#fef3c7;border-radius:8px;padding:8px 10px;margin-bottom:8px;color:#92400e;line-height:1.6;border:1px solid #fcd34d">'
+    +'📡 <b>真實歷史數據回測</b>（MoneyDJ除息記錄 2025/01～2026/06，共'+data.length+'個月）<br>'
+    +'↑ 綠色 = NAV較上月漲；↓ 紅色 = 跌。NAV漲時月收入少（單位數少），NAV跌時月收入反而多。</div>';
+
+  // 主表格
   html += '<div style="display:grid;grid-template-columns:58px 1fr 70px 1fr 70px 72px 80px;padding:6px 8px;font-size:10px;font-weight:700;background:#1e293b;color:white;border-radius:8px 8px 0 0">';
   html += '<div>月份</div><div>安聯NAV</div><div style="text-align:right;color:#c4b5fd">安聯配息</div>';
   html += '<div>聯博NAV</div><div style="text-align:right;color:#fca5a5">聯博配息</div>';
   html += '<div style="text-align:right;color:#86efac">月收入<br><span style="font-size:9px;font-weight:400;color:#94a3b8">本金變化</span></div>';
   html += '<div style="text-align:right;color:#93c5fd">剩餘本金</div>';
   html += '</div>';
-
-  html += '<div style="border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;max-height:420px;overflow-y:auto">'+tableRows+'</div>';
+  html += '<div style="border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;max-height:340px;overflow-y:auto">'+tableRows+'</div>';
 
   // 摘要
   html += '<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px">';
@@ -5431,7 +5492,77 @@ function runHistoricalSim(P, USD) {
   html += '<div style="background:#fff7ed;border-radius:8px;padding:8px;text-align:center"><div style="font-size:9px;color:#c2410c;font-weight:700">最終本金</div><div style="font-size:14px;font-weight:900;color:#ea580c">'+Math.round(capLeft).toLocaleString()+'</div><div style="font-size:9px;color:#c2410c">'+(((capLeft/P)-1)*100).toFixed(1)+'%</div></div>';
   html += '<div style="background:#eff6ff;border-radius:8px;padding:8px;text-align:center"><div style="font-size:9px;color:#1e40af;font-weight:700">本金＋配息合計</div><div style="font-size:14px;font-weight:900;color:#2563eb">'+Math.round(totalDiv+capLeft).toLocaleString()+'</div><div style="font-size:9px;color:#1e40af">'+(((totalDiv+capLeft)/P-1)*100>=0?'+':'')+((totalDiv+capLeft)/P*100-100).toFixed(1)+'%</div></div>';
   html += '</div>';
-  html += '<div style="margin-top:7px;font-size:9px;color:#94a3b8;line-height:1.5">💡 NAV漲跌反映市場真實波動。漲時你買入的單位數少→配息少；跌時單位數多→配息反而多。總財富（本金+配息）幾乎不受影響。USD/TWD=32固定。</div>';
+
+  // ━━━ 填息分析 ━━━
+  html += '<div style="margin-top:14px;border-radius:8px;border:1px solid #c7d2fe;overflow:hidden">';
+  html += '<div style="background:#4338ca;color:white;padding:7px 10px;font-size:11px;font-weight:800">📊 填息追蹤（除息後隔月NAV vs 除息NAV）</div>';
+  html += '<div style="font-size:9px;background:#eef2ff;padding:5px 10px;color:#4338ca;line-height:1.5">'
+    +'✅ = 隔月NAV > 除息後NAV（已填息，配息為真實收益）｜❌ = 未填息（NAV繼續跌，配息部分補本金）｜🟡 = 持平<br>'
+    +'📌 注意：此為月度比較，實際2週填息情況需更細資料；且除息瞬間「配息≡本金損失」是數學必然，填息後才變真實收益。'
+    +'</div>';
+  html += '<div style="display:grid;grid-template-columns:60px 1fr 1fr 68px;padding:5px 8px;font-size:10px;font-weight:700;background:#312e81;color:white">';
+  html += '<div>月份</div><div>安聯 除息→填息?</div><div>聯博 除息→填息?</div><div style="text-align:right;color:#86efac">月配息</div>';
+  html += '</div>';
+  html += '<div style="max-height:340px;overflow-y:auto">'+fillRows+'</div>';
+
+  // 填息統計
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;padding:8px;background:#f5f3ff">';
+  html += '<div style="text-align:center"><div style="font-size:9px;color:#6d28d9;font-weight:700">安聯填息率</div><div style="font-size:16px;font-weight:900;color:#7c3aed">'+fillCountA+'/'+nPairs+'</div><div style="font-size:10px;color:#7c3aed">'+(fillCountA/nPairs*100).toFixed(0)+'%</div></div>';
+  html += '<div style="text-align:center"><div style="font-size:9px;color:#991b1b;font-weight:700">聯博填息率</div><div style="font-size:16px;font-weight:900;color:#dc2626">'+fillCountB+'/'+nPairs+'</div><div style="font-size:10px;color:#dc2626">'+(fillCountB/nPairs*100).toFixed(0)+'%</div></div>';
+  html += '<div style="text-align:center"><div style="font-size:9px;color:#166534;font-weight:700">雙雙填息月</div><div style="font-size:16px;font-weight:900;color:#16a34a">'+bothFill+'月</div><div style="font-size:9px;color:#166534">'+nPairs+'月中佔'+(bothFill/nPairs*100).toFixed(0)+'%</div></div>';
+  html += '<div style="text-align:center"><div style="font-size:9px;color:#b91c1c;font-weight:700">雙雙未填息</div><div style="font-size:16px;font-weight:900;color:#ef4444">'+neitherFill+'月</div><div style="font-size:9px;color:#b91c1c">'+nPairs+'月中佔'+(neitherFill/nPairs*100).toFixed(0)+'%</div></div>';
+  html += '</div>';
+  html += '</div>';
+
+  // ━━━ 長期真實收益 vs 補本金分析 ━━━
+  html += '<div style="margin-top:10px;border-radius:8px;border:1px solid '+(bNavChg<0?'#fecaca':'#bbf7d0')+';overflow:hidden">';
+  html += '<div style="background:'+(bNavChg<0?'#7f1d1d':'#14532d')+';color:white;padding:7px 10px;font-size:11px;font-weight:800">💰 18個月真實收益 vs 補本金分析</div>';
+
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0">';
+
+  // 安聯
+  html += '<div style="padding:10px 12px;border-right:1px solid #e5e7eb">';
+  html += '<div style="font-size:11px;font-weight:800;color:#7c3aed;margin-bottom:6px">安聯AMg7（TLZF9）</div>';
+  html += '<div style="font-size:9px;color:#4b5563;line-height:2">'
+    +'NAV變化：$'+firstD.a_nav.toFixed(3)+' → $'+lastD.a_nav.toFixed(3)
+    +' <span style="color:'+(aNavChg>=0?'#16a34a':'#dc2626')+';font-weight:700">'+(aNavChg>=0?'▲':'▼')+'$'+Math.abs(aNavChg).toFixed(3)+' ('+(aNavChg/firstD.a_nav*100).toFixed(1)+'%)</span><br>'
+    +'18個月累計配息：$'+aTotalDiv.toFixed(4)+'/單位<br>'
+    +'總報酬（NAV+配息）：<span style="color:#16a34a;font-weight:800">+'+aTotalRet.toFixed(1)+'%</span>（18個月）</div>';
+  if (aNavChg >= 0) {
+    html += '<div style="margin-top:8px;padding:6px 8px;background:#dcfce7;border-radius:6px;font-size:10px;color:#166534;font-weight:700">✅ NAV上漲 → 配息100%是真實收益<br>本金未侵蝕，甚至還有資本利得</div>';
+  } else {
+    var aCompPct = Math.min(100, Math.abs(aNavChg)/aTotalDiv*100);
+    html += '<div style="margin-top:8px;padding:6px 8px;background:#fff7ed;border-radius:6px;font-size:10px;color:#92400e;font-weight:700">'
+      +'⚠️ 配息中 '+aCompPct.toFixed(0)+'% 補本金<br>真實收益約 '+(100-aCompPct).toFixed(0)+'%</div>';
+  }
+  html += '</div>';
+
+  // 聯博
+  html += '<div style="padding:10px 12px">';
+  html += '<div style="font-size:11px;font-weight:800;color:#dc2626;margin-bottom:6px">聯博美國成長（ALBT8）</div>';
+  html += '<div style="font-size:9px;color:#4b5563;line-height:2">'
+    +'NAV變化：$'+firstD.b_nav.toFixed(2)+' → $'+lastD.b_nav.toFixed(2)
+    +' <span style="color:'+(bNavChg>=0?'#16a34a':'#dc2626')+';font-weight:700">'+(bNavChg>=0?'▲':'▼')+'$'+Math.abs(bNavChg).toFixed(2)+' ('+(bNavChg/firstD.b_nav*100).toFixed(1)+'%)</span><br>'
+    +'18個月累計配息：$'+bTotalDiv.toFixed(4)+'/單位<br>'
+    +'總報酬（NAV+配息）：<span style="color:'+(bTotalRet>=0?'#16a34a':'#dc2626')+';font-weight:800">'+(bTotalRet>=0?'+':'')+bTotalRet.toFixed(1)+'%</span>（18個月）</div>';
+  if (bNavChg < 0) {
+    html += '<div style="margin-top:8px;padding:6px 8px;background:#fef2f2;border-radius:6px;font-size:10px;color:#991b1b;font-weight:700">'
+      +'⚠️ NAV跌 $'+Math.abs(bNavChg).toFixed(2)+'/單位<br>'
+      +'配息中 <b>'+bDivCompPct.toFixed(0)+'%</b> 補本金損失<br>'
+      +'真實淨收益約 <b>'+bRealIncomePct.toFixed(0)+'%</b> × 配息</div>';
+  } else {
+    html += '<div style="margin-top:8px;padding:6px 8px;background:#dcfce7;border-radius:6px;font-size:10px;color:#166534;font-weight:700">✅ NAV上漲 → 配息100%是真實收益</div>';
+  }
+  html += '</div>';
+  html += '</div>';
+
+  // 底部警示
+  html += '<div style="padding:8px 12px;background:#fafafa;font-size:9px;color:#64748b;border-top:1px solid #e5e7eb;line-height:1.6">'
+    +'💡 <b>核心原理</b>：除息當下，配息 = 本金損失（數學恆等）。要配息成為「真實收益」，需要NAV在你贖回後能填息回來。'
+    +'安聯（65%月填息率）整體NAV小漲，配息品質佳；聯博（53%填息率）NAV波動較大，約'+bDivCompPct.toFixed(0)+'%配息實為本金返還，但總報酬仍為正。'
+    +'</div>';
+
+  html += '</div>'; // end 長期分析
 
   document.getElementById('i2-rot-sim').innerHTML = html;
 }
