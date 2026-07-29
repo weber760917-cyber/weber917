@@ -5564,6 +5564,110 @@ function runHistoricalSim(P, USD) {
 
   html += '</div>'; // end 長期分析
 
+  // ━━━ 5年情境預測 ━━━
+  var scenarios5Y = [
+    {
+      name:'樂觀：填息出場 ✅', color:'#15803d', bgHead:'#14532d', bgCard:'#f0fff4', borderColor:'#bbf7d0',
+      desc:'安聯NAV穩升＋聯博回穩，填息率高',
+      aTrend:0.002, bTrend:0.003, pA:0.75, pB:0.65,
+    },
+    {
+      name:'中性：歷史均值 📊', color:'#1d4ed8', bgHead:'#1e3a5f', bgCard:'#eff6ff', borderColor:'#bfdbfe',
+      desc:'沿用18個月實測趨勢（安聯小漲/聯博小跌）',
+      aTrend:0.0021, bTrend:-0.0053, pA:0.65, pB:0.53,
+    },
+    {
+      name:'悲觀：未填息惡化 ❌', color:'#b91c1c', bgHead:'#7f1d1d', bgCard:'#fff5f5', borderColor:'#fecaca',
+      desc:'NAV持續下跌，填息率低',
+      aTrend:-0.0017, bTrend:-0.0083, pA:0.20, pB:0.15,
+    },
+  ];
+
+  var aN0 = lastD.a_nav; // 用最新NAV起算
+  var bN0 = lastD.b_nav;
+  var aDivM = (aTotalDiv / data.length);  // 平均月配/unit
+  var bDivM = (bTotalDiv / data.length);
+
+  function calc5Y(sc) {
+    var cap = P, cumDiv = 0, cumReal = 0;
+    var aN = aN0, bN = bN0;
+    var years = [];
+    for (var m = 1; m <= 60; m++) {
+      var aY = aDivM / aN;
+      var aDivInc = cap * aY;
+      var aCapLoss = cap * (1-sc.pA) * aY;
+      var aReal = cap * sc.pA * aY;
+      var capA = cap - aCapLoss;
+
+      var bY = bDivM / bN;
+      var bDivInc = capA * bY;
+      var bCapLoss = capA * (1-sc.pB) * bY;
+      var bReal = capA * sc.pB * bY;
+      cap = capA - bCapLoss;
+
+      cumDiv += aDivInc + bDivInc;
+      cumReal += aReal + bReal;
+      aN *= (1+sc.aTrend); bN *= (1+sc.bTrend);
+
+      if (m%12===0) years.push({yr:m/12, cap:cap, cumDiv:cumDiv, cumReal:cumReal, aN:aN, bN:bN});
+    }
+    return years;
+  }
+
+  html += '<div style="margin-top:14px;border-radius:8px;border:1px solid #e2e8f0;overflow:hidden">';
+  html += '<div style="background:#0f172a;color:white;padding:8px 12px;font-size:12px;font-weight:800">🔮 5年情境預測（本金'+Math.round(P/10000)+'萬元）</div>';
+  html += '<div style="font-size:9px;background:#f1f5f9;padding:5px 10px;color:#475569">'
+    +'三種情境下，5年配息總額、本金餘額與年化報酬率預測。填息月 = 配息為真實收益；未填息月 = 配息補本金損失。</div>';
+
+  // 三情境並排
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:1px solid #e2e8f0">';
+  scenarios5Y.forEach(function(sc) {
+    var yrs = calc5Y(sc);
+    var y5 = yrs[4];
+    var annRet = (Math.pow(y5.cap+y5.cumDiv === 0 ? 1 : (y5.cap+y5.cumDiv)/P, 0.2) - 1) * 100;
+    var realPct = y5.cumDiv > 0 ? (y5.cumReal/y5.cumDiv*100).toFixed(0) : 0;
+    var lossCapPct = ((1-y5.cap/P)*100).toFixed(1);
+
+    html += '<div style="border-right:1px solid #e2e8f0;padding:0">';
+    html += '<div style="background:'+sc.bgHead+';color:white;padding:6px 8px;font-size:10px;font-weight:800">'+sc.name+'</div>';
+    html += '<div style="font-size:8.5px;color:#64748b;padding:4px 8px;background:#f8fafc;border-bottom:1px solid #e2e8f0">'+sc.desc+'</div>';
+
+    // 逐年小表格
+    html += '<table style="width:100%;border-collapse:collapse;font-size:9px">';
+    html += '<tr style="background:#e2e8f0"><th style="padding:3px 4px;text-align:left">年</th><th style="text-align:right;padding:3px 4px">本金</th><th style="text-align:right;padding:3px 4px;color:#16a34a">配息</th><th style="text-align:right;padding:3px 4px">合計</th></tr>';
+    yrs.forEach(function(y,i) {
+      var bg = i%2===0?'#fafafa':'white';
+      var tw = y.cap+y.cumDiv;
+      var twRet = ((tw/P-1)*100).toFixed(0);
+      html += '<tr style="background:'+bg+'"><td style="padding:3px 4px;font-weight:700;color:#4338ca">第'+y.yr+'年</td>'
+        +'<td style="text-align:right;padding:3px 4px">'+Math.round(y.cap/10000)+'萬</td>'
+        +'<td style="text-align:right;padding:3px 4px;color:#16a34a">+'+Math.round(y.cumDiv/10000)+'萬</td>'
+        +'<td style="text-align:right;padding:3px 4px;font-weight:700;color:'+(tw>=P?'#15803d':'#dc2626')+'">'
+        +Math.round(tw/10000)+'萬 ('+( tw>=P?'+':'')+twRet+'%)</td></tr>';
+    });
+    html += '</table>';
+
+    // 結論框
+    html += '<div style="padding:7px 8px;background:'+sc.bgCard+';border-top:1px solid '+sc.borderColor+'">';
+    html += '<div style="font-size:10px;font-weight:800;color:'+sc.color+'">5年結算</div>';
+    html += '<div style="font-size:9px;color:#374151;margin-top:3px;line-height:1.8">'
+      +'本金剩：<b>'+Math.round(y5.cap/10000)+'萬</b>（-'+lossCapPct+'%）<br>'
+      +'總配息：<b>+'+Math.round(y5.cumDiv/10000)+'萬</b><br>'
+      +'真實收益佔比：<b>'+realPct+'%</b><br>'
+      +'補本金損失：<b>'+(100-parseInt(realPct))+'%</b><br>'
+      +'年化報酬（本金+配息）：<b style="color:'+sc.color+'">'+annRet.toFixed(1)+'%/年</b>'
+      +'</div>';
+    html += '</div>';
+    html += '</div>';
+  });
+  html += '</div>'; // grid
+
+  // 底部對比表
+  html += '<div style="background:#0f172a;padding:7px 12px;font-size:9px;color:#cbd5e1;border-top:1px solid #1e293b">';
+  html += '⚠️ <b>免責聲明：</b>以上情境預測基於歷史18個月真實數據外推，非保證報酬。NAV走勢、填息率可能顯著偏離預測。建議定期檢視實際NAV趨勢，適時調整或退出。';
+  html += '</div>';
+  html += '</div>'; // 5年情境
+
   document.getElementById('i2-rot-sim').innerHTML = html;
 }
 
