@@ -1414,8 +1414,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   <!-- 月份模擬 -->
   <div class="card" style="margin-bottom:10px;border:1.5px solid #bfdbfe">
     <div class="card-head" style="background:#eff6ff;display:flex;justify-content:space-between;align-items:center">
-      <div class="card-title" style="color:#1e40af">📅 逐月輪轉模擬（12個月）</div>
-      <button onclick="runRotationSim()" style="font-size:11px;font-weight:700;color:white;background:#1e40af;border:none;border-radius:8px;padding:5px 12px;cursor:pointer">▶ 跑模擬</button>
+      <div>
+        <div class="card-title" style="color:#1e40af">📅 逐月輪轉模擬</div>
+        <div style="font-size:9px;color:#3b82f6;margin-top:1px">安聯+聯博：自動套用18個月真實數據 ✦ 其他組合：理論模型</div>
+      </div>
+      <button onclick="runRotationSim()" style="font-size:11px;font-weight:700;color:white;background:#1e40af;border:none;border-radius:8px;padding:5px 12px;cursor:pointer;flex-shrink:0">▶ 跑模擬</button>
     </div>
     <div id="i2-rot-sim" class="card-body" style="padding:10px">
       <div style="font-size:11px;color:var(--sub);text-align:center;padding:10px">點擊「跑模擬」查看逐月配息與淨值變化</div>
@@ -1479,47 +1482,54 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     </div>
   </div>
   <script>
-  (function(){
-    var BT_DATA = [
-      {month:'2025/01',a_nav:8.643,a_div:0.069,b_nav:81.19,b_div:0.8322,div_a:15967,div_b:20336,month_div:36303,capital:1963697},
-      {month:'2025/02',a_nav:8.856,a_div:0.069,b_nav:75.199,b_div:0.8322,div_a:15300,div_b:21562,month_div:36863,capital:1926834},
-      {month:'2025/03',a_nav:8.347,a_div:0.069,b_nav:69.689,b_div:0.8322,div_a:15928,div_b:22819,month_div:38748,capital:1888086},
-      {month:'2025/04',a_nav:8.087,a_div:0.068,b_nav:69.933,b_div:0.8322,div_a:15876,div_b:22279,month_div:38155,capital:1849931},
-      {month:'2025/05',a_nav:8.482,a_div:0.068,b_nav:74.749,b_div:0.8322,div_a:14830,div_b:20431,month_div:35261,capital:1814670},
-      {month:'2025/06',a_nav:8.482,a_div:0.068,b_nav:78.448,b_div:0.8322,div_a:14548,div_b:19096,month_div:33644,capital:1781026},
-      {month:'2025/07',a_nav:8.644,a_div:0.068,b_nav:79.132,b_div:0.8322,div_a:14011,div_b:18583,month_div:32594,capital:1748433},
-      {month:'2025/08',a_nav:8.718,a_div:0.068,b_nav:79.51,b_div:0.8322,div_a:13638,div_b:18158,month_div:31795,capital:1716637},
-      {month:'2025/09',a_nav:8.793,a_div:0.068,b_nav:79.573,b_div:0.8322,div_a:13275,div_b:17814,month_div:31090,capital:1685547},
-      {month:'2025/10',a_nav:8.709,a_div:0.06822,b_nav:80.083,b_div:0.8322,div_a:13204,div_b:17378,month_div:30582,capital:1654969},
-      {month:'2025/11',a_nav:8.718,a_div:0.06822,b_nav:79.006,b_div:0.8322,div_a:12950,div_b:17296,month_div:30246,capital:1624727},
-      {month:'2025/12',a_nav:8.803,a_div:0.06822,b_nav:78.08,b_div:0.8322,div_a:12592,div_b:17183,month_div:29774,capital:1594956},
-      {month:'2026/01',a_nav:8.803,a_div:0.06822,b_nav:76.701,b_div:0.8322,div_a:12361,div_b:17171,month_div:29532,capital:1565428},
-      {month:'2026/02',a_nav:8.727,a_div:0.06822,b_nav:73.755,b_div:0.8322,div_a:12236,div_b:17525,month_div:29762,capital:1535670},
-      {month:'2026/03',a_nav:8.501,a_div:0.06822,b_nav:65.442,b_div:0.8322,div_a:12324,div_b:19372,month_div:31696,capital:1503978},
-      {month:'2026/04',a_nav:8.713,a_div:0.06796,b_nav:74.47,b_div:0.8322,div_a:11731,div_b:16676,month_div:28407,capital:1475581},
-      {month:'2026/05',a_nav:9.041,a_div:0.06796,b_nav:77.115,b_div:0.8322,div_a:11092,div_b:15804,month_div:26896,capital:1448695},
-      {month:'2026/06',a_nav:8.972,a_div:0.06796,b_nav:73.7,b_div:0.8322,div_a:10974,div_b:16234,month_div:27208,capital:1421496}
-    ];
-    function fmt(n){return n.toLocaleString();}
+  // 全域歷史NAV資料（MoneyDJ實際除息日數據）
+  window.BT_NAV_RAW = [
+    {month:'2025/01',a_nav:8.643,a_div:0.069,b_nav:81.19,b_div:0.8322},
+    {month:'2025/02',a_nav:8.856,a_div:0.069,b_nav:75.199,b_div:0.8322},
+    {month:'2025/03',a_nav:8.347,a_div:0.069,b_nav:69.689,b_div:0.8322},
+    {month:'2025/04',a_nav:8.087,a_div:0.068,b_nav:69.933,b_div:0.8322},
+    {month:'2025/05',a_nav:8.482,a_div:0.068,b_nav:74.749,b_div:0.8322},
+    {month:'2025/06',a_nav:8.482,a_div:0.068,b_nav:78.448,b_div:0.8322},
+    {month:'2025/07',a_nav:8.644,a_div:0.068,b_nav:79.132,b_div:0.8322},
+    {month:'2025/08',a_nav:8.718,a_div:0.068,b_nav:79.51,b_div:0.8322},
+    {month:'2025/09',a_nav:8.793,a_div:0.068,b_nav:79.573,b_div:0.8322},
+    {month:'2025/10',a_nav:8.709,a_div:0.06822,b_nav:80.083,b_div:0.8322},
+    {month:'2025/11',a_nav:8.718,a_div:0.06822,b_nav:79.006,b_div:0.8322},
+    {month:'2025/12',a_nav:8.803,a_div:0.06822,b_nav:78.08,b_div:0.8322},
+    {month:'2026/01',a_nav:8.803,a_div:0.06822,b_nav:76.701,b_div:0.8322},
+    {month:'2026/02',a_nav:8.727,a_div:0.06822,b_nav:73.755,b_div:0.8322},
+    {month:'2026/03',a_nav:8.501,a_div:0.06822,b_nav:65.442,b_div:0.8322},
+    {month:'2026/04',a_nav:8.713,a_div:0.06796,b_nav:74.47,b_div:0.8322},
+    {month:'2026/05',a_nav:9.041,a_div:0.06796,b_nav:77.115,b_div:0.8322},
+    {month:'2026/06',a_nav:8.972,a_div:0.06796,b_nav:73.7,b_div:0.8322}
+  ];
+
+  function _btRenderCard() {
     var tbody = document.getElementById('i2-bt-tbody');
     if(!tbody) return;
+    var USD = 32, P = 2000000, capital = P, totalDiv = 0;
     var html = '';
-    BT_DATA.forEach(function(r,i){
+    BT_NAV_RAW.forEach(function(r,i){
       var bg = i%2===0 ? '' : 'background:#f8f9ff';
-      // Highlight months where market dropped (b_nav < 72)
-      var flag = r.b_nav < 70 ? '🔴' : '';
-      html += '<tr style="'+bg+'">'
+      var units_a = capital/(r.a_nav*USD), div_a = units_a*r.a_div*USD;
+      capital = units_a*(r.a_nav-r.a_div)*USD;
+      var units_b = capital/(r.b_nav*USD), div_b = units_b*r.b_div*USD;
+      capital = units_b*(r.b_nav-r.b_div)*USD;
+      var mDiv = div_a+div_b; totalDiv+=mDiv;
+      var bFlag = r.b_nav<70?'🔴':r.b_nav>78?'🟢':'';
+      html+='<tr style="'+bg+'">'
         +'<td style="padding:4px;font-weight:700;color:#4338ca">'+r.month+'</td>'
-        +'<td style="padding:4px;text-align:right;color:#374151">'+r.a_nav.toFixed(3)+'</td>'
-        +'<td style="padding:4px;text-align:right;color:#7c3aed">'+fmt(r.div_a)+'</td>'
-        +'<td style="padding:4px;text-align:right;color:#374151">'+flag+r.b_nav.toFixed(2)+'</td>'
-        +'<td style="padding:4px;text-align:right;color:#dc2626">'+fmt(r.div_b)+'</td>'
-        +'<td style="padding:4px;text-align:right;font-weight:800;color:#16a34a">'+fmt(r.month_div)+'</td>'
-        +'<td style="padding:4px;text-align:right;color:#374151">'+fmt(r.capital)+'</td>'
+        +'<td style="padding:4px;text-align:right">'+r.a_nav.toFixed(3)+'</td>'
+        +'<td style="padding:4px;text-align:right;color:#7c3aed">'+Math.round(div_a).toLocaleString()+'</td>'
+        +'<td style="padding:4px;text-align:right">'+bFlag+r.b_nav.toFixed(2)+'</td>'
+        +'<td style="padding:4px;text-align:right;color:#dc2626">'+Math.round(div_b).toLocaleString()+'</td>'
+        +'<td style="padding:4px;text-align:right;font-weight:800;color:#16a34a">'+Math.round(mDiv).toLocaleString()+'</td>'
+        +'<td style="padding:4px;text-align:right">'+Math.round(capital).toLocaleString()+'</td>'
         +'</tr>';
     });
     tbody.innerHTML = html;
-  })();
+  }
+  _btRenderCard();
   </script>
 
   <!-- 風險提示 -->
@@ -5338,14 +5348,99 @@ function calcIncome2() {
   });
 }
 
+// 真實歷史回測模擬（安聯+聯博，2025/01~2026/06 MoneyDJ實際NAV）
+function runHistoricalSim(P, USD) {
+  var data = window.BT_NAV_RAW;
+  var capital = P, totalDiv = 0;
+  var tableRows = '';
+  var prevANav = null, prevBNav = null;
+
+  data.forEach(function(r, i) {
+    var moCapStart = capital;
+
+    // NAV方向（和上個月比）
+    var aDir = prevANav === null ? '' : r.a_nav > prevANav ? '↑' : r.a_nav < prevANav ? '↓' : '→';
+    var bDir = prevBNav === null ? '' : r.b_nav > prevBNav ? '↑' : r.b_nav < prevBNav ? '↓' : '→';
+    var aDirCol = aDir==='↑'?'#16a34a':aDir==='↓'?'#dc2626':'#64748b';
+    var bDirCol = bDir==='↑'?'#16a34a':bDir==='↓'?'#dc2626':'#64748b';
+
+    // 安聯（月中除息）
+    var units_a = capital / (r.a_nav * USD);
+    var div_a = units_a * r.a_div * USD;
+    var redeem_a = units_a * (r.a_nav - r.a_div) * USD;
+    var capChg_a = redeem_a - capital;
+    capital = redeem_a;
+
+    // 聯博（月底除息）
+    var units_b = capital / (r.b_nav * USD);
+    var div_b = units_b * r.b_div * USD;
+    var redeem_b = units_b * (r.b_nav - r.b_div) * USD;
+    var capChg_b = redeem_b - capital;
+    capital = redeem_b;
+
+    var monthDiv = div_a + div_b;
+    totalDiv += monthDiv;
+    var moCapChg = capital - moCapStart;
+
+    prevANav = r.a_nav; prevBNav = r.b_nav;
+
+    var bg = i%2===0 ? '#f8faff' : 'white';
+    // 月行
+    tableRows += '<div style="display:grid;grid-template-columns:58px 1fr 70px 1fr 70px 72px 80px;padding:6px 8px;font-size:10px;border-bottom:1px solid #e2e8f0;align-items:center;background:'+bg+'">';
+    tableRows += '<div style="font-weight:800;color:#4338ca;font-size:11px">'+r.month+'</div>';
+    // 安聯
+    tableRows += '<div style="color:#7c3aed;font-weight:700">安聯<br>'
+      +'<span style="font-size:9px;font-weight:400;color:'+aDirCol+'">'+aDir+' $'+r.a_nav.toFixed(3)+'</span></div>';
+    tableRows += '<div style="text-align:right;color:#7c3aed;font-weight:700">+'+Math.round(div_a).toLocaleString()
+      +'<br><span style="font-size:9px;color:'+(capChg_a>=0?'#16a34a':'#dc2626')+'">'+(capChg_a>=0?'+':'')+Math.round(capChg_a).toLocaleString()+'</span></div>';
+    // 聯博
+    tableRows += '<div style="color:#dc2626;font-weight:700">聯博<br>'
+      +'<span style="font-size:9px;font-weight:400;color:'+bDirCol+'">'+bDir+' $'+r.b_nav.toFixed(2)+'</span></div>';
+    tableRows += '<div style="text-align:right;color:#dc2626;font-weight:700">+'+Math.round(div_b).toLocaleString()
+      +'<br><span style="font-size:9px;color:'+(capChg_b>=0?'#16a34a':'#dc2626')+'">'+(capChg_b>=0?'+':'')+Math.round(capChg_b).toLocaleString()+'</span></div>';
+    // 月收入
+    tableRows += '<div style="text-align:right;font-weight:900;color:#16a34a;font-size:11px">+'+Math.round(monthDiv).toLocaleString()
+      +'<br><span style="font-size:9px;color:'+(moCapChg>=0?'#16a34a':'#dc2626')+';font-weight:700">'+(moCapChg>=0?'▲':'▼')+Math.round(Math.abs(moCapChg)).toLocaleString()+'</span></div>';
+    // 剩餘本金
+    tableRows += '<div style="text-align:right;font-size:10px;font-weight:700;color:#1e40af">'+Math.round(capital).toLocaleString()+'</div>';
+    tableRows += '</div>';
+  });
+
+  var capLeft = capital;
+  var avgMonthly = totalDiv / data.length;
+
+  var html = '<div style="font-size:10px;background:#fef3c7;border-radius:8px;padding:8px 10px;margin-bottom:8px;color:#92400e;line-height:1.6;border:1px solid #fcd34d">'
+    +'📡 <b>真實歷史數據回測</b>（MoneyDJ除息記錄 2025/01～2026/06，共'+data.length+'個月）<br>'
+    +'↑ 綠色箭頭 = NAV較上月上漲；↓ 紅色 = 下跌。NAV漲時月收入下降（買較少單位），NAV跌時月收入反而上升。'
+    +'</div>';
+
+  // 表頭
+  html += '<div style="display:grid;grid-template-columns:58px 1fr 70px 1fr 70px 72px 80px;padding:6px 8px;font-size:10px;font-weight:700;background:#1e293b;color:white;border-radius:8px 8px 0 0">';
+  html += '<div>月份</div><div>安聯NAV</div><div style="text-align:right;color:#c4b5fd">安聯配息</div>';
+  html += '<div>聯博NAV</div><div style="text-align:right;color:#fca5a5">聯博配息</div>';
+  html += '<div style="text-align:right;color:#86efac">月收入<br><span style="font-size:9px;font-weight:400;color:#94a3b8">本金變化</span></div>';
+  html += '<div style="text-align:right;color:#93c5fd">剩餘本金</div>';
+  html += '</div>';
+
+  html += '<div style="border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;max-height:420px;overflow-y:auto">'+tableRows+'</div>';
+
+  // 摘要
+  html += '<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px">';
+  html += '<div style="background:#f0fdf4;border-radius:8px;padding:8px;text-align:center"><div style="font-size:9px;color:#166534;font-weight:700">平均月收入</div><div style="font-size:14px;font-weight:900;color:#16a34a">'+Math.round(avgMonthly).toLocaleString()+'</div><div style="font-size:9px;color:#166534">元/月</div></div>';
+  html += '<div style="background:#ecfdf5;border-radius:8px;padding:8px;text-align:center"><div style="font-size:9px;color:#166534;font-weight:700">'+data.length+'個月總配息</div><div style="font-size:14px;font-weight:900;color:#059669">'+Math.round(totalDiv).toLocaleString()+'</div></div>';
+  html += '<div style="background:#fff7ed;border-radius:8px;padding:8px;text-align:center"><div style="font-size:9px;color:#c2410c;font-weight:700">最終本金</div><div style="font-size:14px;font-weight:900;color:#ea580c">'+Math.round(capLeft).toLocaleString()+'</div><div style="font-size:9px;color:#c2410c">'+(((capLeft/P)-1)*100).toFixed(1)+'%</div></div>';
+  html += '<div style="background:#eff6ff;border-radius:8px;padding:8px;text-align:center"><div style="font-size:9px;color:#1e40af;font-weight:700">本金＋配息合計</div><div style="font-size:14px;font-weight:900;color:#2563eb">'+Math.round(totalDiv+capLeft).toLocaleString()+'</div><div style="font-size:9px;color:#1e40af">'+(((totalDiv+capLeft)/P-1)*100>=0?'+':'')+((totalDiv+capLeft)/P*100-100).toFixed(1)+'%</div></div>';
+  html += '</div>';
+  html += '<div style="margin-top:7px;font-size:9px;color:#94a3b8;line-height:1.5">💡 NAV漲跌反映市場真實波動。漲時你買入的單位數少→配息少；跌時單位數多→配息反而多。總財富（本金+配息）幾乎不受影響。USD/TWD=32固定。</div>';
+
+  document.getElementById('i2-rot-sim').innerHTML = html;
+}
+
 // 逐月輪轉模擬（同月雙配息版）
-// 策略：每個月內依序輪過所有勾選基金，每檔持有 ~(30/n)天
-// 例：勾選安聯+聯博 → 月中拿安聯配息、月底拿聯博配息，每月共2次
 function runRotationSim() {
   var P = _i2P || 0;
   if (!P) { alert('請先在上方設定本金金額'); return; }
   var USD = 32;
-  var MONTHS = 12;
 
   var sel = I2_IDS.filter(function(id){ return _i2Chk[id]; });
   if (sel.length < 2) {
@@ -5353,6 +5448,14 @@ function runRotationSim() {
       '<div style="font-size:11px;color:#dc2626;text-align:center;padding:8px">請先勾選至少 2 檔基金</div>';
     return;
   }
+
+  // 若只勾安聯+聯博 → 改用真實歷史資料（18個月 MoneyDJ 實際NAV）
+  var useReal = sel.length === 2 && _i2Chk['aling'] && _i2Chk['ab']
+                && !_i2Chk['jpm'] && !_i2Chk['mg'] && !_i2Chk['blk'] && !_i2Chk['pima2']
+                && window.BT_NAV_RAW;
+  if (useReal) { runHistoricalSim(P, USD); return; }
+
+  var MONTHS = 12;
 
   var nFunds = sel.length;
   // 每次持有時間 = 1個月 / n檔基金（以年為單位用於capRate計算）
