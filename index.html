@@ -5338,14 +5338,15 @@ function calcIncome2() {
   });
 }
 
-// 逐月輪轉模擬
+// 逐月輪轉模擬（同月雙配息版）
+// 策略：每個月內依序輪過所有勾選基金，每檔持有 ~(30/n)天
+// 例：勾選安聯+聯博 → 月中拿安聯配息、月底拿聯博配息，每月共2次
 function runRotationSim() {
   var P = _i2P || 0;
   if (!P) { alert('請先在上方設定本金金額'); return; }
-  var USD = 32; // TWD/USD
+  var USD = 32;
   var MONTHS = 12;
 
-  // 取勾選基金（輪轉至少2檔）
   var sel = I2_IDS.filter(function(id){ return _i2Chk[id]; });
   if (sel.length < 2) {
     document.getElementById('i2-rot-sim').innerHTML =
@@ -5353,58 +5354,88 @@ function runRotationSim() {
     return;
   }
 
-  var rows = '';
-  var capital = P;   // 當前可投入本金
+  var nFunds = sel.length;
+  // 每次持有時間 = 1個月 / n檔基金（以年為單位用於capRate計算）
+  var holdFrac = 1 / (12 * nFunds);
+
+  // 週次標籤（2檔 → 第2週/第4週；3檔 → W1/W2/W3；其他 → 輪1..n）
+  var weekLabels;
+  if (nFunds === 2) weekLabels = ['🗓 月中（W2）','🗓 月底（W4）'];
+  else if (nFunds === 3) weekLabels = ['W1','W2','W3'];
+  else weekLabels = sel.map(function(_,i){ return '輪'+(i+1); });
+
+  var capital = P;
   var totalDiv = 0;
-  var cumCapLoss = 0;
+  var tableRows = '';
 
-  for (var m = 0; m < MONTHS; m++) {
-    var fundId = sel[m % sel.length];
-    var f = I2_FUNDS[fundId];
-    // 月capRate侵蝕倍率
-    var capFactor = Math.pow(1 + f.capRate / 100, 1 / 12);
-    // 持有單位數
-    var units = capital / (f.navUSD * USD);
-    // 配息（每單位 × 單位數 × 匯率）
-    var divIncome = units * f.divUSD * USD;
-    // 除息後淨值（扣掉每單位配息）
-    var exDivNav = f.navUSD * capFactor - f.divUSD;
-    var exDivNavChange = exDivNav - f.navUSD;
-    // 贖回金額（除息後 + capRate 侵蝕影響）
-    var redeemAmt = units * exDivNav * USD;
-    var capLoss = capital - redeemAmt; // 本月本金損失（capRate造成）
-    cumCapLoss += capLoss;
+  for (var mo = 0; mo < MONTHS; mo++) {
+    var moCapStart = capital;
+    var moDiv = 0;
 
-    var divColor = '#16a34a';
-    var navChangeColor = exDivNavChange >= 0 ? '#16a34a' : '#dc2626';
-    var capLossColor = capLoss > 0 ? '#dc2626' : '#16a34a';
-    var bgCol = m % 2 === 0 ? '#f8faff' : 'white';
+    // 月分隔header
+    tableRows += '<div style="display:grid;grid-template-columns:30px 1fr 1fr 1fr 1fr;padding:5px 8px;font-size:10px;font-weight:800;background:#1e293b;color:#94a3b8">'
+      +'<div style="color:#e2e8f0">第'+(mo+1)+'月</div>'
+      +'<div style="text-align:right">買入本金</div>'
+      +'<div style="text-align:right;color:#86efac">配息</div>'
+      +'<div style="text-align:right;color:#93c5fd">除息後NAV</div>'
+      +'<div style="text-align:right;color:#fca5a5">贖回</div>'
+      +'</div>';
 
-    rows += '<div style="display:grid;grid-template-columns:28px 80px 70px 70px 70px 70px;padding:7px 8px;font-size:10px;border-bottom:1px solid #f1f5f9;align-items:center;background:'+bgCol+'">';
-    rows += '<div style="font-weight:700;color:#475569">'+( m+1)+'月</div>';
-    rows += '<div style="font-weight:700;color:'+f.col+'">'+I2_NAMES[fundId]+'<br><span style="font-size:9px;color:var(--sub)">基準日'+f.payDay+'日</span></div>';
-    rows += '<div style="text-align:right">'+incFmtP(capital)+'<br><span style="font-size:9px;color:var(--sub)">投入本金</span></div>';
-    rows += '<div style="text-align:right;color:'+divColor+';font-weight:700">+'+incFmtP(divIncome)+'<br><span style="font-size:9px;color:var(--sub)">配息收入</span></div>';
-    rows += '<div style="text-align:right;color:'+navChangeColor+'">$'+(exDivNav).toFixed(3)+'<br><span style="font-size:9px;color:var(--sub)">除息後淨值<br>('+( exDivNavChange>=0?'+':'')+exDivNavChange.toFixed(3)+')</span></div>';
-    rows += '<div style="text-align:right;color:'+capLossColor+'">'+incFmtP(redeemAmt)+'<br><span style="font-size:9px;color:'+(capLoss>0?'#dc2626':'#16a34a')+'">本金'+(capLoss>0?'-':'+')+incFmtP(Math.abs(capLoss))+'</span></div>';
-    rows += '</div>';
+    for (var fi = 0; fi < nFunds; fi++) {
+      var fundId = sel[fi];
+      var f = I2_FUNDS[fundId];
+      // 持有 holdFrac 年的capRate侵蝕
+      var capFactor = Math.pow(1 + f.capRate / 100, holdFrac);
+      var units = capital / (f.navUSD * USD);
+      var divIncome = units * f.divUSD * USD;
+      var exDivNav = f.navUSD * capFactor - f.divUSD;
+      var redeemAmt = units * exDivNav * USD;
+      var capChange = redeemAmt - capital;
 
-    totalDiv += divIncome;
-    capital = redeemAmt; // 贖回金額成為下一檔本金
+      moDiv += divIncome;
+      totalDiv += divIncome;
+
+      var bgCol = fi % 2 === 0 ? '#f8faff' : 'white';
+      tableRows += '<div style="display:grid;grid-template-columns:30px 1fr 1fr 1fr 1fr;padding:6px 8px;font-size:10px;border-bottom:1px solid #f1f5f9;align-items:center;background:'+bgCol+'">';
+      tableRows += '<div style="font-size:9px;color:#64748b;line-height:1.3">'+weekLabels[fi]+'</div>';
+      tableRows += '<div style="font-weight:700;color:'+f.col+'">'+I2_NAMES[fundId]+'<br><span style="font-size:9px;font-weight:400;color:var(--sub)">'+incFmtP(capital)+'</span></div>';
+      tableRows += '<div style="text-align:right;color:#16a34a;font-weight:700">+'+incFmtP(divIncome)+'<br><span style="font-size:9px;font-weight:400;color:var(--sub)">yield '+(f.divUSD/f.navUSD*100).toFixed(2)+'%</span></div>';
+      tableRows += '<div style="text-align:right">$'+exDivNav.toFixed(3)+'<br><span style="font-size:9px;color:#dc2626">'+(exDivNav-f.navUSD>=0?'+':'')+(exDivNav-f.navUSD).toFixed(3)+'</span></div>';
+      tableRows += '<div style="text-align:right;font-weight:700">'+incFmtP(redeemAmt)+'<br><span style="font-size:9px;color:'+(capChange>=0?'#16a34a':'#dc2626')+'">'+(capChange>=0?'+':'')+incFmtP(capChange)+'</span></div>';
+      tableRows += '</div>';
+
+      capital = redeemAmt;
+    }
+
+    // 月小計
+    var moCapChange = capital - moCapStart;
+    tableRows += '<div style="display:grid;grid-template-columns:30px 1fr 1fr 1fr 1fr;padding:6px 8px;font-size:10px;font-weight:700;background:#f0fdf4;border-bottom:2px solid #bbf7d0">';
+    tableRows += '<div></div>';
+    tableRows += '<div style="color:#166534">月小計</div>';
+    tableRows += '<div style="text-align:right;color:#16a34a;font-size:12px">+'+incFmtP(moDiv)+'</div>';
+    tableRows += '<div></div>';
+    tableRows += '<div style="text-align:right;font-size:11px;color:'+(moCapChange>=0?'#16a34a':'#dc2626')+'">本金'+(moCapChange>=0?'+':'')+incFmtP(moCapChange)+'</div>';
+    tableRows += '</div>';
   }
 
   var capLeft = capital;
   var netChange = capLeft - P;
+  var avgMonthly = totalDiv / MONTHS;
 
-  var html = '<div style="display:grid;grid-template-columns:28px 80px 70px 70px 70px 70px;padding:6px 8px;font-size:10px;font-weight:700;background:#0f172a;color:white;border-radius:8px 8px 0 0">';
-  html += '<div>月</div><div>基金</div><div style="text-align:right">投入本金</div><div style="text-align:right;color:#86efac">配息收入</div><div style="text-align:right;color:#93c5fd">除息後淨值</div><div style="text-align:right;color:#fca5a5">贖回/本金變化</div></div>';
-  html += '<div style="border:1px solid #e2e8f0;border-radius:0 0 8px 8px;overflow:hidden">'+rows+'</div>';
-  html += '<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">';
-  html += '<div style="background:#f0fdf4;border-radius:8px;padding:8px;text-align:center"><div style="font-size:10px;color:#166534">12個月總配息</div><div style="font-size:15px;font-weight:900;color:#16a34a">+'+incFmtP(totalDiv)+'</div></div>';
-  html += '<div style="background:'+(netChange>=0?'#f0fdf4':'#fff1f2')+';border-radius:8px;padding:8px;text-align:center"><div style="font-size:10px;color:'+(netChange>=0?'#166534':'#991b1b')+'">本金剩餘 vs 期初</div><div style="font-size:15px;font-weight:900;color:'+(netChange>=0?'#16a34a':'#dc2626')+'">'+(netChange>=0?'+':'')+incFmtP(netChange)+'</div></div>';
-  html += '<div style="background:#f5f3ff;border-radius:8px;padding:8px;text-align:center"><div style="font-size:10px;color:#5b21b6">配息＋贖回合計</div><div style="font-size:15px;font-weight:900;color:#7c3aed">'+incFmtP(totalDiv+capLeft)+'</div></div>';
+  var html = '<div style="font-size:10px;background:#eff6ff;border-radius:8px;padding:8px 10px;margin-bottom:8px;color:#1e40af;line-height:1.6">'
+    +'📌 模擬邏輯：每月內依序買入 '+sel.map(function(id){return I2_NAMES[id];}).join('→')
+    +'，每檔持有約 '+Math.round(30/nFunds)+' 天後除息贖回，當月共領 '+nFunds+' 次配息。'
+    +'</div>';
+
+  html += '<div style="overflow-x:auto;max-height:400px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:8px">'+tableRows+'</div>';
+
+  html += '<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px">';
+  html += '<div style="background:#f0fdf4;border-radius:8px;padding:8px;text-align:center"><div style="font-size:10px;color:#166534;font-weight:700">平均月配息</div><div style="font-size:14px;font-weight:900;color:#16a34a">+'+incFmtP(avgMonthly)+'</div></div>';
+  html += '<div style="background:#ecfdf5;border-radius:8px;padding:8px;text-align:center"><div style="font-size:10px;color:#166534;font-weight:700">12月總配息</div><div style="font-size:14px;font-weight:900;color:#059669">+'+incFmtP(totalDiv)+'</div></div>';
+  html += '<div style="background:'+(netChange>=0?'#f0fdf4':'#fff1f2')+';border-radius:8px;padding:8px;text-align:center"><div style="font-size:10px;color:'+(netChange>=0?'#166534':'#991b1b')+';font-weight:700">本金剩餘</div><div style="font-size:14px;font-weight:900;color:'+(netChange>=0?'#16a34a':'#dc2626')+'">'+incFmtP(capLeft)+'</div><div style="font-size:9px;color:'+(netChange>=0?'#166534':'#991b1b')+'">'+(netChange>=0?'+':'')+incFmtP(netChange)+'</div></div>';
+  html += '<div style="background:#f5f3ff;border-radius:8px;padding:8px;text-align:center"><div style="font-size:10px;color:#5b21b6;font-weight:700">配息＋本金合計</div><div style="font-size:14px;font-weight:900;color:#7c3aed">'+incFmtP(totalDiv+capLeft)+'</div></div>';
   html += '</div>';
-  html += '<div style="margin-top:8px;font-size:10px;color:#94a3b8;line-height:1.6">💡 除息後淨值 = 月初淨值 × capRate月複利 - 每單位配息。本金損失來自 capRate（長期NAV侵蝕），非配息造成。</div>';
+  html += '<div style="margin-top:8px;font-size:10px;color:#94a3b8;line-height:1.6">💡 持有期間約'+Math.round(30/nFunds)+'天，capRate侵蝕按比例縮短計算。本金縮水主要來自capRate（NAV長期下滑），配息收入是真實現金入袋。</div>';
 
   document.getElementById('i2-rot-sim').innerHTML = html;
 }
