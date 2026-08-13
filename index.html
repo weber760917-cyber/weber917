@@ -1085,6 +1085,49 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     </div>
   </div>
 
+  <!-- ══ 基金NAV監控面板 ══ -->
+  <div class="card" style="margin-bottom:10px;border:2px solid #4338ca">
+    <div class="card-head" style="background:linear-gradient(135deg,#1e1b4b,#312e81);padding:10px 14px">
+      <div class="card-title" style="color:white;font-size:14px">📡 基金NAV監控</div>
+      <div id="mon-alert-badge" style="font-size:13px;font-weight:800;color:#86efac">🟢 正常</div>
+    </div>
+    <div class="card-body" style="padding:10px 12px">
+
+      <!-- 當前狀態（兩檔） -->
+      <div id="mon-status-grid"></div>
+
+      <!-- 輸入新月份NAV -->
+      <div style="background:#f1f5f9;border-radius:10px;padding:10px;margin-top:2px">
+        <div style="font-size:11px;font-weight:800;color:#475569;margin-bottom:8px">📝 新增/更新本月NAV（除息後輸入）</div>
+        <div style="display:grid;grid-template-columns:90px 1fr 1fr auto;gap:6px;align-items:center">
+          <input id="mon-month" type="text" placeholder="2026/08" maxlength="7"
+            style="border:1.5px solid #cbd5e1;border-radius:8px;padding:6px 8px;font-size:12px;font-weight:700;font-family:inherit;width:100%">
+          <div style="position:relative">
+            <input id="mon-a-nav" type="number" step="0.001" placeholder="安聯 (如8.972)"
+              style="border:1.5px solid #a78bfa;border-radius:8px;padding:6px 8px;font-size:12px;font-weight:700;font-family:inherit;width:100%;box-sizing:border-box">
+          </div>
+          <div>
+            <input id="mon-b-nav" type="number" step="0.01" placeholder="聯博 (如73.70)"
+              style="border:1.5px solid #fca5a5;border-radius:8px;padding:6px 8px;font-size:12px;font-weight:700;font-family:inherit;width:100%;box-sizing:border-box">
+          </div>
+          <button onclick="monSubmitEntry()" style="background:#4338ca;color:white;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">儲存</button>
+        </div>
+        <div style="font-size:9px;color:#94a3b8;margin-top:4px">月份格式：YYYY/MM　輸入除息後（或當月最新）淨值，自動判斷填息與警示</div>
+      </div>
+
+      <!-- 歷史記錄表 -->
+      <div id="mon-history-table" style="margin-top:8px"></div>
+
+      <!-- 警戒說明 -->
+      <div style="margin-top:8px;font-size:9px;color:#94a3b8;line-height:1.8">
+        🔴 紅色警戒：安聯NAV &lt; $8.50｜聯博NAV &lt; $65.0｜任一基金月跌 &gt; 3%<br>
+        🟠 橙色注意：任一基金連跌3個月，或月跌3-5%<br>
+        🟡 黃色觀察：月跌1-3%<br>
+        <span style="float:right"><button onclick="monResetData()" style="font-size:9px;color:#94a3b8;background:none;border:1px solid #e2e8f0;border-radius:4px;padding:1px 6px;cursor:pointer">↺ 重置數據</button></span>
+      </div>
+    </div>
+  </div>
+
   <!-- 本金 -->
   <div class="card" style="margin-bottom:10px">
     <div class="card-head">
@@ -4849,12 +4892,12 @@ function calcPlatform(){
 
 // ── 月配息2 ──
 var I2_FUNDS = {
-  jpm:  { payDay:9,  grp:'w2', divRate:11.0,  capRate:-1.0, navUSD:75.45, divUSD:0.693,  col:'#d97706', defChk:false, defPct:0  },
-  aling:{ payDay:15, grp:'w3', divRate:9.12,  capRate:-2.0, navUSD:8.8572,  divUSD:0.06796,  col:'#7c3aed', defChk:true,  defPct:50 },
-  mg:   { payDay:19, grp:'w3', divRate:10.05, capRate:-6.0, navUSD:78.4966, divUSD:0.654,  col:'#0369a1', defChk:false, defPct:0  },
-  ab:   { payDay:29, grp:'w4', divRate:13.85, capRate:-2.0, navUSD:74.38, divUSD:0.8322, col:'#dc2626', defChk:true,  defPct:50 },
-  blk:  { payDay:30, grp:'w4', divRate:7.78,  capRate:-2.0, navUSD:11.62,  divUSD:0.0735, col:'#6366f1', defChk:false, defPct:0  },
-  pima2:{ payDay:28, grp:'w4', divRate:9.01,  capRate:-1.0, navUSD:11.9, divUSD:0.087,  col:'#059669', defChk:false, defPct:0  }
+  jpm:  { payDay:9,  grp:'w2', divRate:11.0,  capRate:-1.0, navUSD:74.73, divUSD:0.693,  col:'#d97706', defChk:false, defPct:0  },
+  aling:{ payDay:15, grp:'w3', divRate:9.09,  capRate:-2.0, navUSD:8.922,  divUSD:0.06796,  col:'#7c3aed', defChk:true,  defPct:50 },
+  mg:   { payDay:19, grp:'w3', divRate:9.95, capRate:-6.0, navUSD:78.3241, divUSD:0.654,  col:'#0369a1', defChk:false, defPct:0  },
+  ab:   { payDay:29, grp:'w4', divRate:13.55, capRate:-2.0, navUSD:73.76, divUSD:0.8322, col:'#dc2626', defChk:true,  defPct:50 },
+  blk:  { payDay:30, grp:'w4', divRate:7.65,  capRate:-2.0, navUSD:11.48,  divUSD:0.0735, col:'#6366f1', defChk:false, defPct:0  },
+  pima2:{ payDay:28, grp:'w4', divRate:8.93,  capRate:-1.0, navUSD:11.68, divUSD:0.087,  col:'#059669', defChk:false, defPct:0  }
 };
 var I2_NAMES = { jpm:'摩根多重收益', aling:'安聯AMg7', mg:'M&G入息', ab:'聯博AP', blk:'貝萊德環球A10', pima2:'品浩平衡M' };
 var I2_IDS   = ['jpm','aling','mg','ab','pima2','blk'];
@@ -4863,6 +4906,172 @@ var _i2P = 5000000;
 var _i2Chk = {};
 var _i2Timer = null;
 
+// ══ 基金NAV監控系統 ══
+var MON_KEY = 'weber_fund_monitor_v2';
+var MON_A_WARN = 8.50;   // 安聯 NAV 紅色警戒
+var MON_B_WARN = 65.0;   // 聯博 NAV 紅色警戒
+var MON_A_DIV  = 0.0685; // 安聯平均月配/unit（用於估算除息NAV）
+var MON_B_DIV  = 0.8322; // 聯博固定月配/unit
+
+function monLoadHistory() {
+  try {
+    var s = localStorage.getItem(MON_KEY);
+    if (s) return JSON.parse(s);
+  } catch(e) {}
+  // 預載入最後4個月歷史數據
+  var base = window.BT_NAV_RAW || [];
+  return base.slice(-4).map(function(r){ return {month:r.month, a_nav:r.a_nav, b_nav:r.b_nav}; });
+}
+
+function monSaveHistory(hist) {
+  try { localStorage.setItem(MON_KEY, JSON.stringify(hist)); } catch(e) {}
+}
+
+function monSubmitEntry() {
+  var month = (document.getElementById('mon-month').value || '').trim();
+  var a = parseFloat(document.getElementById('mon-a-nav').value);
+  var b = parseFloat(document.getElementById('mon-b-nav').value);
+  if (!month.match(/^\d{4}\/\d{2}$/)) { alert('月份格式錯誤，請用 YYYY/MM（如 2026/08）'); return; }
+  if (isNaN(a) || a < 5 || a > 15) { alert('安聯NAV 數值異常（正常範圍 5-15）'); return; }
+  if (isNaN(b) || b < 30 || b > 120) { alert('聯博NAV 數值異常（正常範圍 30-120）'); return; }
+  var hist = monLoadHistory();
+  var idx = hist.findIndex(function(h){ return h.month === month; });
+  if (idx >= 0) hist[idx] = {month:month, a_nav:a, b_nav:b};
+  else hist.push({month:month, a_nav:a, b_nav:b});
+  hist.sort(function(a,b){ return a.month.localeCompare(b.month); });
+  monSaveHistory(hist);
+  document.getElementById('mon-month').value = '';
+  document.getElementById('mon-a-nav').value = '';
+  document.getElementById('mon-b-nav').value = '';
+  renderMonitor();
+}
+
+function monResetData() {
+  if (!confirm('重置後將回到歷史預設數據（2025/03~2026/06），確定？')) return;
+  try { localStorage.removeItem(MON_KEY); } catch(e) {}
+  renderMonitor();
+}
+
+function monComputeAlerts(hist) {
+  var n = hist.length;
+  function noData(fund) { return {level:'info', msg:'尚無資料', fill:'—'}; }
+  if (n === 0) return {a: noData(), b: noData()};
+
+  var curr = hist[n-1];
+  var prev = n > 1 ? hist[n-2] : null;
+
+  function alertFor(navCurr, navPrev, warnLow, divAmt, fund) {
+    var fillMark = '—';
+    if (navPrev !== null) {
+      var exNav = navPrev - divAmt;
+      fillMark = navCurr > exNav ? '✅' : '❌';
+    }
+    // 連跌偵測
+    var streak3 = false;
+    if (n >= 4) {
+      var key = fund === 'a' ? 'a_nav' : 'b_nav';
+      var s = 0;
+      for (var i = n-3; i < n; i++) { if (hist[i][key] < hist[i-1][key]) s++; }
+      if (s === 3) streak3 = true;
+    }
+    if (navCurr < warnLow) return {level:'red', msg:'跌破$'+warnLow+' 警戒線！立即評估', fill:fillMark};
+    if (navPrev === null) return {level:'green', msg:'$'+(fund==='a'?navCurr.toFixed(3):navCurr.toFixed(2)), fill:'—'};
+    var chg = (navCurr - navPrev) / navPrev * 100;
+    if (chg < -5) return {level:'red', msg:'月跌'+chg.toFixed(1)+'%！嚴重警戒', fill:fillMark};
+    if (streak3) return {level:'orange', msg:'連跌3個月，考慮換檔 ('+(chg>=0?'+':'')+chg.toFixed(1)+'%)', fill:fillMark};
+    if (chg < -3) return {level:'orange', msg:'月跌'+chg.toFixed(1)+'%，接近警戒', fill:fillMark};
+    if (chg < -1) return {level:'yellow', msg:'月跌'+chg.toFixed(1)+'%，請注意', fill:fillMark};
+    return {level:'green', msg:(chg>=0?'↑':'↓')+(Math.abs(chg)).toFixed(2)+'%　正常', fill:fillMark};
+  }
+
+  return {
+    a: alertFor(curr.a_nav, prev ? prev.a_nav : null, MON_A_WARN, MON_A_DIV, 'a'),
+    b: alertFor(curr.b_nav, prev ? prev.b_nav : null, MON_B_WARN, MON_B_DIV, 'b'),
+    curr: curr
+  };
+}
+
+function renderMonitor() {
+  var hist = monLoadHistory();
+  var alerts = monComputeAlerts(hist);
+  var curr = alerts.curr || null;
+
+  var lc = {red:'#dc2626',orange:'#ea580c',yellow:'#d97706',green:'#16a34a',info:'#94a3b8'};
+  var lb = {red:'#fef2f2',orange:'#fff7ed',yellow:'#fefce8',green:'#f0fdf4',info:'#f8fafc'};
+  var lb2 = {red:'#fecaca',orange:'#fed7aa',yellow:'#fef08a',green:'#bbf7d0',info:'#e2e8f0'};
+
+  // 整體警示 badge
+  var overall = 'green';
+  if (alerts.a.level==='red'||alerts.b.level==='red') overall='red';
+  else if (alerts.a.level==='orange'||alerts.b.level==='orange') overall='orange';
+  else if (alerts.a.level==='yellow'||alerts.b.level==='yellow') overall='yellow';
+  var badgeEl = document.getElementById('mon-alert-badge');
+  if (badgeEl) {
+    badgeEl.textContent = {red:'🔴 警示',orange:'🟠 注意',yellow:'🟡 觀察',green:'🟢 正常'}[overall];
+    badgeEl.style.color = lc[overall];
+  }
+
+  // 狀態卡
+  var sg = document.getElementById('mon-status-grid');
+  if (sg) {
+    function mkCard(title, color, val, alertObj, warnLow) {
+      var dotIcon = {red:'🔴',orange:'🟠',yellow:'🟡',green:'🟢',info:'⚪'}[alertObj.level];
+      return '<div style="background:'+lb[alertObj.level]+';border:1.5px solid '+lb2[alertObj.level]+';border-radius:10px;padding:10px 12px">'
+        +'<div style="font-size:10px;font-weight:800;color:'+color+';margin-bottom:3px">'+title+'</div>'
+        +'<div style="font-size:22px;font-weight:900;color:'+lc[alertObj.level]+'">'+val+'</div>'
+        +'<div style="font-size:10px;color:'+lc[alertObj.level]+';margin-top:2px;font-weight:700">'+dotIcon+' '+alertObj.msg+'</div>'
+        +'<div style="font-size:9px;color:#6b7280;margin-top:3px">填息狀況：'+alertObj.fill+'　警戒線：$'+warnLow+'</div>'
+        +'</div>';
+    }
+    var aVal = curr ? '$'+curr.a_nav.toFixed(3) : '— 無資料';
+    var bVal = curr ? '$'+curr.b_nav.toFixed(2) : '— 無資料';
+    sg.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
+      + mkCard('安聯AMg7 (TLZF9)', '#7c3aed', aVal, alerts.a, MON_A_WARN)
+      + mkCard('聯博AP (ALBT8)', '#dc2626', bVal, alerts.b, MON_B_WARN)
+      + '</div>';
+  }
+
+  // 歷史記錄表
+  var ht = document.getElementById('mon-history-table');
+  if (!ht) return;
+  if (hist.length === 0) { ht.innerHTML='<div style="font-size:11px;color:#94a3b8;text-align:center;padding:8px">尚未輸入任何數據</div>'; return; }
+
+  var rows = '';
+  var recent = hist.slice(-7).reverse();
+  recent.forEach(function(h, idx) {
+    var origIdx = hist.findIndex(function(x){ return x.month===h.month; });
+    var prevH = origIdx > 0 ? hist[origIdx-1] : null;
+    var aChg = prevH ? ((h.a_nav-prevH.a_nav)/prevH.a_nav*100) : null;
+    var bChg = prevH ? ((h.b_nav-prevH.b_nav)/prevH.b_nav*100) : null;
+    var aFill = prevH ? (h.a_nav > prevH.a_nav - MON_A_DIV ? '✅' : '❌') : '—';
+    var bFill = prevH ? (h.b_nav > prevH.b_nav - MON_B_DIV ? '✅' : '❌') : '—';
+    var bg = idx%2===0?'#f8fafc':'white';
+    rows += '<tr style="background:'+bg+'">'
+      +'<td style="padding:4px 7px;font-weight:800;color:#4338ca;white-space:nowrap">'+h.month+'</td>'
+      +'<td style="text-align:right;padding:4px 7px">$'+h.a_nav.toFixed(3)+'</td>'
+      +'<td style="text-align:right;padding:4px 7px;color:'+(aChg===null?'#94a3b8':aChg>=0?'#16a34a':'#dc2626')+'font-weight:700">'+(aChg===null?'—':(aChg>=0?'+':'')+aChg.toFixed(1)+'%')+'</td>'
+      +'<td style="text-align:center;font-size:11px;padding:4px 4px">'+aFill+'</td>'
+      +'<td style="text-align:right;padding:4px 7px">$'+h.b_nav.toFixed(2)+'</td>'
+      +'<td style="text-align:right;padding:4px 7px;color:'+(bChg===null?'#94a3b8':bChg>=0?'#16a34a':'#dc2626')+'font-weight:700">'+(bChg===null?'—':(bChg>=0?'+':'')+bChg.toFixed(1)+'%')+'</td>'
+      +'<td style="text-align:center;font-size:11px;padding:4px 4px">'+bFill+'</td>'
+      +'</tr>';
+  });
+
+  ht.innerHTML = '<div style="font-size:10px;font-weight:700;color:#475569;margin-bottom:4px">📋 近期紀錄（最新在上）</div>'
+    +'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px">'
+    +'<tr style="background:#1e293b;color:white">'
+    +'<th style="padding:5px 7px;text-align:left">月份</th>'
+    +'<th style="text-align:right;padding:5px 7px;color:#c4b5fd">安聯NAV</th>'
+    +'<th style="text-align:right;padding:5px 7px;color:#c4b5fd">月變</th>'
+    +'<th style="text-align:center;padding:5px 5px;color:#c4b5fd">填</th>'
+    +'<th style="text-align:right;padding:5px 7px;color:#fca5a5">聯博NAV</th>'
+    +'<th style="text-align:right;padding:5px 7px;color:#fca5a5">月變</th>'
+    +'<th style="text-align:center;padding:5px 5px;color:#fca5a5">填</th>'
+    +'</tr>'
+    +rows+'</table></div>';
+}
+
+// ══ 初始化月配息2 Tab ══
 function initIncome2Tab() {
   if (Object.keys(_i2Chk).length === 0) {
     I2_IDS.forEach(function(id) {
@@ -4872,6 +5081,7 @@ function initIncome2Tab() {
     var lbl = document.getElementById('inc2-p-lbl');
     if (lbl) lbl.textContent = incFmtP(_i2P) + '元';
   }
+  renderMonitor();
   calcIncome2();
 }
 
@@ -5873,15 +6083,15 @@ function calcLoan() {
 
 // ── 月配息基金資料 ──
 const FUND_DIST = {
-  jfzn3: { name:'摩根多重收益 JPM',   nav:75.45,   dist:0.693,    annRate:11.0, color:'#f59e0b', week:'第一週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=JFZN3' },
-  tlzf9: { name:'安聯收益成長 AMg7',  nav:8.8572,  dist:0.06796, annRate:9.12,  color:'#3b82f6', week:'第二週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZF9' },
-  mmg55: { name:'M&G 入息基金',       nav:78.4966, dist:0.654,   annRate:10.05,  color:'#8b5cf6', week:'第三週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=MMG55' },
-  albt8: { name:'聯博美國成長 AP',    nav:74.38,   dist:0.8322,  annRate:13.85, color:'#10b981', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=ALBT8' },
-  tlzl7: { name:'安聯AI收益成長 AM',  nav:26.912, dist:0.14619, annRate:6.38, color:'#f97316', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZL7' },
-  shzv9: { name:'貝萊德世界科技 A10', nav:20.78,   dist:0.153,  annRate:9.49, color:'#ec4899', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=SHZV9' },
-  tlz64: { name:'安聯收益成長 AM',   nav:8.6873,  dist:0.055,   annRate:7.53,  color:'#06b6d4', week:'第二週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZ64' },
-  shzw8: { name:'貝萊德環球資產配置 A10', nav:11.62, dist:0.0735, annRate:7.78, color:'#6366f1', week:'第4週', url:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=SHZW8' },
-  pima2: { name:'品浩收益增長 M',    nav:11.9, dist:0.087, annRate:9.01, color:'#059669', week:'第四週', url:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=PIMA2' },
+  jfzn3: { name:'摩根多重收益 JPM',   nav:74.73,   dist:0.693,    annRate:11.0, color:'#f59e0b', week:'第一週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=JFZN3' },
+  tlzf9: { name:'安聯收益成長 AMg7',  nav:8.922,  dist:0.06796, annRate:9.09,  color:'#3b82f6', week:'第二週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZF9' },
+  mmg55: { name:'M&G 入息基金',       nav:78.3241, dist:0.654,   annRate:9.95,  color:'#8b5cf6', week:'第三週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=MMG55' },
+  albt8: { name:'聯博美國成長 AP',    nav:73.76,   dist:0.8322,  annRate:13.55, color:'#10b981', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=ALBT8' },
+  tlzl7: { name:'安聯AI收益成長 AM',  nav:27.2683, dist:0.14619, annRate:6.33, color:'#f97316', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZL7' },
+  shzv9: { name:'貝萊德世界科技 A10', nav:20.99,   dist:0.1375,  annRate:7.49, color:'#ec4899', week:'第四週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=SHZV9' },
+  tlz64: { name:'安聯收益成長 AM',   nav:8.7391,  dist:0.055,   annRate:7.52,  color:'#06b6d4', week:'第二週', url:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZ64' },
+  shzw8: { name:'貝萊德環球資產配置 A10', nav:11.48, dist:0.0735, annRate:7.65, color:'#6366f1', week:'第4週', url:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=SHZW8' },
+  pima2: { name:'品浩收益增長 M',    nav:11.68, dist:0.087, annRate:8.93, color:'#059669', week:'第四週', url:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=PIMA2' },
 };
 var _selFund = null;
 
@@ -6002,44 +6212,44 @@ function calcFund() {
 // ── 月配息搭配試算 ──
 var INCOME_FUNDS = [
   { id:'jpm',    name:'摩根多重收益',
-    nav:75.45,  navCur:'USD', navKey:'jfzn3',  distMo:0.693,
+    nav:74.73,  navCur:'USD', navKey:'jfzn3',  distMo:0.693,
     divRate:11.0, capRate:-0.38, annReturn:10.6,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=JFZN3',
     divHist:[{d:'2026/06',a:'$0.69'},{d:'2026/05',a:'$0.69'},{d:'2026/04',a:'$0.69'},{d:'2026/03',a:'$0.69'}] },
   { id:'aling',  name:'安聯收益成長 AMg7',
-    nav:8.8572, navCur:'TWD', navKey:'tlzf9',  distMo:0.06796,
-    divRate:9.12,  capRate:-1.05, annReturn:8.1,
+    nav:8.922, navCur:'TWD', navKey:'tlzf9',  distMo:0.06796,
+    divRate:9.09,  capRate:-1.05, annReturn:8.1,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZF9',
     divHist:[{d:'2026/06',a:'NT$0.0680'},{d:'2026/05',a:'NT$0.0680'},{d:'2026/04',a:'NT$0.0680'},{d:'2026/03',a:'NT$0.0680'}] },
   { id:'tlz64',  name:'安聯收益成長 AM',
-    nav:8.6873, navCur:'TWD', navKey:'tlz64',  distMo:0.055,
-    divRate:7.53,  capRate:0.24, annReturn:7.8,
+    nav:8.7391, navCur:'TWD', navKey:'tlz64',  distMo:0.055,
+    divRate:7.52,  capRate:0.24, annReturn:7.8,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZ64',
     divHist:[{d:'2026/06',a:'NT$0.055'},{d:'2026/05',a:'NT$0.055'},{d:'2026/04',a:'NT$0.055'},{d:'2026/03',a:'NT$0.055'}] },
   { id:'mg',     name:'M&G 入息基金',
-    nav:78.4966,navCur:'USD', navKey:'mmg55',  distMo:0.654,
-    divRate:10.05, capRate:-5.14, annReturn:4.9,
+    nav:78.3241,navCur:'USD', navKey:'mmg55',  distMo:0.654,
+    divRate:9.95, capRate:-5.14, annReturn:4.9,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=MMG55',
     divHist:[{d:'2026/06',a:'$0.654'},{d:'2026/05',a:'$0.654'},{d:'2026/04',a:'$0.654'},{d:'2026/03',a:'$0.654'}] },
   { id:'ab',     name:'聯博美國成長 AP',
-    nav:74.38,  navCur:'USD', navKey:'albt8',  distMo:0.8322,
-    divRate:13.85, capRate:-2.92, annReturn:10.9,
+    nav:73.76,  navCur:'USD', navKey:'albt8',  distMo:0.8322,
+    divRate:13.55, capRate:-2.92, annReturn:10.9,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=ALBT8',
     divHist:[{d:'2026/06',a:'$0.832'},{d:'2026/05',a:'$0.832'},{d:'2026/04',a:'$0.832'},{d:'2026/03',a:'$0.832'}] },
   { id:'aiai',   name:'安聯AI收益成長',
-    nav:26.912,navCur:'TWD', navKey:'tlzl7',  distMo:0.14619,
-    divRate:6.38,  capRate:9.13, annReturn:15.4,
+    nav:27.2683,navCur:'TWD', navKey:'tlzl7',  distMo:0.14619,
+    divRate:6.33,  capRate:9.13, annReturn:15.4,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=TLZL7',
     divHist:[{d:'2026/06',a:'NT$0.146'},{d:'2026/05',a:'NT$0.146'},{d:'2026/04',a:'NT$0.146'},{d:'2026/03',a:'NT$0.146'}] },
   { id:'brwt',   name:'貝萊德世界科技 A10',
-    nav:20.78,  navCur:'TWD', navKey:'shzv9',  distMo:0.153,
-    divRate:9.49,  capRate:27.73, annReturn:35.2,
+    nav:20.99,  navCur:'TWD', navKey:'shzv9',  distMo:0.1375,
+    divRate:7.49,  capRate:27.73, annReturn:35.2,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/yp012001.djhtm?a=SHZV9',
     divHist:[{d:'2026/06',a:'NT$0.138'},{d:'2026/05',a:'NT$0.138'},{d:'2026/04',a:'NT$0.138'},{d:'2026/03',a:'NT$0.138'}] },
@@ -6068,14 +6278,14 @@ var INCOME_FUNDS = [
     mdjUrl:'https://www.moneydj.com/ETF/X/Basic/Basic0004.xdjhtm?etfid=VT',
     divHist:[{d:'2026/06',a:'$0.563'},{d:'2026/03',a:'$0.327'},{d:'2025/12',a:'$1.115'},{d:'2025/09',a:'$0.478'}] },
   { id:'blk',    name:'貝萊德環球資產配置 A10',
-    nav:11.62,  navCur:'USD', navKey:'shzw8',  distMo:0.0735,
-    divRate:7.78,  capRate:-2.0, annReturn:5.7,
+    nav:11.48,  navCur:'USD', navKey:'shzw8',  distMo:0.0735,
+    divRate:7.65,  capRate:-2.0, annReturn:5.7,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=SHZW8',
     divHist:[{d:'2026/06',a:'$0.0735'},{d:'2026/05',a:'$0.0735'},{d:'2026/04',a:'$0.069'},{d:'2026/03',a:'$0.069'}] },
   { id:'pima2',  name:'品浩全球平衡收益M',
-    nav:11.9,  navCur:'USD', navKey:'pima2',  distMo:0.087,
-    divRate:9.01,  capRate:0.09, annReturn:8.93,
+    nav:11.68,  navCur:'USD', navKey:'pima2',  distMo:0.087,
+    divRate:8.93,  capRate:0.09, annReturn:8.93,
     note:'月配', freq:'月配', defMode:'div',
     mdjUrl:'https://www.moneydj.com/funddj/yp/wb05.djhtm?a=PIMA2',
     divHist:[{d:'2026/06',a:'$0.087'},{d:'2026/05',a:'$0.087'},{d:'2026/04',a:'$0.087'},{d:'2026/03',a:'$0.087'}] },
