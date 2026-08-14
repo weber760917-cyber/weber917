@@ -4897,10 +4897,11 @@ var I2_FUNDS = {
   mg:   { payDay:19, grp:'w3', divRate:9.95, capRate:-6.0, navUSD:78.3241, divUSD:0.654,  col:'#0369a1', defChk:false, defPct:0  },
   ab:   { payDay:29, grp:'w4', divRate:13.55, capRate:-2.0, navUSD:73.76, divUSD:0.8322, col:'#dc2626', defChk:true,  defPct:50 },
   blk:  { payDay:30, grp:'w4', divRate:7.65,  capRate:-2.0, navUSD:11.48,  divUSD:0.0735, col:'#6366f1', defChk:false, defPct:0  },
-  pima2:{ payDay:28, grp:'w4', divRate:8.93,  capRate:-1.0, navUSD:11.68, divUSD:0.087,  col:'#059669', defChk:false, defPct:0  }
+  pima2:{ payDay:28, grp:'w4', divRate:8.93,  capRate:-1.0, navUSD:11.68, divUSD:0.087,  col:'#059669', defChk:false, defPct:0  },
+  brwt: { payDay:30, grp:'w4', divRate:7.76,  capRate: 5.0, navUSD:21.49, divUSD:0.1390, col:'#0ea5e9', defChk:false, defPct:0  }
 };
-var I2_NAMES = { jpm:'摩根多重收益', aling:'安聯AMg7', mg:'M&G入息', ab:'聯博AP', blk:'貝萊德環球A10', pima2:'品浩平衡M' };
-var I2_IDS   = ['jpm','aling','mg','ab','pima2','blk'];
+var I2_NAMES = { jpm:'摩根多重收益', aling:'安聯AMg7', mg:'M&G入息', ab:'聯博AP', blk:'貝萊德環球A10', pima2:'品浩平衡M', brwt:'貝萊德世界科技A10' };
+var I2_IDS   = ['jpm','aling','mg','ab','pima2','blk','brwt'];
 var I2_FX    = 32;
 var _i2P = 5000000;
 var _i2Chk = {};
@@ -5198,6 +5199,17 @@ var I2_PROFILES = {
     holdings:'全球股票 ~35% ｜ 美國投資等級債 ~25% ｜ 全球高收益債 ~20% ｜ 其他固收 ~20%',
     perf:'近3年年化報酬約5–8%，追求穩健資本保全兼顧配息',
     risk:'中',
+  },
+  brwt: {
+    full:'貝萊德世界科技基金 A10（BlackRock Global Fund - World Technology Fund A10 USD）',
+    cat:'股票型・全球科技',
+    mgr:'貝萊德（BlackRock），全球最大資產管理公司，管理資產逾10兆美元',
+    aum:'約200億美元',
+    intro:'貝萊德旗艦科技股票基金，深度集中投資全球科技龍頭（NVIDIA、Apple、Microsoft、台積電等），搭配 Covered Call 選擇權覆蓋策略產生穩定月配息。美元計價，科技股高成長潛力與月配息兼具，但NAV波動較大，適合能承受較高風險的積極型投資人。',
+    pros:['科技龍頭集中：持有NVIDIA、Apple、Microsoft、ASML、台積電等全球頂尖科技股','Covered Call月配：賣出買權收取期權金，在持有科技股同時月月配息','貝萊德品牌：全球最大資管機構，Aladdin®風控平台支撐','高成長潛力：科技股長期增值空間大（近1年淨值+33.8%）'],
+    holdings:'美國大型科技股 ~50%（NVIDIA、Apple、Microsoft、Alphabet）｜ 全球科技硬體&半導體 ~30%（ASML、台積電等）｜ 其他成長科技 ~20%',
+    perf:'近1年報酬+33.8%，近3年年化約25–30%；科技股多頭期間表現突出，但修正時波動顯著',
+    risk:'高',
   },
   pima2: {
     full:'PIMCO品浩全球平衡收益基金 M（PIMCO Balanced Income and Growth M）',
@@ -6851,7 +6863,7 @@ function printIncReport() {
     mg:   { tag:'全球股債·月配', icon:'🏛️', risk:'中', desc:'英國百年老牌資產管理公司M&G旗下入息基金，廣泛投資全球股票與債券，以產生穩定收入為目標。美元計價，歷史悠久、管理經驗豐富，適合尋求全球多元配置的保守型投資人。' },
     ab:   { tag:'美國股票·月配', icon:'🇺🇸', risk:'中高', desc:'聯博資產管理旗艦基金，主要投資美國大型成長股（科技、醫療、消費等），透過股票收益（股息＋選擇權策略）實現高配息。美元計價，成長潛力強，但本金波動較高，適合積極型投資人。' },
     aiai: { tag:'AI科技·月配', icon:'🤖', risk:'高', desc:'安聯投信新一代旗艦基金，聚焦人工智慧、雲端運算、半導體等科技成長股，同時搭配收益策略提供月配息。台幣計價，高成長潛力但波動較高，適合看好AI長期趨勢的積極型投資人。' },
-    brwt: { tag:'全球科技·月配', icon:'💡', risk:'高', desc:'貝萊德（全球最大資產管理公司，管理規模逾10兆美元）旗下世界科技基金，投資全球頂尖科技龍頭（輝達、蘋果、微軟等），搭配選擇權策略產生月配息。台幣計價，長期年化報酬亮眼，適合高風險承受度投資人。' },
+    brwt: { tag:'全球科技·月配', icon:'💡', risk:'高', desc:'貝萊德（全球最大資產管理公司，管理規模逾10兆美元）旗下世界科技基金，投資全球頂尖科技龍頭（NVIDIA、Apple、Microsoft、台積電等），搭配 Covered Call 選擇權策略產生月配息。美元計價，近1年淨值+33.8%，適合高風險承受度投資人。' },
     e0050:{ tag:'台灣指數·半年配', icon:'🇹🇼', risk:'中', desc:'元大投信發行，追蹤「台灣50指數」，持有台灣市值最大50家企業（台積電、鴻海、聯發科等），是台灣最具代表性的ETF。費用率低、高度分散，適合長期存股、定期定額的穩健型投資人。' },
     e006208:{ tag:'台灣指數·半年配', icon:'🇹🇼', risk:'中', desc:'富邦投信發行，同樣追蹤「台灣50指數」，與0050持股幾乎相同，費用率略低。近年股價成長表現亮眼，適合重視成本效益的長期指數投資人，可與0050互補配置。' },
     e0056:{ tag:'高股息·季配', icon:'💰', risk:'中低', desc:'元大投信發行高股息ETF，從台灣上市公司中篩選預期股息殖利率最高的50檔股票。季配息頻率高、現金流穩定，適合退休族群或需要規律配息現金流的保守型投資人。' },
