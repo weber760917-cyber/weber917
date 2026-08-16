@@ -1085,49 +1085,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     </div>
   </div>
 
-  <!-- ══ 基金NAV監控面板 ══ -->
-  <div class="card" style="margin-bottom:10px;border:2px solid #4338ca">
-    <div class="card-head" style="background:linear-gradient(135deg,#1e1b4b,#312e81);padding:10px 14px">
-      <div class="card-title" style="color:white;font-size:14px">📡 基金NAV監控</div>
-      <div id="mon-alert-badge" style="font-size:13px;font-weight:800;color:#86efac">🟢 正常</div>
-    </div>
-    <div class="card-body" style="padding:10px 12px">
-
-      <!-- 當前狀態（兩檔） -->
-      <div id="mon-status-grid"></div>
-
-      <!-- 輸入新月份NAV -->
-      <div style="background:#f1f5f9;border-radius:10px;padding:10px;margin-top:2px">
-        <div style="font-size:11px;font-weight:800;color:#475569;margin-bottom:8px">📝 新增/更新本月NAV（除息後輸入）</div>
-        <div style="display:grid;grid-template-columns:90px 1fr 1fr auto;gap:6px;align-items:center">
-          <input id="mon-month" type="text" placeholder="2026/08" maxlength="7"
-            style="border:1.5px solid #cbd5e1;border-radius:8px;padding:6px 8px;font-size:12px;font-weight:700;font-family:inherit;width:100%">
-          <div style="position:relative">
-            <input id="mon-a-nav" type="number" step="0.001" placeholder="安聯 (如8.972)"
-              style="border:1.5px solid #a78bfa;border-radius:8px;padding:6px 8px;font-size:12px;font-weight:700;font-family:inherit;width:100%;box-sizing:border-box">
-          </div>
-          <div>
-            <input id="mon-b-nav" type="number" step="0.01" placeholder="聯博 (如73.70)"
-              style="border:1.5px solid #fca5a5;border-radius:8px;padding:6px 8px;font-size:12px;font-weight:700;font-family:inherit;width:100%;box-sizing:border-box">
-          </div>
-          <button onclick="monSubmitEntry()" style="background:#4338ca;color:white;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">儲存</button>
-        </div>
-        <div style="font-size:9px;color:#94a3b8;margin-top:4px">月份格式：YYYY/MM　輸入除息後（或當月最新）淨值，自動判斷填息與警示</div>
-      </div>
-
-      <!-- 歷史記錄表 -->
-      <div id="mon-history-table" style="margin-top:8px"></div>
-
-      <!-- 警戒說明 -->
-      <div style="margin-top:8px;font-size:9px;color:#94a3b8;line-height:1.8">
-        🔴 紅色警戒：安聯NAV &lt; $8.50｜聯博NAV &lt; $65.0｜任一基金月跌 &gt; 3%<br>
-        🟠 橙色注意：任一基金連跌3個月，或月跌3-5%<br>
-        🟡 黃色觀察：月跌1-3%<br>
-        <span style="float:right"><button onclick="monResetData()" style="font-size:9px;color:#94a3b8;background:none;border:1px solid #e2e8f0;border-radius:4px;padding:1px 6px;cursor:pointer">↺ 重置數據</button></span>
-      </div>
-    </div>
-  </div>
-
   <!-- 本金 -->
   <div class="card" style="margin-bottom:10px">
     <div class="card-head">
@@ -1576,64 +1533,25 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   })();
   </script>
 
-  <!-- 歷史回測 -->
+  <!-- 歷史回測（動態） -->
   <div class="card" style="margin-bottom:10px;border:1.5px solid #6366f1">
-    <div class="card-head" style="background:#eef2ff;cursor:pointer" onclick="var b=document.getElementById('i2-bt-body');b.style.display=b.style.display==='none'?'block':'none'">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div class="card-title" style="color:#4338ca">📊 真實歷史回測</div>
-        <div style="font-size:9px;font-weight:700;background:#4338ca;color:white;border-radius:5px;padding:2px 7px">MoneyDJ實際數據</div>
+    <div class="card-head" style="background:#eef2ff">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+        <div>
+          <div class="card-title" style="color:#4338ca">📊 輪轉回測（依選取基金）</div>
+          <div id="dynbt-sub" style="font-size:10px;color:#6366f1;margin-top:2px">請先勾選基金，再點「執行回測」</div>
+        </div>
+        <button onclick="runDynBT()" style="font-size:11px;font-weight:700;color:white;background:#4338ca;border:none;border-radius:8px;padding:5px 12px;cursor:pointer;flex-shrink:0">▶ 執行回測</button>
       </div>
-      <div style="font-size:10px;color:#6366f1;margin-top:2px">安聯AMg7 ＋ 聯博AP｜2025/01～2026/06｜200萬初始｜點擊展開</div>
     </div>
     <div id="i2-bt-body" class="card-body" style="display:none;padding:10px">
-      <!-- 說明 -->
-      <div style="font-size:10px;background:#eef2ff;border-radius:7px;padding:8px 10px;color:#3730a3;margin-bottom:10px;line-height:1.6">
-        策略：每月先買 <b>安聯AMg7</b>（月中除息），除息後贖回轉入 <b>聯博AP</b>（月底除息），再贖回。<br>
-        NAV 由 MoneyDJ 配息歷史反推（每單位配息 ÷ 年化配息率），USD/TWD＝32。
-      </div>
-      <!-- 指標 -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
-        <div style="background:#f0fdf4;border-radius:8px;padding:8px;text-align:center">
-          <div style="font-size:9px;color:#166534;font-weight:700">平均月收入</div>
-          <div style="font-size:15px;font-weight:800;color:#16a34a">3.2萬</div>
-          <div style="font-size:9px;color:#166534">18個月平均</div>
-        </div>
-        <div style="background:#fff7ed;border-radius:8px;padding:8px;text-align:center">
-          <div style="font-size:9px;color:#c2410c;font-weight:700">最終本金</div>
-          <div style="font-size:15px;font-weight:800;color:#ea580c">142萬</div>
-          <div style="font-size:9px;color:#c2410c">-28.9%（侵蝕）</div>
-        </div>
-        <div style="background:#eff6ff;border-radius:8px;padding:8px;text-align:center">
-          <div style="font-size:9px;color:#1e40af;font-weight:700">總財富</div>
-          <div style="font-size:15px;font-weight:800;color:#2563eb">200萬</div>
-          <div style="font-size:9px;color:#1e40af">本金+累計配息≈持平</div>
-        </div>
-      </div>
-      <!-- 表格 -->
-      <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:10px">
-          <thead>
-            <tr style="background:#eef2ff;color:#3730a3;font-weight:700">
-              <td style="padding:5px 4px;border-bottom:1px solid #c7d2fe">月份</td>
-              <td style="padding:5px 4px;border-bottom:1px solid #c7d2fe;text-align:right">安聯NAV</td>
-              <td style="padding:5px 4px;border-bottom:1px solid #c7d2fe;text-align:right">安聯配息↗</td>
-              <td style="padding:5px 4px;border-bottom:1px solid #c7d2fe;text-align:right">聯博NAV</td>
-              <td style="padding:5px 4px;border-bottom:1px solid #c7d2fe;text-align:right">聯博配息↗</td>
-              <td style="padding:5px 4px;border-bottom:1px solid #c7d2fe;text-align:right">月收入</td>
-              <td style="padding:5px 4px;border-bottom:1px solid #c7d2fe;text-align:right">剩餘本金</td>
-            </tr>
-          </thead>
-          <tbody id="i2-bt-tbody"></tbody>
-        </table>
-      </div>
-      <!-- 注意 -->
-      <div style="font-size:9px;color:var(--sub);margin-top:8px;line-height:1.5">
-        ⚠️ 此回測為理想情境：假設贖回後立即再申購、無T+3空窗、匯率固定32。實際操作會因空窗期少領1次配息、匯率變動而有差異。歷史數據不代表未來績效。
-      </div>
+      <div id="dynbt-kpi" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px"></div>
+      <div id="dynbt-tbl" style="overflow-x:auto"></div>
+      <div id="dynbt-note" style="font-size:9px;color:var(--sub);margin-top:8px;line-height:1.5"></div>
     </div>
   </div>
   <script>
-  // 全域歷史NAV資料（MoneyDJ實際除息日數據）
+  // MoneyDJ實際除息數據（安聯AMg7 + 聯博AP，2025/01–2026/06）
   window.BT_NAV_RAW = [
     {month:'2025/01',a_nav:8.643,a_div:0.069,b_nav:81.19,b_div:0.8322},
     {month:'2025/02',a_nav:8.856,a_div:0.069,b_nav:75.199,b_div:0.8322},
@@ -1655,32 +1573,117 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     {month:'2026/06',a_nav:8.972,a_div:0.06796,b_nav:73.7,b_div:0.8322}
   ];
 
-  function _btRenderCard() {
-    var tbody = document.getElementById('i2-bt-tbody');
-    if(!tbody) return;
-    var USD = 32, P = 2000000, capital = P, totalDiv = 0;
-    var html = '';
-    BT_NAV_RAW.forEach(function(r,i){
-      var bg = i%2===0 ? '' : 'background:#f8f9ff';
-      var units_a = capital/(r.a_nav*USD), div_a = units_a*r.a_div*USD;
-      capital = units_a*(r.a_nav-r.a_div)*USD;
-      var units_b = capital/(r.b_nav*USD), div_b = units_b*r.b_div*USD;
-      capital = units_b*(r.b_nav-r.b_div)*USD;
-      var mDiv = div_a+div_b; totalDiv+=mDiv;
-      var bFlag = r.b_nav<70?'🔴':r.b_nav>78?'🟢':'';
-      html+='<tr style="'+bg+'">'
-        +'<td style="padding:4px;font-weight:700;color:#4338ca">'+r.month+'</td>'
-        +'<td style="padding:4px;text-align:right">'+r.a_nav.toFixed(3)+'</td>'
-        +'<td style="padding:4px;text-align:right;color:#7c3aed">'+Math.round(div_a).toLocaleString()+'</td>'
-        +'<td style="padding:4px;text-align:right">'+bFlag+r.b_nav.toFixed(2)+'</td>'
-        +'<td style="padding:4px;text-align:right;color:#dc2626">'+Math.round(div_b).toLocaleString()+'</td>'
-        +'<td style="padding:4px;text-align:right;font-weight:800;color:#16a34a">'+Math.round(mDiv).toLocaleString()+'</td>'
-        +'<td style="padding:4px;text-align:right">'+Math.round(capital).toLocaleString()+'</td>'
-        +'</tr>';
-    });
-    tbody.innerHTML = html;
+  function runDynBT() {
+    var P = _i2P || 0;
+    if (!P) { alert('請先設定本金'); return; }
+    var USD = 32;
+    var sel = I2_IDS.filter(function(id){ return _i2Chk[id]; });
+    if (sel.length < 2) { alert('請先勾選至少 2 檔基金'); return; }
+
+    // 若只選安聯+聯博 → 用MoneyDJ真實歷史數據（18個月）
+    var useReal = sel.length === 2 && _i2Chk['aling'] && _i2Chk['ab'] && window.BT_NAV_RAW;
+
+    var capital = P, totalDiv = 0, tableRows = '';
+    function fmt(v) { return Math.round(v).toLocaleString(); }
+    function fmtW(v) { return Math.round(v/10000)+'萬'; }
+
+    if (useReal) {
+      window.BT_NAV_RAW.forEach(function(r, mi) {
+        var bg = mi%2===0 ? '' : 'background:#f8f9ff';
+        var ua = capital/(r.a_nav*USD), da = ua*r.a_div*USD;
+        var ca1 = ua*(r.a_nav-r.a_div)*USD, chg_a = ca1-capital; capital = ca1;
+        var ub = capital/(r.b_nav*USD), db = ub*r.b_div*USD;
+        var cb1 = ub*(r.b_nav-r.b_div)*USD, chg_b = cb1-capital; capital = cb1;
+        var mDiv = da+db; totalDiv += mDiv;
+        var totChg = chg_a+chg_b;
+        tableRows += '<tr style="'+bg+'">'
+          +'<td style="padding:4px 5px;font-weight:700;color:#4338ca;font-size:11px;white-space:nowrap">'+r.month+'</td>'
+          +'<td style="padding:4px 5px;font-size:10px">'
+            +'<span style="color:#7c3aed;font-weight:700">安聯</span> +'+fmt(da)
+            +'<span style="font-size:9px;color:'+(chg_a>=0?'#16a34a':'#dc2626')+'"> '+(chg_a>=0?'▲':'▼')+fmt(Math.abs(chg_a))+'</span>'
+            +'　<span style="color:#dc2626;font-weight:700">聯博</span> +'+fmt(db)
+            +'<span style="font-size:9px;color:'+(chg_b>=0?'#16a34a':'#dc2626')+'"> '+(chg_b>=0?'▲':'▼')+fmt(Math.abs(chg_b))+'</span>'
+          +'</td>'
+          +'<td style="padding:4px 5px;text-align:right;font-weight:800;color:#16a34a">+'+fmt(mDiv)+'</td>'
+          +'<td style="padding:4px 5px;text-align:right;font-size:10px;color:'+(totChg>=0?'#16a34a':'#dc2626')+'">'+(totChg>=0?'▲':'▼')+fmt(Math.abs(totChg))+'</td>'
+          +'<td style="padding:4px 5px;text-align:right;font-size:10px;color:#1e40af">'+fmt(capital)+'</td>'
+          +'</tr>';
+      });
+    } else {
+      // 理論模型（18個月，從當月起）
+      var holdFrac = 1/(12*sel.length);
+      var now = new Date(), y = now.getFullYear(), m = now.getMonth()+1;
+      for (var mo=0; mo<18; mo++) {
+        var ym = y+'/'+('0'+m).slice(-2);
+        var bg = mo%2===0 ? '' : 'background:#f8f9ff';
+        var moCapStart = capital, mDiv = 0, fundDetails = '';
+        sel.forEach(function(id) {
+          var f = I2_FUNDS[id];
+          var capFactor = Math.pow(1+f.capRate/100, holdFrac);
+          var units = capital/(f.navUSD*USD);
+          var divInc = units*f.divUSD*USD;
+          var redeem = units*(f.navUSD*capFactor-f.divUSD)*USD;
+          var capChg = redeem-capital;
+          mDiv += divInc; totalDiv += divInc;
+          fundDetails += '<span style="color:'+f.col+';font-weight:700">'+I2_NAMES[id]+'</span> +'
+            +fmt(divInc)+'<span style="font-size:9px;color:'+(capChg>=0?'#16a34a':'#dc2626')+'"> '
+            +(capChg>=0?'▲':'▼')+fmt(Math.abs(capChg))+'</span>　';
+          capital = redeem;
+        });
+        var moCapChg = capital-moCapStart;
+        tableRows += '<tr style="'+bg+'">'
+          +'<td style="padding:4px 5px;font-weight:700;color:#4338ca;font-size:11px;white-space:nowrap">'+ym+'</td>'
+          +'<td style="padding:4px 5px;font-size:10px">'+fundDetails+'</td>'
+          +'<td style="padding:4px 5px;text-align:right;font-weight:800;color:#16a34a">+'+fmt(mDiv)+'</td>'
+          +'<td style="padding:4px 5px;text-align:right;font-size:10px;color:'+(moCapChg>=0?'#16a34a':'#dc2626')+'">'+(moCapChg>=0?'▲':'▼')+fmt(Math.abs(moCapChg))+'</td>'
+          +'<td style="padding:4px 5px;text-align:right;font-size:10px;color:#1e40af">'+fmt(capital)+'</td>'
+          +'</tr>';
+        if (++m>12){m=1;y++;}
+      }
+    }
+
+    var nMo = useReal ? window.BT_NAV_RAW.length : 18;
+    var avgMo = totalDiv/nMo;
+    var capChgTot = capital-P;
+    var capSign = capChgTot>=0?'+':'';
+    var capCol = capChgTot>=0?'#16a34a':'#dc2626';
+    var capPct = (capChgTot/P*100).toFixed(1);
+
+    document.getElementById('dynbt-kpi').innerHTML =
+      '<div style="background:#f0fdf4;border-radius:8px;padding:8px;text-align:center">'
+      +'<div style="font-size:9px;color:#166534;font-weight:700">月均配息</div>'
+      +'<div style="font-size:15px;font-weight:800;color:#16a34a">'+fmtW(avgMo)+'</div>'
+      +'<div style="font-size:9px;color:#166534">'+nMo+'個月平均</div></div>'
+      +'<div style="background:#fff7ed;border-radius:8px;padding:8px;text-align:center">'
+      +'<div style="font-size:9px;color:#c2410c;font-weight:700">最終本金</div>'
+      +'<div style="font-size:15px;font-weight:800;color:#ea580c">'+fmtW(capital)+'</div>'
+      +'<div style="font-size:9px;color:'+capCol+'">'+capSign+Math.round(capChgTot/10000)+'萬 ('+capSign+capPct+'%)</div></div>'
+      +'<div style="background:#eff6ff;border-radius:8px;padding:8px;text-align:center">'
+      +'<div style="font-size:9px;color:#1e40af;font-weight:700">累計配息</div>'
+      +'<div style="font-size:15px;font-weight:800;color:#2563eb">'+fmtW(totalDiv)+'</div>'
+      +'<div style="font-size:9px;color:#1e40af">總財富 '+fmtW(capital+totalDiv)+'</div></div>';
+
+    document.getElementById('dynbt-tbl').innerHTML =
+      '<table style="width:100%;border-collapse:collapse;font-size:10px">'
+      +'<thead><tr style="background:#eef2ff;color:#3730a3;font-weight:700">'
+      +'<td style="padding:5px;border-bottom:1px solid #c7d2fe">月份</td>'
+      +'<td style="padding:5px;border-bottom:1px solid #c7d2fe">各基金配息明細</td>'
+      +'<td style="padding:5px;border-bottom:1px solid #c7d2fe;text-align:right">月配息</td>'
+      +'<td style="padding:5px;border-bottom:1px solid #c7d2fe;text-align:right">本金±</td>'
+      +'<td style="padding:5px;border-bottom:1px solid #c7d2fe;text-align:right">剩餘本金</td>'
+      +'</tr></thead><tbody>'+tableRows+'</tbody></table>';
+
+    document.getElementById('dynbt-note').innerHTML = useReal
+      ? '✅ MoneyDJ 實際除息數據（2025/01–2026/06）｜假設無T+3空窗、匯率32固定｜歷史不代表未來績效。'
+      : '⚠️ 理論模型（18個月）：以各基金目前年化配息率與淨值漲跌率估算，非真實歷史數據。';
+
+    document.getElementById('dynbt-sub').textContent =
+      (useReal ? '✅ MoneyDJ 實際數據　' : '📐 理論模型　')
+      + sel.map(function(id){return I2_NAMES[id];}).join(' × ')
+      + '｜本金 '+(P/10000).toFixed(0)+'萬';
+
+    document.getElementById('i2-bt-body').style.display = 'block';
   }
-  _btRenderCard();
   </script>
 
   <!-- 風險提示 -->
