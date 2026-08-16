@@ -1576,41 +1576,65 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   function runDynBT() {
     var P = _i2P || 0;
     if (!P) { alert('請先設定本金'); return; }
-    var USD = 32;
     var sel = I2_IDS.filter(function(id){ return _i2Chk[id]; });
     if (sel.length < 2) { alert('請先勾選至少 2 檔基金'); return; }
 
-    // 若只選安聯+聯博 → 用MoneyDJ真實歷史數據（18個月）
+    // 若只選安聯+聯博 → 用MoneyDJ真實歷史數據
     var useReal = sel.length === 2 && _i2Chk['aling'] && _i2Chk['ab'] && window.BT_NAV_RAW;
 
     var capital = P, totalDiv = 0, tableRows = '';
     function fmt(v) { return Math.round(v).toLocaleString(); }
-    function fmtW(v) { return Math.round(v/10000)+'萬'; }
+    function fmtW(v) { return (v/10000).toFixed(1)+'萬'; }
 
     if (useReal) {
-      window.BT_NAV_RAW.forEach(function(r, mi) {
+      // ── 真實數據路徑 ──
+      // 原理：配息 與 本金漲跌 完全分離
+      //   配息 = capital × (div/nav)          ← 現金收入，獨立
+      //   本金 = capital × (nav_下月/nav_本月)^0.5  ← NAV漲跌（每檔持有≈2週取平方根）
+      var raw = window.BT_NAV_RAW;
+      raw.forEach(function(r, mi) {
+        var next = raw[mi+1];
         var bg = mi%2===0 ? '' : 'background:#f8f9ff';
-        var ua = capital/(r.a_nav*USD), da = ua*r.a_div*USD;
-        var ca1 = ua*(r.a_nav-r.a_div)*USD, chg_a = ca1-capital; capital = ca1;
-        var ub = capital/(r.b_nav*USD), db = ub*r.b_div*USD;
-        var cb1 = ub*(r.b_nav-r.b_div)*USD, chg_b = cb1-capital; capital = cb1;
-        var mDiv = da+db; totalDiv += mDiv;
-        var totChg = chg_a+chg_b;
+
+        // 配息（獨立，不動本金）
+        var da = capital * r.a_div / r.a_nav;
+        var db = capital * r.b_div / r.b_nav;
+        var mDiv = da + db;
+        totalDiv += mDiv;
+
+        // 本金漲跌：依下月NAV vs 本月NAV，各持約2週 → 取^0.5
+        var pr_a = next ? Math.pow(next.a_nav / r.a_nav, 0.5) : 1.0;
+        var pr_b = next ? Math.pow(next.b_nav / r.b_nav, 0.5) : 1.0;
+        var newCap = capital * pr_a * pr_b;
+        var capChg = newCap - capital;
+
+        // 顯示：NAV月變動%
+        var nc_a = next ? ((next.a_nav/r.a_nav-1)*100).toFixed(1) : '0.0';
+        var nc_b = next ? ((next.b_nav/r.b_nav-1)*100).toFixed(1) : '0.0';
+        var ca_col = parseFloat(nc_a)>=0?'#16a34a':'#dc2626';
+        var cb_col = parseFloat(nc_b)>=0?'#16a34a':'#dc2626';
+
+        capital = newCap;
+
         tableRows += '<tr style="'+bg+'">'
           +'<td style="padding:4px 5px;font-weight:700;color:#4338ca;font-size:11px;white-space:nowrap">'+r.month+'</td>'
           +'<td style="padding:4px 5px;font-size:10px">'
-            +'<span style="color:#7c3aed;font-weight:700">安聯</span> +'+fmt(da)
-            +'<span style="font-size:9px;color:'+(chg_a>=0?'#16a34a':'#dc2626')+'"> '+(chg_a>=0?'▲':'▼')+fmt(Math.abs(chg_a))+'</span>'
-            +'　<span style="color:#dc2626;font-weight:700">聯博</span> +'+fmt(db)
-            +'<span style="font-size:9px;color:'+(chg_b>=0?'#16a34a':'#dc2626')+'"> '+(chg_b>=0?'▲':'▼')+fmt(Math.abs(chg_b))+'</span>'
+            +'<span style="color:#7c3aed;font-weight:700">安聯</span>'
+            +' 配息+'+fmt(da)
+            +'<span style="font-size:9px;color:'+ca_col+'"> NAV'+(parseFloat(nc_a)>=0?'+':'')+nc_a+'%</span>'
+            +'　<span style="color:#dc2626;font-weight:700">聯博</span>'
+            +' 配息+'+fmt(db)
+            +'<span style="font-size:9px;color:'+cb_col+'"> NAV'+(parseFloat(nc_b)>=0?'+':'')+nc_b+'%</span>'
           +'</td>'
           +'<td style="padding:4px 5px;text-align:right;font-weight:800;color:#16a34a">+'+fmt(mDiv)+'</td>'
-          +'<td style="padding:4px 5px;text-align:right;font-size:10px;color:'+(totChg>=0?'#16a34a':'#dc2626')+'">'+(totChg>=0?'▲':'▼')+fmt(Math.abs(totChg))+'</td>'
+          +'<td style="padding:4px 5px;text-align:right;font-size:10px;color:'+(capChg>=0?'#16a34a':'#dc2626')+'">'+(capChg>=0?'▲':'▼')+fmt(Math.abs(capChg))+'</td>'
           +'<td style="padding:4px 5px;text-align:right;font-size:10px;color:#1e40af">'+fmt(capital)+'</td>'
           +'</tr>';
       });
     } else {
-      // 理論模型（18個月，從當月起）
+      // ── 理論模型路徑（18個月）──
+      // 配息 = capital × divRate/12/100   （獨立，不動本金）
+      // 本金 = capital × (1+capRate/100)^holdFrac  （純NAV漲跌）
       var holdFrac = 1/(12*sel.length);
       var now = new Date(), y = now.getFullYear(), m = now.getMonth()+1;
       for (var mo=0; mo<18; mo++) {
@@ -1619,16 +1643,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
         var moCapStart = capital, mDiv = 0, fundDetails = '';
         sel.forEach(function(id) {
           var f = I2_FUNDS[id];
-          var capFactor = Math.pow(1+f.capRate/100, holdFrac);
-          var units = capital/(f.navUSD*USD);
-          var divInc = units*f.divUSD*USD;
-          var redeem = units*(f.navUSD*capFactor-f.divUSD)*USD;
-          var capChg = redeem-capital;
+          var divInc = capital * f.divRate/100/12;          // 配息（獨立）
+          var capChg = capital * (Math.pow(1+f.capRate/100, holdFrac)-1); // 本金漲跌
           mDiv += divInc; totalDiv += divInc;
-          fundDetails += '<span style="color:'+f.col+';font-weight:700">'+I2_NAMES[id]+'</span> +'
-            +fmt(divInc)+'<span style="font-size:9px;color:'+(capChg>=0?'#16a34a':'#dc2626')+'"> '
-            +(capChg>=0?'▲':'▼')+fmt(Math.abs(capChg))+'</span>　';
-          capital = redeem;
+          fundDetails += '<span style="color:'+f.col+';font-weight:700">'+I2_NAMES[id]+'</span>'
+            +' 配息+'+fmt(divInc)
+            +'<span style="font-size:9px;color:'+(capChg>=0?'#16a34a':'#dc2626')+'"> 本金'+(capChg>=0?'▲':'▼')+fmt(Math.abs(capChg))+'</span>　';
+          capital += capChg;
         });
         var moCapChg = capital-moCapStart;
         tableRows += '<tr style="'+bg+'">'
