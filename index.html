@@ -1411,6 +1411,130 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     </div>
   </div>
 
+  <!-- 組合推薦＋策略 -->
+  <div class="card" style="margin-bottom:10px;border:1.5px solid #8b5cf6">
+    <div class="card-head" style="background:linear-gradient(90deg,#f5f3ff,#eff6ff)">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px">
+        <div>
+          <div class="card-title" style="color:#5b21b6">🎯 輪轉組合推薦＋操作策略</div>
+          <div style="font-size:9px;color:#7c3aed;margin-top:2px">選擇組合 → 自動套用基金 → 查看SOP → 執行回測</div>
+        </div>
+        <div id="combo-sel-badge" style="font-size:9px;font-weight:700;color:#5b21b6;background:#ede9fe;padding:2px 10px;border-radius:12px;white-space:nowrap">未選擇組合</div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="combo-grid"></div>
+      <div id="combo-sop-wrap" style="display:none;margin-top:10px;border-top:1px solid #e5e7eb;padding-top:10px">
+        <div id="combo-sop-content"></div>
+        <div style="text-align:center;margin-top:10px">
+          <button onclick="(function(){if(window.runDynBT){var bd=document.getElementById('i2-bt-body');if(bd)bd.style.display='block';window.runDynBT();setTimeout(function(){var el=document.getElementById('dynbt-kpi');if(el)el.scrollIntoView({behavior:'smooth'});},350);}})();return false"
+            style="font-size:11px;font-weight:700;color:white;background:#4338ca;border:none;border-radius:8px;padding:6px 22px;cursor:pointer">▶ 依此組合執行回測</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    var COMBOS=[
+      {id:'jpm-aling-pima2',title:'三檔均衡首選',emoji:'🏆',funds:['jpm','aling','pima2'],
+       divAvg:'9.7',capAvg:'-1.3',spacing:'9 / 15 / 28 日',
+       desc:'三週均勻配息，週期分散最完整，本金波動最低，最適合長期穩健領息',
+       color:'#7c3aed',bg:'#f5f3ff',badge:'#ede9fe',rec:true},
+      {id:'jpm-pima2',title:'最穩定雙檔',emoji:'💎',funds:['jpm','pima2'],
+       divAvg:'10.0',capAvg:'-1.0',spacing:'9 / 28 日（上下旬）',
+       desc:'本金跌幅預估最小的雙檔組合，保守型優先；配息間距達19天，操作寬裕',
+       color:'#0369a1',bg:'#eff6ff',badge:'#dbeafe',rec:false},
+      {id:'aling-pima2',title:'TLZF9×PIMA2',emoji:'🔄',funds:['aling','pima2'],
+       divAvg:'9.0',capAvg:'-1.5',spacing:'15 / 28 日（中下旬）',
+       desc:'本站5年回測組合，有 MoneyDJ 實際NAV數據支撐，可對比圖表驗證',
+       color:'#059669',bg:'#f0fdf4',badge:'#d1fae5',rec:false},
+      {id:'aling-ab',title:'高息雙檔',emoji:'💰',funds:['aling','ab'],
+       divAvg:'11.3',capAvg:'-2.0',spacing:'15 / 29 日（中下旬）',
+       desc:'年化配息率最高，適合積極追求現金流；本金波動略大，需留意NAV趨勢',
+       color:'#dc2626',bg:'#fff1f2',badge:'#fee2e2',rec:false}
+    ];
+    var FALLBACK_NAMES={jpm:'摩根多重',aling:'安聯AMg7',pima2:'品浩平衡',ab:'聯博AP',mg:'M&G入息',blk:'貝萊德環球',brwt:'貝萊德科技'};
+    var FALLBACK_COLORS={jpm:'#d97706',aling:'#7c3aed',pima2:'#059669',ab:'#dc2626',mg:'#0369a1',blk:'#6366f1',brwt:'#0ea5e9'};
+    var FALLBACK_DAYS={jpm:9,aling:15,pima2:28,ab:29,mg:19,blk:30,brwt:30};
+    function gName(id){return(window.I2_NAMES&&window.I2_NAMES[id])||FALLBACK_NAMES[id]||id;}
+    function gColor(id){return(window.I2_FUNDS&&window.I2_FUNDS[id]&&window.I2_FUNDS[id].col)||FALLBACK_COLORS[id]||'#888';}
+    function gDay(id){return(window.I2_FUNDS&&window.I2_FUNDS[id]&&window.I2_FUNDS[id].payDay)||FALLBACK_DAYS[id]||0;}
+    function renderCombos(){
+      var grid=document.getElementById('combo-grid');
+      if(!grid)return;
+      grid.innerHTML=COMBOS.map(function(c){
+        return '<div style="border:2px solid '+c.color+';border-radius:10px;padding:9px;background:'+c.bg+'" id="combo-card-'+c.id+'">'
+          +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px">'
+          +'<div style="font-size:10px;font-weight:800;color:'+c.color+'">'+c.emoji+' '+c.title+'</div>'
+          +(c.rec?'<span style="font-size:7px;background:'+c.color+';color:#fff;padding:1px 5px;border-radius:8px;white-space:nowrap">推薦</span>':'')
+          +'</div>'
+          +'<div style="font-size:10px;font-weight:700;color:#1a1a1a;margin-bottom:5px">'+c.funds.map(gName).join(' × ')+'</div>'
+          +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;font-size:9px;margin-bottom:5px">'
+          +'<div style="background:'+c.badge+';border-radius:5px;padding:3px 6px"><div style="color:#6b7280">年均配息</div><div style="font-weight:800;color:'+c.color+'">~'+c.divAvg+'%</div></div>'
+          +'<div style="background:'+c.badge+';border-radius:5px;padding:3px 6px"><div style="color:#6b7280">本金±</div><div style="font-weight:800;color:'+(parseFloat(c.capAvg)>=0?'#059669':'#dc2626')+'">'+c.capAvg+'%/年</div></div>'
+          +'</div>'
+          +'<div style="font-size:8px;color:#6b7280;margin-bottom:5px">📅 '+c.spacing+'</div>'
+          +'<div style="font-size:8px;color:#374151;line-height:1.5;margin-bottom:8px">'+c.desc+'</div>'
+          +'<button onclick="window._applyCombo(\''+c.id+'\')" style="font-size:9px;font-weight:700;color:white;background:'+c.color+';border:none;border-radius:6px;padding:4px 0;cursor:pointer;width:100%">✓ 套用此組合</button>'
+          +'</div>';
+      }).join('');
+    }
+    function getSOP(comboId){
+      var combo=COMBOS.filter(function(c){return c.id===comboId;})[0];
+      if(!combo)return'';
+      var fds=combo.funds.map(function(id){return{id:id,name:gName(id),day:gDay(id),color:gColor(id)};});
+      fds.sort(function(a,b){return a.day-b.day;});
+      var stepsHtml=fds.map(function(fd,i){
+        var next=fds[(i+1)%fds.length];
+        return '<div style="display:flex;gap:8px;margin-bottom:8px">'
+          +'<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">'
+          +'<div style="width:26px;height:26px;border-radius:50%;background:'+fd.color+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">'+(i+1)+'</div>'
+          +(i<fds.length-1?'<div style="width:2px;min-height:20px;flex:1;background:#e5e7eb;margin:3px 0"></div>':'')
+          +'</div>'
+          +'<div style="flex:1;padding-bottom:4px">'
+          +'<div style="font-size:10px;font-weight:800;color:'+fd.color+';margin-bottom:2px">每月 '+fd.day+' 日 ─ <span style="font-weight:700">'+fd.name+'</span> 配息</div>'
+          +'<div style="font-size:9px;color:#374151;line-height:1.9">'
+          +'<b>T+0</b>：除息日，配息單位數到帳<br>'
+          +'<b>T+2</b>（'+fd.day+'日後2天）：確認配息現金入帳<br>'
+          +'<b>T+3</b>：贖回 <span style="color:'+fd.color+';font-weight:700">'+fd.name+'</span> → 當日申購 <span style="color:'+next.color+';font-weight:700">'+next.name+'</span>'
+          +'</div></div></div>';
+      }).join('');
+      return '<div style="font-size:11px;font-weight:800;color:#5b21b6;margin-bottom:10px">'+combo.emoji+' '+combo.title+' 操作SOP（每月循環）</div>'
+        +stepsHtml
+        +'<div style="background:#fef9c3;border:1px solid #fde047;border-radius:8px;padding:9px;margin-top:2px;font-size:9px;color:#713f12;line-height:1.9">'
+        +'<b>🔑 關鍵守則</b><br>'
+        +'① 等 <b>T+2</b> 配息現金入帳後，<b>T+3</b> 才執行轉換（避免配息被沖銷）<br>'
+        +'② <b>避免週五</b>下單 ─ T+3 落週一，空窗兩天本金曝險<br>'
+        +'③ 本金跌超 <b>5%</b> 時暫停輪轉，持有等待回穩<br>'
+        +'④ <b>先申購新基金，確認成功後再贖回舊基金</b>（避免空倉）<br>'
+        +'⑤ 每筆轉換完成後，記錄入帳金額以對比下月是否有異常'
+        +'</div>';
+    }
+    window._applyCombo=function(comboId){
+      var combo=COMBOS.filter(function(c){return c.id===comboId;})[0];
+      if(!combo)return;
+      COMBOS.forEach(function(c){
+        var el=document.getElementById('combo-card-'+c.id);
+        if(el){el.style.boxShadow=c.id===comboId?'0 0 0 3px '+combo.color:'none';el.style.opacity=c.id===comboId?'1':'0.55';}
+      });
+      var badge=document.getElementById('combo-sel-badge');
+      if(badge){badge.textContent=combo.emoji+' '+combo.title;badge.style.background=combo.bg;badge.style.color=combo.color;badge.style.border='1px solid '+combo.color;}
+      if(window.I2_IDS&&window._i2ApplyChk){
+        window.I2_IDS.forEach(function(id){
+          var chk=combo.funds.indexOf(id)>=0;
+          if(window._i2Chk)window._i2Chk[id]=chk;
+          window._i2ApplyChk(id,chk);
+        });
+        if(window.calcIncome2)window.calcIncome2();
+      }
+      var w=document.getElementById('combo-sop-wrap'),cc=document.getElementById('combo-sop-content');
+      if(w&&cc){cc.innerHTML=getSOP(comboId);w.style.display='block';}
+    };
+    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',renderCombos);}
+    else{setTimeout(renderCombos,50);}
+  })();
+  </script>
+
   <!-- 逐月輪轉模擬 → 歷史回測＋預測 -->
   <div class="card" style="margin-bottom:10px;border:1.5px solid #2563eb">
     <div class="card-head" style="background:linear-gradient(90deg,#eff6ff,#f5f3ff);padding-bottom:10px">
