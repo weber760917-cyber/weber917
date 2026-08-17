@@ -1521,10 +1521,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       var badge=document.getElementById('combo-sel-badge');
       if(badge){badge.textContent=combo.emoji+' '+combo.title;badge.style.background=combo.bg;badge.style.color=combo.color;badge.style.border='1px solid '+combo.color;}
       if(window.I2_IDS&&window._i2ApplyChk){
+        var eachPct=Math.floor(100/combo.funds.length);
         window.I2_IDS.forEach(function(id){
           var chk=combo.funds.indexOf(id)>=0;
           if(window._i2Chk)window._i2Chk[id]=chk;
           window._i2ApplyChk(id,chk);
+          // 同步更新配置滑桿：選中的基金平分100%，未選中歸零
+          var pct=chk?eachPct:0;
+          var sl=document.getElementById('i2pct-'+id);
+          var ll=document.getElementById('i2pctlbl-'+id);
+          if(sl)sl.value=pct;
+          if(ll)ll.textContent=pct+'%';
         });
         if(window.calcIncome2)window.calcIncome2();
       }
