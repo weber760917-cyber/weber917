@@ -1553,8 +1553,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
     </div>
   </div>
   <script>
-  // MoneyDJ實際除息數據（安聯AMg7 + 聯博AP，2025/01–2026/06）
+  // 2024：依市場走勢估算（est:1）；2025/01–2026/06：MoneyDJ 實際除息數據
   window.BT_NAV_RAW = [
+    {month:'2024/01',a_nav:9.10, a_div:0.069,b_nav:84.50,b_div:0.8322,est:1},
+    {month:'2024/02',a_nav:9.18, a_div:0.069,b_nav:84.20,b_div:0.8322,est:1},
+    {month:'2024/03',a_nav:9.25, a_div:0.069,b_nav:83.50,b_div:0.8322,est:1},
+    {month:'2024/04',a_nav:9.08, a_div:0.069,b_nav:82.30,b_div:0.8322,est:1},
+    {month:'2024/05',a_nav:9.20, a_div:0.069,b_nav:83.80,b_div:0.8322,est:1},
+    {month:'2024/06',a_nav:9.28, a_div:0.069,b_nav:84.60,b_div:0.8322,est:1},
+    {month:'2024/07',a_nav:9.35, a_div:0.069,b_nav:85.80,b_div:0.8322,est:1},
+    {month:'2024/08',a_nav:9.30, a_div:0.069,b_nav:86.20,b_div:0.8322,est:1},
+    {month:'2024/09',a_nav:9.22, a_div:0.069,b_nav:85.50,b_div:0.8322,est:1},
+    {month:'2024/10',a_nav:9.05, a_div:0.069,b_nav:83.50,b_div:0.8322,est:1},
+    {month:'2024/11',a_nav:8.98, a_div:0.069,b_nav:82.80,b_div:0.8322,est:1},
+    {month:'2024/12',a_nav:8.78, a_div:0.069,b_nav:82.00,b_div:0.8322,est:1},
     {month:'2025/01',a_nav:8.643,a_div:0.069,b_nav:81.19,b_div:0.8322},
     {month:'2025/02',a_nav:8.856,a_div:0.069,b_nav:75.199,b_div:0.8322},
     {month:'2025/03',a_nav:8.347,a_div:0.069,b_nav:69.689,b_div:0.8322},
@@ -1619,7 +1631,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
         capital = newCap;
 
         tableRows += '<tr style="'+bg+'">'
-          +'<td style="padding:4px 5px;font-weight:700;color:#4338ca;font-size:11px;white-space:nowrap">'+r.month+'</td>'
+          +'<td style="padding:4px 5px;font-weight:700;color:#4338ca;font-size:11px;white-space:nowrap">'+r.month+(r.est?' <span style="font-size:8px;background:#fef9c3;color:#92400e;padding:0 3px;border-radius:3px">估</span>':'')+'</td>'
           +'<td style="padding:4px 5px;font-size:10px">'
             +'<span style="color:#7c3aed;font-weight:700">安聯</span>'
             +' 配息+'+fmt(da)
@@ -1638,8 +1650,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       // 配息 = capital × divRate/12/100   （獨立，不動本金）
       // 本金 = capital × (1+capRate/100)^holdFrac  （純NAV漲跌）
       var holdFrac = 1/(12*sel.length);
-      var now = new Date(), y = now.getFullYear(), m = now.getMonth()+1;
-      for (var mo=0; mo<18; mo++) {
+      var _now = new Date();
+      var totalMoT = (_now.getFullYear()-2024)*12+(_now.getMonth()+1);
+      var y = 2024, m = 1;
+      for (var mo=0; mo<totalMoT; mo++) {
         var ym = y+'/'+('0'+m).slice(-2);
         var bg = mo%2===0 ? '' : 'background:#f8f9ff';
         var moCapStart = capital, mDiv = 0, fundDetails = '';
@@ -1665,7 +1679,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       }
     }
 
-    var nMo = useReal ? window.BT_NAV_RAW.length : 18;
+    var nMo = useReal ? window.BT_NAV_RAW.length : (function(){var n=new Date();return(n.getFullYear()-2024)*12+(n.getMonth()+1);})();
     var avgMo = totalDiv/nMo;
     var capChgTot = capital-P;
     var capSign = capChgTot>=0?'+':'';
@@ -1697,8 +1711,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       +'</tr></thead><tbody>'+tableRows+'</tbody></table>';
 
     document.getElementById('dynbt-note').innerHTML = useReal
-      ? '✅ MoneyDJ 實際除息數據（2025/01–2026/06）｜假設無T+3空窗、匯率32固定｜歷史不代表未來績效。'
-      : '⚠️ 理論模型（18個月）：以各基金目前年化配息率與淨值漲跌率估算，非真實歷史數據。';
+      ? '✅ 2025/01–2026/06：MoneyDJ 實際除息數據｜2024/01–12：依市場走勢估算（表格標示「估」）｜假設無T+3空窗、匯率32固定。'
+      : '⚠️ 理論模型（2024/01 至今）：以各基金年化配息率與本金漲跌率估算，非真實歷史數據。';
 
     document.getElementById('dynbt-sub').textContent =
       (useReal ? '✅ MoneyDJ 實際數據　' : '📐 理論模型　')
