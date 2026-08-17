@@ -1437,19 +1437,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
   (function(){
     var COMBOS=[
       {id:'jpm-aling-pima2',title:'三檔均衡首選',emoji:'🏆',funds:['jpm','aling','pima2'],
-       divAvg:'9.7',capAvg:'-1.3',spacing:'9 / 15 / 28 日',
+       divAvg:'29.0',capAvg:'-1.3',spacing:'9 / 15 / 28 日',
        desc:'三週均勻配息，週期分散最完整，本金波動最低，最適合長期穩健領息',
        color:'#7c3aed',bg:'#f5f3ff',badge:'#ede9fe',rec:true},
       {id:'jpm-pima2',title:'最穩定雙檔',emoji:'💎',funds:['jpm','pima2'],
-       divAvg:'10.0',capAvg:'-1.0',spacing:'9 / 28 日（上下旬）',
+       divAvg:'19.9',capAvg:'-1.0',spacing:'9 / 28 日（上下旬）',
        desc:'本金跌幅預估最小的雙檔組合，保守型優先；配息間距達19天，操作寬裕',
        color:'#0369a1',bg:'#eff6ff',badge:'#dbeafe',rec:false},
       {id:'aling-pima2',title:'TLZF9×PIMA2',emoji:'🔄',funds:['aling','pima2'],
-       divAvg:'9.0',capAvg:'-1.5',spacing:'15 / 28 日（中下旬）',
+       divAvg:'18.0',capAvg:'-1.5',spacing:'15 / 28 日（中下旬）',
        desc:'本站5年回測組合，有 MoneyDJ 實際NAV數據支撐，可對比圖表驗證',
        color:'#059669',bg:'#f0fdf4',badge:'#d1fae5',rec:false},
       {id:'aling-ab',title:'高息雙檔',emoji:'💰',funds:['aling','ab'],
-       divAvg:'11.3',capAvg:'-2.0',spacing:'15 / 29 日（中下旬）',
+       divAvg:'22.6',capAvg:'-2.0',spacing:'15 / 29 日（中下旬）',
        desc:'年化配息率最高，適合積極追求現金流；本金波動略大，需留意NAV趨勢',
        color:'#dc2626',bg:'#fff1f2',badge:'#fee2e2',rec:false}
     ];
@@ -1470,7 +1470,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
           +'</div>'
           +'<div style="font-size:10px;font-weight:700;color:#1a1a1a;margin-bottom:5px">'+c.funds.map(gName).join(' × ')+'</div>'
           +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;font-size:9px;margin-bottom:5px">'
-          +'<div style="background:'+c.badge+';border-radius:5px;padding:3px 6px"><div style="color:#6b7280">年均配息</div><div style="font-weight:800;color:'+c.color+'">~'+c.divAvg+'%</div></div>'
+          +'<div style="background:'+c.badge+';border-radius:5px;padding:3px 6px"><div style="color:#6b7280">輪轉年化配息</div><div style="font-weight:800;color:'+c.color+'">~'+c.divAvg+'%</div></div>'
           +'<div style="background:'+c.badge+';border-radius:5px;padding:3px 6px"><div style="color:#6b7280">本金±</div><div style="font-weight:800;color:'+(parseFloat(c.capAvg)>=0?'#059669':'#dc2626')+'">'+c.capAvg+'%/年</div></div>'
           +'</div>'
           +'<div style="font-size:8px;color:#6b7280;margin-bottom:5px">📅 '+c.spacing+'</div>'
