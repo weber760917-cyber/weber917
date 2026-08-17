@@ -1768,33 +1768,37 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
           <input type="radio" name="i2mode" value="rot" onchange="calcIncome2()"> 🔄 輪轉提領
         </label>
       </div>
-      <!-- 情境選擇 -->
-      <div style="display:flex;gap:6px;margin-bottom:8px">
-        <button class="i2-sc-btn" data-s="opt" onclick="setI2Scene('opt')"
-          style="flex:1;padding:7px 4px;border-radius:9px;border:1.5px solid #16a34a;background:#f0fdf4;font-size:11px;font-weight:700;color:#166534;cursor:pointer">📈 樂觀</button>
-        <button class="i2-sc-btn" data-s="neu" onclick="setI2Scene('neu')"
-          style="flex:1;padding:7px 4px;border-radius:9px;border:1.5px solid #e2e8f0;background:var(--bg);font-size:11px;font-weight:700;color:#374151;cursor:pointer">📊 中立</button>
-        <button class="i2-sc-btn" data-s="pes" onclick="setI2Scene('pes')"
-          style="flex:1;padding:7px 4px;border-radius:9px;border:1.5px solid #e2e8f0;background:var(--bg);font-size:11px;font-weight:700;color:#374151;cursor:pointer">📉 悲觀</button>
-      </div>
-      <div id="i2-sc-desc" style="font-size:10px;background:#f0fdf4;border-radius:7px;padding:7px 10px;color:#166534;margin-bottom:8px;line-height:1.5">
-        📈 樂觀：市場正常運行，配息依歷史水準維持，資本侵蝕依模型估算。
+      <div style="font-size:9px;background:#f0fdf4;border-radius:7px;padding:7px 10px;color:#166534;margin-bottom:8px;line-height:1.7">
+        📈 <b>樂觀</b>：依 2024–2026 歷史回測水準，配息率維持現況，本金依各基金 capRate 估算<br>
+        📊 <b>中立</b>：配息率 ×0.85（預留降配空間），本金侵蝕加速 ×2.0（保守估算）
       </div>
       <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
-        <div style="background:var(--border);display:grid;grid-template-columns:60px 1fr 1fr 1fr 72px;padding:8px 10px;font-size:11px;font-weight:700;text-align:center">
-          <div></div><div>帳戶價值</div><div>已領配息</div><div>合計</div><div>年化IRR</div>
+        <div style="background:var(--border);display:grid;grid-template-columns:72px 1fr 1fr 1fr 60px;padding:7px 10px;font-size:10px;font-weight:700;text-align:center">
+          <div style="text-align:left">年度・情境</div><div>帳戶價值</div><div>累積配息</div><div>合計資產</div><div>IRR</div>
         </div>
-        <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 72px;padding:10px;font-size:12px;border-bottom:1px solid var(--border);text-align:center">
-          <div style="font-weight:800;color:#7c3aed;text-align:left">📌 5年</div>
-          <div id="inc2-acc-5" style="font-weight:700">—</div><div id="inc2-div-5" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-5" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2-irr-5" style="font-weight:800;color:#dc2626">—</div>
+        <div style="display:grid;grid-template-columns:72px 1fr 1fr 1fr 60px;padding:8px 10px;font-size:11px;border-bottom:1px solid #d1fae5;text-align:center;background:#f0fdf4">
+          <div style="font-weight:800;text-align:left;line-height:1.5">5年<br><span style="font-size:8px;background:#16a34a;color:#fff;border-radius:4px;padding:1px 5px">📈 樂觀</span></div>
+          <div id="inc2-acc-5" style="font-weight:700">—</div><div id="inc2-div-5" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-5" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2-irr-5" style="font-weight:800">—</div>
         </div>
-        <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 72px;padding:10px;font-size:12px;border-bottom:1px solid var(--border);text-align:center;background:var(--bg)">
-          <div style="font-weight:800;color:#7c3aed;text-align:left">📌 10年</div>
-          <div id="inc2-acc-10" style="font-weight:700">—</div><div id="inc2-div-10" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-10" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2-irr-10" style="font-weight:800;color:#dc2626">—</div>
+        <div style="display:grid;grid-template-columns:72px 1fr 1fr 1fr 60px;padding:8px 10px;font-size:11px;border-bottom:1px solid #fde68a;text-align:center;background:#fffbeb">
+          <div style="font-weight:800;text-align:left;line-height:1.5">5年<br><span style="font-size:8px;background:#d97706;color:#fff;border-radius:4px;padding:1px 5px">📊 中立</span></div>
+          <div id="inc2n-acc-5" style="font-weight:700">—</div><div id="inc2n-div-5" style="color:#d97706;font-weight:700">—</div><div id="inc2n-tot-5" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2n-irr-5" style="font-weight:800">—</div>
         </div>
-        <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr 72px;padding:10px;font-size:12px;text-align:center">
-          <div style="font-weight:800;color:#7c3aed;text-align:left">📌 20年</div>
-          <div id="inc2-acc-20" style="font-weight:700">—</div><div id="inc2-div-20" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-20" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2-irr-20" style="font-weight:800;color:#dc2626">—</div>
+        <div style="display:grid;grid-template-columns:72px 1fr 1fr 1fr 60px;padding:8px 10px;font-size:11px;border-bottom:1px solid #d1fae5;text-align:center;background:#f0fdf4">
+          <div style="font-weight:800;text-align:left;line-height:1.5">10年<br><span style="font-size:8px;background:#16a34a;color:#fff;border-radius:4px;padding:1px 5px">📈 樂觀</span></div>
+          <div id="inc2-acc-10" style="font-weight:700">—</div><div id="inc2-div-10" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-10" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2-irr-10" style="font-weight:800">—</div>
+        </div>
+        <div style="display:grid;grid-template-columns:72px 1fr 1fr 1fr 60px;padding:8px 10px;font-size:11px;border-bottom:1px solid #fde68a;text-align:center;background:#fffbeb">
+          <div style="font-weight:800;text-align:left;line-height:1.5">10年<br><span style="font-size:8px;background:#d97706;color:#fff;border-radius:4px;padding:1px 5px">📊 中立</span></div>
+          <div id="inc2n-acc-10" style="font-weight:700">—</div><div id="inc2n-div-10" style="color:#d97706;font-weight:700">—</div><div id="inc2n-tot-10" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2n-irr-10" style="font-weight:800">—</div>
+        </div>
+        <div style="display:grid;grid-template-columns:72px 1fr 1fr 1fr 60px;padding:8px 10px;font-size:11px;border-bottom:1px solid #d1fae5;text-align:center;background:#f0fdf4">
+          <div style="font-weight:800;text-align:left;line-height:1.5">20年<br><span style="font-size:8px;background:#16a34a;color:#fff;border-radius:4px;padding:1px 5px">📈 樂觀</span></div>
+          <div id="inc2-acc-20" style="font-weight:700">—</div><div id="inc2-div-20" style="color:#16a34a;font-weight:700">—</div><div id="inc2-tot-20" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2-irr-20" style="font-weight:800">—</div>
+        </div>
+        <div style="display:grid;grid-template-columns:72px 1fr 1fr 1fr 60px;padding:8px 10px;font-size:11px;text-align:center;background:#fffbeb">
+          <div style="font-weight:800;text-align:left;line-height:1.5">20年<br><span style="font-size:8px;background:#d97706;color:#fff;border-radius:4px;padding:1px 5px">📊 中立</span></div>
+          <div id="inc2n-acc-20" style="font-weight:700">—</div><div id="inc2n-div-20" style="color:#d97706;font-weight:700">—</div><div id="inc2n-tot-20" style="font-weight:800;color:#1d4ed8">—</div><div id="inc2n-irr-20" style="font-weight:800">—</div>
         </div>
       </div>
       <div id="i2-warn" style="background:#fef3c7;border-radius:8px;padding:10px 12px;margin-top:10px;font-size:11px;color:#92400e">
@@ -5694,49 +5698,57 @@ function calcIncome2() {
   var isRotMode = (mode === 'rot');
   var fixedMonthlyDiv = rotP * effDivRate / 100 / 12; // 標準模式：固定
 
-  [5,10,20].forEach(function(yr) {
-    var n = yr * 12;
-    var cap = rotP, cumDiv = 0;
-    var annDivs = new Array(yr).fill(0);
-    for (var m = 1; m <= n; m++) {
-      if (m === 1 && sc.shock !== 0) cap *= (1 + sc.shock); // 悲觀：淨值一次性下跌
-      if (isRotMode) {
-        // 輪轉：配息 = 當前本金 × 配息率（本金因贖回NAV跌而縮減）
-        var mDiv = cap * effDivRate / 100 / 12;
-        cumDiv += mDiv;
-        annDivs[Math.floor((m-1)/12)] += mDiv;
-      } else {
-        // 標準持有：配息固定，不隨NAV變動
-        cumDiv += fixedMonthlyDiv;
-        annDivs[Math.floor((m-1)/12)] += fixedMonthlyDiv;
+  // 樂觀：依歷史回測配息水準（divMult=1.0）
+  // 中立：配息率×0.85（降配空間），本金侵蝕×2.0
+  [{pfx:'',  divMult:1.0, capMult:1.0, shock:0},
+   {pfx:'n', divMult:0.85,capMult:2.0, shock:0}
+  ].forEach(function(sv) {
+    var adjDivR = effDivRate * sv.divMult;
+    var adjCapR = effCapRate * sv.capMult;
+    var mcf = Math.pow(1 + adjCapR/100, 1/12);
+    var fixedMo = rotP * adjDivR / 100 / 12;
+    [5,10,20].forEach(function(yr) {
+      var n = yr * 12;
+      var cap = rotP, cumDiv = 0;
+      var annDivs = new Array(yr).fill(0);
+      for (var m = 1; m <= n; m++) {
+        if (m === 1 && sv.shock !== 0) cap *= (1 + sv.shock);
+        if (isRotMode) {
+          var mDiv = cap * adjDivR / 100 / 12;
+          cumDiv += mDiv;
+          annDivs[Math.floor((m-1)/12)] += mDiv;
+        } else {
+          cumDiv += fixedMo;
+          annDivs[Math.floor((m-1)/12)] += fixedMo;
+        }
+        cap *= mcf;
       }
-      cap *= monthlyCapFactor; // 帳戶淨值持續侵蝕
-    }
-    var terminal = cap;
-    var r = 0.05;
-    for (var i = 0; i < 200; i++) {
-      var f = -rotP, df = 0;
-      for (var t = 0; t < yr; t++) {
-        var v = Math.pow(1+r, t+1);
-        f  += annDivs[t] / v;
-        df -= (t+1) * annDivs[t] / (v * (1+r));
+      var terminal = cap;
+      var r = 0.05;
+      for (var i = 0; i < 200; i++) {
+        var f = -rotP, df = 0;
+        for (var t = 0; t < yr; t++) {
+          var v = Math.pow(1+r, t+1);
+          f  += annDivs[t] / v;
+          df -= (t+1) * annDivs[t] / (v * (1+r));
+        }
+        var vn = Math.pow(1+r, yr);
+        f  += terminal / vn;
+        df -= yr * terminal / (vn * (1+r));
+        if (Math.abs(df) < 1e-15) break;
+        var delta = f / df;
+        r -= delta;
+        if (Math.abs(delta) < 1e-10) break;
+        if (r < -0.5) r = 0.01;
       }
-      var vn = Math.pow(1+r, yr);
-      f  += terminal / vn;
-      df -= yr * terminal / (vn * (1+r));
-      if (Math.abs(df) < 1e-15) break;
-      var delta = f / df;
-      r -= delta;
-      if (Math.abs(delta) < 1e-10) break;
-      if (r < -0.5) r = 0.01;
-    }
-    // IRR色彩：正高=綠，正低=橙，負=紅
-    var irrColor = r >= 0.05 ? '#16a34a' : (r >= 0 ? '#d97706' : '#dc2626');
-    $t('inc2-acc-'+yr, incFmtP(cap)+'元');
-    $t('inc2-div-'+yr, incFmtP(cumDiv)+'元');
-    $t('inc2-tot-'+yr, incFmtP(cap+cumDiv)+'元');
-    var irrEl = document.getElementById('inc2-irr-'+yr);
-    if (irrEl) { irrEl.textContent = (r*100).toFixed(2)+'%'; irrEl.style.color = irrColor; }
+      var irrColor = r >= 0.05 ? '#16a34a' : (r >= 0 ? '#d97706' : '#dc2626');
+      var p = 'inc2' + sv.pfx;
+      $t(p+'-acc-'+yr, incFmtP(cap)+'元');
+      $t(p+'-div-'+yr, incFmtP(cumDiv)+'元');
+      $t(p+'-tot-'+yr, incFmtP(cap+cumDiv)+'元');
+      var irrEl = document.getElementById(p+'-irr-'+yr);
+      if (irrEl) { irrEl.textContent = (r*100).toFixed(2)+'%'; irrEl.style.color = irrColor; }
+    });
   });
 }
 
