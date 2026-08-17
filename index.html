@@ -5410,9 +5410,25 @@ function printIncome2Report() {
 
   // 讀試算結果
   function txt(id) { var el = document.getElementById(id); return el ? el.textContent : '—'; }
+
+  // 樂觀情境
   var res5  = { acc: txt('inc2-acc-5'),  div: txt('inc2-div-5'),  tot: txt('inc2-tot-5'),  irr: txt('inc2-irr-5')  };
   var res10 = { acc: txt('inc2-acc-10'), div: txt('inc2-div-10'), tot: txt('inc2-tot-10'), irr: txt('inc2-irr-10') };
   var res20 = { acc: txt('inc2-acc-20'), div: txt('inc2-div-20'), tot: txt('inc2-tot-20'), irr: txt('inc2-irr-20') };
+
+  // 中立情境
+  var res5n  = { acc: txt('inc2n-acc-5'),  div: txt('inc2n-div-5'),  tot: txt('inc2n-tot-5'),  irr: txt('inc2n-irr-5')  };
+  var res10n = { acc: txt('inc2n-acc-10'), div: txt('inc2n-div-10'), tot: txt('inc2n-tot-10'), irr: txt('inc2n-irr-10') };
+  var res20n = { acc: txt('inc2n-acc-20'), div: txt('inc2n-div-20'), tot: txt('inc2n-tot-20'), irr: txt('inc2n-irr-20') };
+
+  // 回測結果
+  var btKpiEl  = document.getElementById('dynbt-kpi');
+  var btTblEl  = document.getElementById('dynbt-tbl');
+  var btNoteEl = document.getElementById('dynbt-note');
+  var btKpiHtml  = btKpiEl  ? btKpiEl.innerHTML  : '';
+  var btTblHtml  = btTblEl  ? btTblEl.innerHTML  : '';
+  var btNoteText = btNoteEl ? btNoteEl.textContent : '';
+  var btRan = btKpiHtml.trim() !== '';
 
   // 月收益
   var moIncome = '';
@@ -5479,6 +5495,7 @@ function printIncome2Report() {
     + 'tr:nth-child(even) td{background:#f8fafc}'
     + '@media print{body{padding:15px 20px} @page{size:A4 portrait;margin:15mm} .no-print{display:none}}'
     + '.section{margin-bottom:24px} .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}'
+    + '.opt-row td{background:#f0fdf4 !important} .neu-row td{background:#fefce8 !important}'
     + '</style></head><body>'
 
     // Header
@@ -5487,15 +5504,14 @@ function printIncome2Report() {
     + '<div style="text-align:right;font-size:11px;color:#94a3b8"><div>報告日期：'+today+'</div><div style="margin-top:2px">weber760917@gmail.com</div></div>'
     + '</div>'
 
-    // Strategy summary
+    // 一、投資策略配置
     + '<div class="section">'
     + '<h2>一、投資策略配置</h2>'
     + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">'
     + '<div style="background:#eff6ff;border-radius:9px;padding:12px"><div style="font-size:11px;color:#1e40af;font-weight:700">投入本金</div><div style="font-size:18px;font-weight:900;color:#1e3a5f;margin-top:3px">'+pTw+'萬元</div></div>'
-    + '<div style="background:#f0fdf4;border-radius:9px;padding:12px"><div style="font-size:11px;color:#15803d;font-weight:700">策略模式</div><div style="font-size:15px;font-weight:900;color:#15803d;margin-top:3px">'+(mode==='rot'?'🔄 安聯↔聯博輪轉':'📊 標準加權')+'</div></div>'
+    + '<div style="background:#f0fdf4;border-radius:9px;padding:12px"><div style="font-size:11px;color:#15803d;font-weight:700">策略模式</div><div style="font-size:15px;font-weight:900;color:#15803d;margin-top:3px">'+(mode==='rot'?'🔄 輪轉策略':'📊 標準加權')+'</div></div>'
     + '<div style="background:#fdf4ff;border-radius:9px;padding:12px"><div style="font-size:11px;color:#7e22ce;font-weight:700">選取基金</div><div style="font-size:13px;font-weight:700;color:#7e22ce;margin-top:3px">'+sel.map(function(id){return I2_NAMES[id];}).join('、')+'</div></div>'
     + '</div>'
-    // Allocation table
     + '<table><tr><th>基金</th><th>配置比例</th><th>年化配息率</th><th>每月配息/單位 (USD)</th><th>最新NAV</th></tr>'
     + sel.map(function(id){
         var f = I2_FUNDS[id];
@@ -5507,7 +5523,7 @@ function printIncome2Report() {
       }).join('')
     + '</table></div>'
 
-    // Monthly income – per fund breakdown
+    // 二、月配息試算結果
     + '<div class="section"><h2>二、月配息試算結果</h2>'
     + '<table style="margin-bottom:10px"><thead><tr>'
     + '<th>基金名稱</th><th style="text-align:right">配置比例</th>'
@@ -5539,28 +5555,59 @@ function printIncome2Report() {
     + '💡 <b>輪轉月配息邏輯：</b>本金 '+incFmtP(rotP2)+'元 × 各基金配息率加總 '+totalDivRate2.toFixed(2)+'% ÷ 12，實現每月均衡收益。</div>':'')
     + '</div>'
 
-    // Long-term table
-    + '<div class="section" style="page-break-inside:avoid"><h2>三、長期複利預估（年均平均法 IRR）</h2>'
-    + '<table><tr><th>期間</th><th>期末帳戶價值</th><th>累計已領配息</th><th>總資產合計</th><th>年化內部報酬率（IRR）</th></tr>'
-    + '<tr><td style="font-weight:800;color:#7c3aed">📌 5年</td><td>'+res5.acc+'</td><td style="color:#16a34a;font-weight:700">'+res5.div+'</td><td style="color:#1d4ed8;font-weight:800">'+res5.tot+'</td><td style="color:#dc2626;font-weight:800">'+res5.irr+'</td></tr>'
-    + '<tr><td style="font-weight:800;color:#7c3aed">📌 10年</td><td>'+res10.acc+'</td><td style="color:#16a34a;font-weight:700">'+res10.div+'</td><td style="color:#1d4ed8;font-weight:800">'+res10.tot+'</td><td style="color:#dc2626;font-weight:800">'+res10.irr+'</td></tr>'
-    + '<tr><td style="font-weight:800;color:#7c3aed">📌 20年</td><td>'+res20.acc+'</td><td style="color:#16a34a;font-weight:700">'+res20.div+'</td><td style="color:#1d4ed8;font-weight:800">'+res20.tot+'</td><td style="color:#dc2626;font-weight:800">'+res20.irr+'</td></tr>'
-    + '</table>'
-    + '<div style="background:#fef3c7;border-radius:7px;padding:8px 12px;margin-top:10px;font-size:11px;color:#92400e">⚠️ 假設：每月配息如期提領、本金依資本增值率估算。IRR使用年均平均法計算。實際績效視市場而異，僅供參考。</div>'
+    // 三、歷史回測結果
+    + '<div class="section" style="page-break-inside:avoid"><h2>三、歷史回測結果（2024/01–2026/06）</h2>'
+    + (btRan
+        ? '<div style="margin-bottom:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">' + btKpiHtml + '</div>'
+          + '<div style="overflow-x:auto">' + btTblHtml + '</div>'
+          + (btNoteText ? '<div style="background:#f0f9ff;border-radius:6px;padding:8px 12px;margin-top:8px;font-size:11px;color:#0369a1">' + btNoteText + '</div>' : '')
+        : '<div style="background:#fef3c7;border-radius:8px;padding:12px 16px;font-size:12px;color:#92400e">'
+          + '⚠️ 尚未執行回測。請回到試算頁點選「▶ 執行回測」後，再重新產生報表，以取得實際回測數據。'
+          + '</div>')
     + '</div>'
 
-    // Fund profiles
-    + '<div class="section"><h2>四、基金介紹與持股分析</h2>'
+    // 四、長期複利預估（樂觀＋中立）
+    + '<div class="section" style="page-break-inside:avoid"><h2>四、長期複利預估（5 / 10 / 20 年）</h2>'
+    + '<div style="display:flex;gap:12px;margin-bottom:10px;font-size:11px">'
+    + '<div style="background:#f0fdf4;border-radius:6px;padding:7px 12px;flex:1"><b style="color:#15803d">📈 樂觀</b>：依 2024–2026 歷史回測水準估算</div>'
+    + '<div style="background:#fefce8;border-radius:6px;padding:7px 12px;flex:1"><b style="color:#a16207">📊 中立</b>：配息率×0.85，本金侵蝕加速×2.0</div>'
+    + '</div>'
+    + '<table>'
+    + '<tr><th>期間</th><th>情境</th><th style="text-align:right">期末帳戶價值</th><th style="text-align:right">累計已領配息</th><th style="text-align:right">總資產合計</th><th style="text-align:right">IRR</th></tr>'
+    + '<tr class="opt-row"><td rowspan="2" style="font-weight:800;color:#7c3aed;vertical-align:middle;border-right:1px solid #e2e8f0">📌 5年</td><td style="color:#15803d;font-weight:700">📈 樂觀</td><td style="text-align:right">'+res5.acc+'</td><td style="text-align:right;color:#16a34a;font-weight:700">'+res5.div+'</td><td style="text-align:right;color:#1d4ed8;font-weight:800">'+res5.tot+'</td><td style="text-align:right;color:#dc2626;font-weight:800">'+res5.irr+'</td></tr>'
+    + '<tr class="neu-row"><td style="color:#a16207;font-weight:700">📊 中立</td><td style="text-align:right">'+res5n.acc+'</td><td style="text-align:right;color:#16a34a;font-weight:700">'+res5n.div+'</td><td style="text-align:right;color:#1d4ed8;font-weight:800">'+res5n.tot+'</td><td style="text-align:right;color:#dc2626;font-weight:800">'+res5n.irr+'</td></tr>'
+    + '<tr class="opt-row"><td rowspan="2" style="font-weight:800;color:#7c3aed;vertical-align:middle;border-right:1px solid #e2e8f0;border-top:2px solid #c7d2fe">📌 10年</td><td style="color:#15803d;font-weight:700">📈 樂觀</td><td style="text-align:right">'+res10.acc+'</td><td style="text-align:right;color:#16a34a;font-weight:700">'+res10.div+'</td><td style="text-align:right;color:#1d4ed8;font-weight:800">'+res10.tot+'</td><td style="text-align:right;color:#dc2626;font-weight:800">'+res10.irr+'</td></tr>'
+    + '<tr class="neu-row"><td style="color:#a16207;font-weight:700">📊 中立</td><td style="text-align:right">'+res10n.acc+'</td><td style="text-align:right;color:#16a34a;font-weight:700">'+res10n.div+'</td><td style="text-align:right;color:#1d4ed8;font-weight:800">'+res10n.tot+'</td><td style="text-align:right;color:#dc2626;font-weight:800">'+res10n.irr+'</td></tr>'
+    + '<tr class="opt-row"><td rowspan="2" style="font-weight:800;color:#7c3aed;vertical-align:middle;border-right:1px solid #e2e8f0;border-top:2px solid #c7d2fe">📌 20年</td><td style="color:#15803d;font-weight:700">📈 樂觀</td><td style="text-align:right">'+res20.acc+'</td><td style="text-align:right;color:#16a34a;font-weight:700">'+res20.div+'</td><td style="text-align:right;color:#1d4ed8;font-weight:800">'+res20.tot+'</td><td style="text-align:right;color:#dc2626;font-weight:800">'+res20.irr+'</td></tr>'
+    + '<tr class="neu-row"><td style="color:#a16207;font-weight:700">📊 中立</td><td style="text-align:right">'+res20n.acc+'</td><td style="text-align:right;color:#16a34a;font-weight:700">'+res20n.div+'</td><td style="text-align:right;color:#1d4ed8;font-weight:800">'+res20n.tot+'</td><td style="text-align:right;color:#dc2626;font-weight:800">'+res20n.irr+'</td></tr>'
+    + '</table>'
+    + '<div style="background:#fef3c7;border-radius:7px;padding:8px 12px;margin-top:10px;font-size:11px;color:#92400e">⚠️ 假設：每月配息如期提領、本金依資本增值率估算。IRR 以牛頓迭代法計算。實際績效視市場而異，僅供參考。</div>'
+    + '</div>'
+
+    // 五、投資注意事項
+    + '<div class="section" style="page-break-inside:avoid"><h2>五、投資注意事項</h2>'
+    + '<table><thead><tr><th style="width:28%">注意項目</th><th>說明</th></tr></thead><tbody>'
+    + '<tr><td style="font-weight:700;color:#dc2626">📉 NAV 波動風險</td><td>基金淨值受市場利率、信用利差及股市波動影響，可能下跌。本金價值並非保本，投資人需承擔資本損失風險。</td></tr>'
+    + '<tr><td style="font-weight:700;color:#d97706">⚠️ 降配息風險</td><td>配息率可能因市場環境改變而調降，且部分配息可能來自本金，並非保證收益。請定期確認各基金公告。</td></tr>'
+    + '<tr><td style="font-weight:700;color:#7c3aed">💱 匯率風險</td><td>境外基金以美元計價，台幣升值時換算收益縮減。匯率波動可能影響實際到手金額，建議評估匯率趨勢。</td></tr>'
+    + '<tr><td style="font-weight:700;color:#0369a1">🔄 轉換空窗期</td><td>輪轉策略中 T+0（申購）至 T+3（到位）約需 3 個工作日。建議週一～三上午執行轉換，避開 Fed 及 CPI 公布日前後。</td></tr>'
+    + '<tr><td style="font-weight:700;color:#475569">📉 本金侵蝕</td><td>持續提領配息且本金持續下跌時，帳戶價值將隨時間遞減，配息金額亦可能縮小。請定期檢視並評估是否調整。</td></tr>'
+    + '<tr><td style="font-weight:700;color:#065f46">📅 配息入帳時間</td><td>各基金配息基準日後約 3–5 個工作日到帳，實際入帳日以基金公告為準，勿以到帳日推算轉換時機。</td></tr>'
+    + '</tbody></table>'
+    + '</div>'
+
+    // 六、基金介紹與持股分析
+    + '<div class="section"><h2>六、基金介紹與持股分析</h2>'
     + fundSections
     + '</div>'
 
-    // Risk disclosure
+    // 風險揭示
     + '<div style="background:#f8fafc;border-radius:10px;padding:14px;font-size:11px;color:#64748b;page-break-inside:avoid;border:1px solid #e2e8f0">'
     + '<div style="font-weight:700;color:#334155;margin-bottom:6px">⚠️ 風險揭示與免責聲明</div>'
     + '本報告由Weber理財顧問提供，僅供參考，不構成投資建議或保證。境外基金投資涉及市場風險、匯率風險、信用風險及流動性風險。基金過去績效不代表未來表現。配息可能來自本金，配息率可能隨市場波動。投資人申購前應詳閱公開說明書，並自行評估風險承受能力。'
     + '</div>'
 
-    // Print button (hidden in print)
+    // Print button
     + '<div class="no-print" style="text-align:center;margin-top:24px">'
     + '<button onclick="window.print()" style="background:#1e3a5f;color:white;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-right:8px">🖨️ 列印 / 儲存PDF</button>'
     + '<button onclick="window.close()" style="background:#e2e8f0;color:#334155;border:none;padding:12px 24px;border-radius:8px;font-size:14px;cursor:pointer">✕ 關閉</button>'
