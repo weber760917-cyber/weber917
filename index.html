@@ -2831,12 +2831,33 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft
       </div>
       <div class="faq-body" style="display:none;font-size:14px;color:#8a9ab5;line-height:1.8;padding-bottom:14px">越早規劃，複利效果越明顯。30 歲開始和 45 歲開始，同樣的退休目標，每月需要存的金額差距可能超過兩倍。早開始，壓力就小。</div>
     </div>
-    <div class="faq-item">
+    <div class="faq-item" style="border-bottom:1px solid #f0f3f7">
       <div onclick="toggleFaq(this)" style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;cursor:pointer">
         <div style="font-size:15px;font-weight:600;color:#1a1a2e">以前買過不好的保單，可以調整嗎？</div>
         <div class="faq-arrow" style="font-size:16px;color:#8a9ab5;transition:transform 0.2s">▼</div>
       </div>
       <div class="faq-body" style="display:none;font-size:14px;color:#8a9ab5;line-height:1.8;padding-bottom:14px">可以。不一定要停損解約，很多時候透過批改、部分解約或重新配置，可以在不損失太多的情況下讓保障結構更合理。</div>
+    </div>
+    <div class="faq-item">
+      <div onclick="toggleFaq(this)" style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;cursor:pointer">
+        <div style="font-size:15px;font-weight:600;color:#1a1a2e">本金減少，配息會跟著少嗎？還是 NAV 低反而可以買更多單位？</div>
+        <div class="faq-arrow" style="font-size:16px;color:#8a9ab5;transition:transform 0.2s">▼</div>
+      </div>
+      <div class="faq-body" style="display:none;font-size:14px;color:#4b5563;line-height:1.9;padding-bottom:14px">
+        <b style="color:#1a1a2e">配息的計算基礎是「單位數 × 每單位配息」，與市值無關。</b><br><br>
+        舉例：你持有 1,000 單位，每單位配息 $0.1，本月就領 $100。就算 NAV 從 $10 跌到 $9，只要基金公司沒調降每單位配息金額，你仍領到 $100，不多也不少。<br><br>
+        <b style="color:#1a1a2e">那麼，影響什麼時候才發生？</b><br>
+        在輪轉策略中，影響發生在「贖回 A 再申購 B」那個時刻：<br>
+        ① 贖回 A 時若 NAV 已跌 → 拿回現金變少<br>
+        ② 現金少 → 申購 B 的單位數就少<br>
+        ③ 單位數少 → B 的配息才真正減少<br><br>
+        <b style="color:#1a1a2e">「NAV 低、反而能買更多單位」這個說法有前提：</b>你的現金不能縮水。在輪轉策略裡，現金來自上一檔贖回，若上一檔 NAV 已跌，現金就少了。除非 B 的 NAV 跌幅一樣大，才能中性抵消；若只有 A 跌、B 沒跌，你買到的 B 單位數就真的變少。<br><br>
+        <div style="background:#f0fdf4;border-left:3px solid #22c55e;padding:9px 12px;border-radius:0 6px 6px 0;font-size:13px;color:#166534">
+          📌 持有不動時：配息不受 NAV 漲跌影響。<br>
+          📌 輪轉後：本金縮水了，下一輪的配息就跟著減少。<br>
+          📌 基金公司主動「降配」：每單位配息金額調低，當月立即影響。
+        </div>
+      </div>
     </div>
   </div>
 </div>
